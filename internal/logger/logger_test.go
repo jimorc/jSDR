@@ -41,3 +41,22 @@ func TestLogln(t *testing.T) {
 
 	assert.Equal(t, "[Fatal]: Fatal msg\n", logBuf.String())
 }
+
+func TestDefaultLoggingLevel(t *testing.T) {
+	logBuf := new(strings.Builder)
+	l := logger.New(logBuf)
+
+	// Default level is Info, so these messages should be logged.
+	l.Log(logger.Info, "Info message 1")
+	l.Logf(logger.Info, "Info message %d", 2)
+	l.Logln(logger.Info, "Info message 3")
+
+	assert.Equal(t, "[Info]: Info message 1[Info]: Info message 2[Info]: Info message 3\n", logBuf.String())
+
+	// Default logging level is Info, so these messages should not be logged.
+	l.Log(logger.Debug, "Debug message 1")
+	l.Logf(logger.Debug, "Debug message %d", 2)
+	l.Logln(logger.Debug, "Debug message 3")
+
+	assert.Equal(t, "[Info]: Info message 1[Info]: Info message 2[Info]: Info message 3\n", logBuf.String())
+}
