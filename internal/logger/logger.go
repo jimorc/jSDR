@@ -60,6 +60,11 @@ func (l *Logger) Logln(level LoggingLevel, message string) {
 	l.Log(level, msg)
 }
 
+// SetMaxLevel sets the max logging level.
+func (l *Logger) SetMaxLevel(level LoggingLevel) {
+	l.level = level
+}
+
 func levelAsString(level LoggingLevel) string {
 	if level < Fatal || level > Debug {
 		return fmt.Sprintf("%s:%d", LevelsAsStrings[0], level)

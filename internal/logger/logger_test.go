@@ -60,3 +60,26 @@ func TestDefaultLoggingLevel(t *testing.T) {
 
 	assert.Equal(t, "[Info]: Info message 1[Info]: Info message 2[Info]: Info message 3\n", logBuf.String())
 }
+
+func TestSLoggingLevel(t *testing.T) {
+	logBuf := new(strings.Builder)
+	l := logger.New(logBuf)
+
+	// Default level is Info, so these messages should be logged.
+	l.Log(logger.Info, "Info message 1")
+	l.Logf(logger.Info, "Info message %d", 2)
+	l.Logln(logger.Info, "Info message 3")
+
+	assert.Equal(t, "[Info]: Info message 1[Info]: Info message 2[Info]: Info message 3\n", logBuf.String())
+
+	l.SetMaxLevel(logger.Error)
+
+	// Default logging level is Info, so these messages should not be logged.
+	l.Log(logger.Info, "Info message 4")
+	l.Logf(logger.Error, "Error message %d", 1)
+	l.Logln(logger.Fatal, "Fatal message")
+
+	assert.Equal(t, `[Info]: Info message 1[Info]: Info message 2[Info]: Info message 3
+[Error]: Error message 1[Fatal]: Fatal message
+`, logBuf.String())
+}
