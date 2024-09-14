@@ -5,9 +5,14 @@ import (
 	"testing"
 
 	"github.com/jimorc/jsdr/internal/logger"
+	"github.com/stretchr/testify/assert"
 )
 
-func TestNew(t *testing.T) {
+func TestLog(t *testing.T) {
 	logBuf := new(strings.Builder)
-	_ = logger.New(logBuf)
+	l := logger.New(logBuf)
+
+	l.Log(logger.Error, "An error message")
+
+	assert.Equal(t, "[Error]: An error message", logBuf.String())
 }
