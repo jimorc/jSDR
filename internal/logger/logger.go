@@ -36,6 +36,12 @@ func (l *Logger) Log(level LoggingLevel, messsage string) {
 	l.writer.WriteString(logMsg)
 }
 
+func (l *Logger) Logf(level LoggingLevel, format string, args ...any) {
+	formatted := fmt.Sprintf(format, args...)
+	msg := fmt.Sprintf("[%s]: %s", levelAsString(level), formatted)
+	l.writer.WriteString(msg)
+}
+
 func levelAsString(level LoggingLevel) string {
 	if level < Fatal || level > Debug {
 		return fmt.Sprintf("%s:%d", LevelsAsStrings[0], level)
