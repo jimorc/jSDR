@@ -36,6 +36,7 @@ func (l *Logger) Log(level LoggingLevel, messsage string) {
 	l.writer.WriteString(logMsg)
 }
 
+// Logf writes a formatted message prepended by the logging level.
 func (l *Logger) Logf(level LoggingLevel, format string, args ...any) {
 	formatted := fmt.Sprintf(format, args...)
 	msg := fmt.Sprintf("[%s]: %s", levelAsString(level), formatted)
