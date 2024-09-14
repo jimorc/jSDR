@@ -42,6 +42,13 @@ func (l *Logger) Logf(level LoggingLevel, format string, args ...any) {
 	l.writer.WriteString(msg)
 }
 
+// Logln writes a log message prepended by the logging level with a
+// line return appended.
+func (l *Logger) Logln(level LoggingLevel, message string) {
+	msg := fmt.Sprintf("%s\n", message)
+	l.Log(level, msg)
+}
+
 func levelAsString(level LoggingLevel) string {
 	if level < Fatal || level > Debug {
 		return fmt.Sprintf("%s:%d", LevelsAsStrings[0], level)

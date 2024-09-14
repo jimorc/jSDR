@@ -32,3 +32,12 @@ func TestLogf(t *testing.T) {
 
 	assert.Equal(t, "[Info]: Test msg with two variables: 4, str", logBuf.String())
 }
+
+func TestLogln(t *testing.T) {
+	logBuf := new(strings.Builder)
+	l := logger.New(logBuf)
+
+	l.Logln(logger.Fatal, "Fatal msg")
+
+	assert.Equal(t, "[Fatal]: Fatal msg\n", logBuf.String())
+}
