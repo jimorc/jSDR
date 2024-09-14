@@ -8,7 +8,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestLog(t *testing.T) {
+func TestLog_UnformattedMessages(t *testing.T) {
 	logBuf := new(strings.Builder)
 	l := logger.New(logBuf)
 
@@ -18,29 +18,20 @@ func TestLog(t *testing.T) {
 	assert.Equal(t, "[Error]: An error message", logBuf.String())
 }
 
-func TestLogf(t *testing.T) {
+func TestLog_FormattedMessages(t *testing.T) {
 	logBuf := new(strings.Builder)
 	l := logger.New(logBuf)
 
-	l.Logf(logger.Fatal, "Test message with variable: %d", 16)
+	l.Log(logger.NewLogMessageWithFormat(logger.Fatal, "Test message with variable: %d", 16))
 
 	assert.Equal(t, "[Fatal]: Test message with variable: 16", logBuf.String())
 
 	logBuf = new(strings.Builder)
 	l = logger.New(logBuf)
 
-	l.Logf(logger.Info, "Test msg with two variables: %d, %s", 4, "str")
+	l.Log(logger.NewLogMessageWithFormat(logger.Info, "Test msg with two variables: %d, %s", 4, "str"))
 
 	assert.Equal(t, "[Info]: Test msg with two variables: 4, str", logBuf.String())
-}
-
-func TestLogln(t *testing.T) {
-	logBuf := new(strings.Builder)
-	l := logger.New(logBuf)
-
-	l.Logln(logger.Fatal, "Fatal msg")
-
-	assert.Equal(t, "[Fatal]: Fatal msg\n", logBuf.String())
 }
 
 func TestDefaultLoggingLevel(t *testing.T) {
@@ -49,17 +40,14 @@ func TestDefaultLoggingLevel(t *testing.T) {
 
 	// Default level is Info, so these messages should be logged.
 	l.Log(logger.NewLogMessage(logger.Info, "Info message 1"))
-	l.Logf(logger.Info, "Info message %d", 2)
-	l.Logln(logger.Info, "Info message 3")
 
-	assert.Equal(t, "[Info]: Info message 1[Info]: Info message 2[Info]: Info message 3\n", logBuf.String())
+	assert.Equal(t, "[Info]: Info message 1", logBuf.String())
 
 	// Default logging level is Info, so these messages should not be logged.
 	l.Log(logger.NewLogMessage(logger.Debug, "Debug message 1"))
-	l.Logf(logger.Debug, "Debug message %d", 2)
-	l.Logln(logger.Debug, "Debug message 3")
+	l.Log(logger.NewLogMessageWithFormat(logger.Debug, "Debug message %d", 2))
 
-	assert.Equal(t, "[Info]: Info message 1[Info]: Info message 2[Info]: Info message 3\n", logBuf.String())
+	assert.Equal(t, "[Info]: Info message 1", logBuf.String())
 }
 
 func TestSetLoggingLevel(t *testing.T) {
@@ -68,19 +56,15 @@ func TestSetLoggingLevel(t *testing.T) {
 
 	// Default level is Info, so these messages should be logged.
 	l.Log(logger.NewLogMessage(logger.Info, "Info message 1"))
-	l.Logf(logger.Info, "Info message %d", 2)
-	l.Logln(logger.Info, "Info message 3")
 
-	assert.Equal(t, "[Info]: Info message 1[Info]: Info message 2[Info]: Info message 3\n", logBuf.String())
+	assert.Equal(t, "[Info]: Info message 1", logBuf.String())
 
 	l.SetMaxLevel(logger.Error)
 
 	// Default logging level is Info, so these messages should not be logged.
 	l.Log(logger.NewLogMessage(logger.Info, "Info message 4"))
-	l.Logf(logger.Error, "Error message %d", 1)
-	l.Logln(logger.Fatal, "Fatal message")
+	l.Log(logger.NewLogMessageWithFormat(logger.Error, "Error message %d", 1))
+	l.Log(logger.NewLogMessage(logger.Fatal, "Fatal message"))
 
-	assert.Equal(t, `[Info]: Info message 1[Info]: Info message 2[Info]: Info message 3
-[Error]: Error message 1[Fatal]: Fatal message
-`, logBuf.String())
+	assert.Equal(t, "[Info]: Info message 1[Error]: Error message 1[Fatal]: Fatal message", logBuf.String())
 }

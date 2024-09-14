@@ -36,28 +36,14 @@ func (l *Logger) Log(m *LogMessage) {
 	if l.level < m.level {
 		return
 	}
-	logMsg := fmt.Sprintf("[%s]: %s", levelAsString(m.level), m.message)
-	l.writer.WriteString(logMsg)
-}
-
-// Logf writes a formatted message prepended by the logging level.
-func (l *Logger) Logf(level LoggingLevel, format string, args ...any) {
-	if l.level < level {
-		return
+	logMsg := ""
+	if m.format == "" {
+		logMsg = m.message
+	} else {
+		logMsg = fmt.Sprintf(m.format, m.args...)
 	}
-	formatted := fmt.Sprintf(format, args...)
-	msg := fmt.Sprintf("[%s]: %s", levelAsString(level), formatted)
+	msg := fmt.Sprintf("[%s]: %s", levelAsString(m.level), logMsg)
 	l.writer.WriteString(msg)
-}
-
-// Logln writes a log message prepended by the logging level with a
-// line return appended.
-func (l *Logger) Logln(level LoggingLevel, message string) {
-	if l.level < level {
-		return
-	}
-	msg := fmt.Sprintf("%s\n", message)
-	l.Log(NewLogMessage(level, msg))
 }
 
 // SetMaxLevel sets the max logging level.
@@ -84,4 +70,9 @@ type LogMessage struct {
 // "[level]: msg"
 func NewLogMessage(level LoggingLevel, msg string) *LogMessage {
 	return &LogMessage{level: level, message: msg}
+}
+
+// NewLogMessageWithFormat creates a log message with formatting info and arguments.
+func NewLogMessageWithFormat(level LoggingLevel, fmt string, args ...any) *LogMessage {
+	return &LogMessage{level: level, format: fmt, args: args}
 }
