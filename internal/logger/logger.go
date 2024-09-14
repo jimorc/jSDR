@@ -18,6 +18,25 @@ const (
 
 var LevelsAsStrings [5]string = [5]string{"Undefined", "Fatal", "Error", "Info", "Debug"}
 
+// LogMessage contains the information needed to generate a log message.
+type LogMessage struct {
+	level   LoggingLevel
+	message string
+	format  string
+	args    []any
+}
+
+// NewLogMessage creates a log message without formatting. It is of the form:
+// "[level]: msg"
+func NewLogMessage(level LoggingLevel, msg string) *LogMessage {
+	return &LogMessage{level: level, message: msg}
+}
+
+// NewLogMessageWithFormat creates a log message with formatting info and arguments.
+func NewLogMessageWithFormat(level LoggingLevel, fmt string, args ...any) *LogMessage {
+	return &LogMessage{level: level, format: fmt, args: args}
+}
+
 // Logger is a simple logger. It provides a few functions and methods to log information
 // to any io.StringWriter.
 type Logger struct {
@@ -56,23 +75,4 @@ func levelAsString(level LoggingLevel) string {
 		return fmt.Sprintf("%s:%d", LevelsAsStrings[0], level)
 	}
 	return LevelsAsStrings[level]
-}
-
-// LogMessage contains the information needed to generate a log message.
-type LogMessage struct {
-	level   LoggingLevel
-	message string
-	format  string
-	args    []any
-}
-
-// NewLogMessage creates a log message without formatting. It is of the form:
-// "[level]: msg"
-func NewLogMessage(level LoggingLevel, msg string) *LogMessage {
-	return &LogMessage{level: level, message: msg}
-}
-
-// NewLogMessageWithFormat creates a log message with formatting info and arguments.
-func NewLogMessageWithFormat(level LoggingLevel, fmt string, args ...any) *LogMessage {
-	return &LogMessage{level: level, format: fmt, args: args}
 }
