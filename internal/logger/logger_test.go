@@ -61,7 +61,7 @@ func TestDefaultLoggingLevel(t *testing.T) {
 	assert.Equal(t, "[Info]: Info message 1[Info]: Info message 2[Info]: Info message 3\n", logBuf.String())
 }
 
-func TestSLoggingLevel(t *testing.T) {
+func TestSetLoggingLevel(t *testing.T) {
 	logBuf := new(strings.Builder)
 	l := logger.New(logBuf)
 
