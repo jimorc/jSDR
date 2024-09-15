@@ -59,6 +59,7 @@ func New(writer io.StringWriter) *Logger {
 	return l
 }
 
+// NewFileLogger creates a new Logger that logs to a file.
 func NewFileLogger(f string) (*Logger, error) {
 	file, err := os.Create(f)
 	if err != nil {
