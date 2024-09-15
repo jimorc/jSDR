@@ -2,7 +2,10 @@ module github.com/jimorc/jsdr
 
 go 1.23.1
 
-require github.com/stretchr/testify v1.9.0
+require (
+	github.com/pothosware/go-soapy-sdr v0.7.4
+	github.com/stretchr/testify v1.9.0
+)
 
 require (
 	github.com/davecgh/go-spew v1.1.1 // indirect

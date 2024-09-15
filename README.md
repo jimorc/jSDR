@@ -49,6 +49,7 @@ The following instructions assume you are starting from a freshly installed syst
 
 * sudo apt update
 * sudo apt install build-essential libgl1-mesa-dev xorg-dev
+* sudo apt install libsoapysdr-dev
 * sudo snap install go
 * sudo snap install code
 * cd ~
