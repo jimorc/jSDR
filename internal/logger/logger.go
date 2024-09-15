@@ -3,6 +3,8 @@ package logger
 import (
 	"fmt"
 	"io"
+	"os"
+	"sync"
 )
 
 type LoggingLevel uint8
@@ -40,22 +42,39 @@ func NewLogMessageWithFormat(level LoggingLevel, fmt string, args ...any) *LogMe
 // Logger is a simple logger. It provides a few functions and methods to log information
 // to any io.StringWriter.
 type Logger struct {
-	writer io.StringWriter
-	level  LoggingLevel
-	logCh  chan LogMessage
+	writer    io.StringWriter
+	file      *os.File
+	waitGroup sync.WaitGroup
+	level     LoggingLevel
+	logCh     chan LogMessage
 }
 
 // New creates a new Logger with a max logging level of Info.
 func New(writer io.StringWriter) *Logger {
 	l := &Logger{writer: writer, level: Info}
+	l.waitGroup.Add(1)
 	l.logCh = make(chan LogMessage, 100)
 	go l.outputMessages()
 	return l
 }
 
+func NewFileLogger(f string) (*Logger, error) {
+	file, err := os.Create(f)
+	if err != nil {
+		return nil, err
+	}
+	l := New(file)
+	l.file = file
+	return l, nil
+}
+
 // Close closes the logger.
 func (l *Logger) Close() {
 	close(l.logCh)
+	l.waitGroup.Wait()
+	if l.file != nil {
+		l.file.Close()
+	}
 }
 
 // Log queues a log message to be output to the logger. The message is queued only if
@@ -83,6 +102,7 @@ func (l *Logger) outputMessages() {
 	for {
 		msg, ok := <-l.logCh
 		if !ok {
+			l.waitGroup.Done()
 			return
 		}
 		logMsg := ""

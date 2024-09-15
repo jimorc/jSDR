@@ -1,6 +1,7 @@
 package logger_test
 
 import (
+	"os"
 	"strings"
 	"testing"
 	"time"
@@ -99,4 +100,27 @@ func TestSetLoggingLevel(t *testing.T) {
 	l.Close()
 
 	assert.Equal(t, "[Info]: Info message 1[Error]: Error message 1[Fatal]: Fatal message", logBuf.String())
+}
+
+func TestNewFileLogger_ValidFile(t *testing.T) {
+	logFile := "logger.log"
+	log, err := logger.NewFileLogger(logFile)
+	assert.Nil(t, err)
+	assert.NotNil(t, log)
+	defer os.Remove(logFile)
+	log.Log(logger.NewLogMessage(logger.Info, "An Info message\n"))
+	//wait for write
+	time.Sleep(10 * time.Millisecond)
+	log.Close()
+	contents, err := os.ReadFile(logFile)
+	assert.Nil(t, err)
+
+	assert.Equal(t, []byte("[Info]: An Info message\n"), contents)
+}
+
+func TestNewFileLogger_InvalidFile(t *testing.T) {
+	logFile := "/logger.log"
+	log, err := logger.NewFileLogger(logFile)
+	assert.NotNil(t, err)
+	assert.Nil(t, log)
 }
