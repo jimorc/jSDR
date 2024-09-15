@@ -19,14 +19,14 @@ func TestLog_UnformattedMessages(t *testing.T) {
 	// wait for the logging to complete
 	time.Sleep(10 * time.Millisecond)
 
-	assert.Equal(t, "[Error]: An error message\n", logBuf.String())
+	assert.Equal(t, "[Info]: Setting max logging level to 'Info'\n[Error]: An error message\n", logBuf.String())
 
 	l.Log(logger.NewLogMessage(logger.Info, "An Info message"))
 	// wait for the logging to complete
 	time.Sleep(10 * time.Millisecond)
 	l.Close()
 
-	assert.Equal(t, "[Error]: An error message\n[Info]: An Info message", logBuf.String())
+	assert.Equal(t, "[Info]: Setting max logging level to 'Info'\n[Error]: An error message\n[Info]: An Info message", logBuf.String())
 }
 
 func TestLog_FormattedMessages(t *testing.T) {
@@ -38,7 +38,7 @@ func TestLog_FormattedMessages(t *testing.T) {
 	time.Sleep(10 * time.Millisecond)
 	l.Close()
 
-	assert.Equal(t, "[Fatal]: Test message with variable: 16\n", logBuf.String())
+	assert.Equal(t, "[Info]: Setting max logging level to 'Info'\n[Fatal]: Test message with variable: 16\n", logBuf.String())
 
 	logBuf = new(strings.Builder)
 	l = logger.New(logBuf)
@@ -48,7 +48,7 @@ func TestLog_FormattedMessages(t *testing.T) {
 	time.Sleep(10 * time.Millisecond)
 	l.Close()
 
-	assert.Equal(t, "[Info]: Test msg with two variables: 4, str", logBuf.String())
+	assert.Equal(t, "[Info]: Setting max logging level to 'Info'\n[Info]: Test msg with two variables: 4, str", logBuf.String())
 }
 
 func TestDefaultLoggingLevel(t *testing.T) {
@@ -60,7 +60,7 @@ func TestDefaultLoggingLevel(t *testing.T) {
 	// wait for the logging to complete
 	time.Sleep(10 * time.Millisecond)
 
-	assert.Equal(t, "[Info]: Info message 1", logBuf.String())
+	assert.Equal(t, "[Info]: Setting max logging level to 'Info'\n[Info]: Info message 1", logBuf.String())
 
 	// Default logging level is Info, so these messages should not be logged.
 	l.Log(logger.NewLogMessage(logger.Debug, "Debug message 1"))
@@ -68,14 +68,14 @@ func TestDefaultLoggingLevel(t *testing.T) {
 
 	// wait for the logging to complete
 	time.Sleep(10 * time.Millisecond)
-	assert.Equal(t, "[Info]: Info message 1", logBuf.String())
+	assert.Equal(t, "[Info]: Setting max logging level to 'Info'\n[Info]: Info message 1", logBuf.String())
 
 	// But this message should.
 	l.Log(logger.NewLogMessage(logger.Error, "An error message"))
 	// wait for the logging to complete
 	time.Sleep(10 * time.Millisecond)
 	l.Close()
-	assert.Equal(t, "[Info]: Info message 1[Error]: An error message", logBuf.String())
+	assert.Equal(t, "[Info]: Setting max logging level to 'Info'\n[Info]: Info message 1[Error]: An error message", logBuf.String())
 }
 
 func TestSetLoggingLevel(t *testing.T) {
@@ -87,7 +87,7 @@ func TestSetLoggingLevel(t *testing.T) {
 	// wait for the logging to complete
 	time.Sleep(10 * time.Millisecond)
 
-	assert.Equal(t, "[Info]: Info message 1", logBuf.String())
+	assert.Equal(t, "[Info]: Setting max logging level to 'Info'\n[Info]: Info message 1", logBuf.String())
 
 	l.SetMaxLevel(logger.Error)
 
@@ -99,7 +99,7 @@ func TestSetLoggingLevel(t *testing.T) {
 	time.Sleep(10 * time.Millisecond)
 	l.Close()
 
-	assert.Equal(t, "[Info]: Info message 1[Error]: Error message 1[Fatal]: Fatal message", logBuf.String())
+	assert.Equal(t, "[Info]: Setting max logging level to 'Info'\n[Info]: Info message 1[Info]: Setting max logging level to 'Error'\n[Error]: Error message 1[Fatal]: Fatal message", logBuf.String())
 }
 
 func TestNewFileLogger_ValidFile(t *testing.T) {
@@ -115,7 +115,7 @@ func TestNewFileLogger_ValidFile(t *testing.T) {
 	contents, err := os.ReadFile(logFile)
 	assert.Nil(t, err)
 
-	assert.Equal(t, []byte("[Info]: An Info message\n"), contents)
+	assert.Equal(t, []byte("[Info]: Setting max logging level to 'Info'\n[Info]: An Info message\n"), contents)
 }
 
 func TestNewFileLogger_InvalidFile(t *testing.T) {

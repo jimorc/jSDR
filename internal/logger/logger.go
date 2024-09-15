@@ -51,10 +51,11 @@ type Logger struct {
 
 // New creates a new Logger with a max logging level of Info.
 func New(writer io.StringWriter) *Logger {
-	l := &Logger{writer: writer, level: Info}
+	l := &Logger{writer: writer}
 	l.waitGroup.Add(1)
 	l.logCh = make(chan LogMessage, 100)
 	go l.outputMessages()
+	l.SetMaxLevel(Info)
 	return l
 }
 
@@ -88,6 +89,8 @@ func (l *Logger) Log(m *LogMessage) {
 
 // SetMaxLevel sets the max logging level.
 func (l *Logger) SetMaxLevel(level LoggingLevel) {
+	l.level = Info
+	l.Log(NewLogMessageWithFormat(Info, "Setting max logging level to '%s'\n", levelAsString(level)))
 	l.level = level
 }
 
