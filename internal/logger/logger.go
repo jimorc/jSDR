@@ -42,27 +42,29 @@ func NewLogMessageWithFormat(level LoggingLevel, fmt string, args ...any) *LogMe
 type Logger struct {
 	writer io.StringWriter
 	level  LoggingLevel
+	logCh  chan LogMessage
 }
 
 // New creates a new Logger with a max logging level of Info.
 func New(writer io.StringWriter) *Logger {
-	return &Logger{writer: writer, level: Info}
+	l := &Logger{writer: writer, level: Info}
+	l.logCh = make(chan LogMessage, 100)
+	go l.outputMessages()
+	return l
 }
 
-// Log writes a log message prepended by the logging level. A line return is not
-// appended to the messsage.
+// Close closes the logger.
+func (l *Logger) Close() {
+	close(l.logCh)
+}
+
+// Log queues a log message to be output to the logger. The message is queued only if
+// the message level is less than the logger's maximum logging level.
 func (l *Logger) Log(m *LogMessage) {
 	if l.level < m.level {
 		return
 	}
-	logMsg := ""
-	if m.format == "" {
-		logMsg = m.message
-	} else {
-		logMsg = fmt.Sprintf(m.format, m.args...)
-	}
-	msg := fmt.Sprintf("[%s]: %s", levelAsString(m.level), logMsg)
-	l.writer.WriteString(msg)
+	l.logCh <- *m
 }
 
 // SetMaxLevel sets the max logging level.
@@ -75,4 +77,21 @@ func levelAsString(level LoggingLevel) string {
 		return fmt.Sprintf("%s:%d", LevelsAsStrings[0], level)
 	}
 	return LevelsAsStrings[level]
+}
+
+func (l *Logger) outputMessages() {
+	for {
+		msg, ok := <-l.logCh
+		if !ok {
+			return
+		}
+		logMsg := ""
+		if msg.format == "" {
+			logMsg = msg.message
+		} else {
+			logMsg = fmt.Sprintf(msg.format, msg.args...)
+		}
+		message := fmt.Sprintf("[%s]: %s", levelAsString(msg.level), logMsg)
+		l.writer.WriteString(message)
+	}
 }
