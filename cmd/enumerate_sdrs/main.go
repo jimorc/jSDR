@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"os"
+	"strings"
 
 	"github.com/jimorc/jsdr/internal/logger"
 	"github.com/pothosware/go-soapy-sdr/pkg/device"
@@ -18,9 +19,14 @@ func main() {
 	defer log.Close()
 
 	devices := device.Enumerate(nil)
-	if len(devices) == 0 {
-		log.Log(logger.NewLogMessage(logger.Error, "There are no attached SDRs\n"))
-	} else {
-		log.Log(logger.NewLogMessageWithFormat(logger.Info, "There are %d SDRs attached\n", len(devices)))
+	log.Log(logger.NewLogMessageWithFormat(logger.Info, "Found %d attached SDR(s)\n", len(devices)))
+
+	for i, dev := range devices {
+		var devInfo strings.Builder
+		devInfo.WriteString(fmt.Sprintf("Device %d\n", i))
+		for k, v := range dev {
+			devInfo.WriteString(fmt.Sprintf("         %s: %s\n", k, v))
+		}
+		log.Log(logger.NewLogMessage(logger.Info, devInfo.String()))
 	}
 }
