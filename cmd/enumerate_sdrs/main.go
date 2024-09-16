@@ -57,6 +57,7 @@ func main() {
 
 		logHardwareInfo(sdr, log)
 		logGPIOBanks(sdr, log)
+		logSettingInfo(sdr, log)
 	}
 }
 
@@ -84,5 +85,54 @@ func logGPIOBanks(sdr *device.SDRDevice, log *logger.Logger) {
 			gpioBanks.WriteString(fmt.Sprintf("         GPIO Bank#%d: %v\n", i, bank))
 		}
 		log.Log(logger.NewLogMessage(logger.Info, gpioBanks.String()))
+	}
+}
+
+func logSettingInfo(sdr *device.SDRDevice, log *logger.Logger) {
+	SDRSettings := sdr.GetSettingInfo()
+	if len(SDRSettings) == 0 {
+		log.Log(logger.NewLogMessage(logger.Info, "Settings: none"))
+	} else {
+		var settings strings.Builder
+		for i, set := range SDRSettings {
+			if i == 0 {
+				settings.WriteString(fmt.Sprintf("Setting%d:\n", i))
+			} else {
+				settings.WriteString(fmt.Sprintf("        Setting%d:\n", i))
+			}
+			settings.WriteString(fmt.Sprintf("         key: %s\n", set.Key))
+			settings.WriteString(fmt.Sprintf("         value: %s\n", set.Value))
+			settings.WriteString(fmt.Sprintf("         name: %s\n", set.Name))
+			settings.WriteString(fmt.Sprintf("         description: %s\n", set.Description))
+			settings.WriteString(fmt.Sprintf("         unit: %s\n", set.Unit))
+			argType := "unknown type"
+			switch set.Type {
+			case device.ArgInfoBool:
+				argType = "bool"
+			case device.ArgInfoInt:
+				argType = "int"
+			case device.ArgInfoFloat:
+				argType = "float"
+			case device.ArgInfoString:
+				argType = "string"
+			}
+			settings.WriteString(fmt.Sprintf("         type: %s\n", argType))
+			settings.WriteString(fmt.Sprintf("         range: %v\n", set.Range.ToString()))
+			numOptions := set.NumOptions
+			if numOptions == 0 {
+				settings.WriteString(fmt.Sprintln("         options: none"))
+				settings.WriteString(fmt.Sprintln("         option names: none"))
+			} else {
+				settings.WriteString(fmt.Sprintln("         options:"))
+				for _, opt := range set.Options {
+					settings.WriteString(fmt.Sprintf("            %s\n", opt))
+				}
+				settings.WriteString(fmt.Sprintln("            option names:"))
+				for _, name := range set.OptionNames {
+					settings.WriteString(fmt.Sprintf("             %s\n", name))
+				}
+			}
+		}
+		log.Log(logger.NewLogMessage(logger.Info, settings.String()))
 	}
 }
