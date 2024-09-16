@@ -54,5 +54,20 @@ func main() {
 				"Device with label: `%s` was unmade.\n",
 				dev["label"]))
 		}()
+
+		displayHardwareInfo(sdr, log)
 	}
+}
+
+func displayHardwareInfo(sdr *device.SDRDevice, log *logger.Logger) {
+	var hwInfo strings.Builder
+	hwInfo.WriteString(fmt.Sprintln("Hardware Info:"))
+	hwInfo.WriteString(fmt.Sprintf("         Driver Key: %s\n", sdr.GetDriverKey()))
+	hwInfo.WriteString(fmt.Sprintf("         Hardware Key: %s\n", sdr.GetHardwareKey()))
+	hardwareInfo := sdr.GetHardwareInfo()
+
+	for k, v := range hardwareInfo {
+		hwInfo.WriteString(fmt.Sprintf("         %s: %s\n", k, v))
+	}
+	log.Log(logger.NewLogMessage(logger.Info, hwInfo.String()))
 }
