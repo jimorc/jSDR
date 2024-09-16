@@ -10,7 +10,7 @@ import (
 )
 
 func main() {
-	logFile := "enumerate_sdrs.log"
+	logFile := os.Getenv("HOME") + "/enumerate_sdrs.log"
 	log, err := logger.NewFileLogger(logFile)
 	if err != nil {
 		fmt.Printf("Error trying to open log file '%s': %s\n", logFile, err.Error())
