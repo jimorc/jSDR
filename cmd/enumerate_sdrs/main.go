@@ -55,11 +55,12 @@ func main() {
 				dev["label"]))
 		}()
 
-		displayHardwareInfo(sdr, log)
+		logHardwareInfo(sdr, log)
+		logGPIOBanks(sdr, log)
 	}
 }
 
-func displayHardwareInfo(sdr *device.SDRDevice, log *logger.Logger) {
+func logHardwareInfo(sdr *device.SDRDevice, log *logger.Logger) {
 	var hwInfo strings.Builder
 	hwInfo.WriteString(fmt.Sprintln("Hardware Info:"))
 	hwInfo.WriteString(fmt.Sprintf("         Driver Key: %s\n", sdr.GetDriverKey()))
@@ -70,4 +71,18 @@ func displayHardwareInfo(sdr *device.SDRDevice, log *logger.Logger) {
 		hwInfo.WriteString(fmt.Sprintf("         %s: %s\n", k, v))
 	}
 	log.Log(logger.NewLogMessage(logger.Info, hwInfo.String()))
+}
+
+func logGPIOBanks(sdr *device.SDRDevice, log *logger.Logger) {
+	banks := sdr.ListGPIOBanks()
+	if len(banks) == 0 {
+		log.Log(logger.NewLogMessage(logger.Info, "GPIO Banks: none\n"))
+	} else {
+		var gpioBanks strings.Builder
+		gpioBanks.WriteString("GPIO Banks:\n")
+		for i, bank := range banks {
+			gpioBanks.WriteString(fmt.Sprintf("         GPIO Bank#%d: %v\n", i, bank))
+		}
+		log.Log(logger.NewLogMessage(logger.Info, gpioBanks.String()))
+	}
 }
