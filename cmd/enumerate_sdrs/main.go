@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"strings"
+	"time"
 
 	"github.com/jimorc/jsdr/internal/logger"
 	"github.com/pothosware/go-soapy-sdr/pkg/device"
@@ -225,5 +226,18 @@ func logTimeSources(sdr *device.SDRDevice, log *logger.Logger) {
 			tMsg.WriteString(fmt.Sprintf("         Time Source#%d: %s\n", i, source))
 		}
 		log.Log(logger.NewLogMessage(logger.Info, tMsg.String()))
+	}
+
+	hasHardwareTime := sdr.HasHardwareTime("")
+	log.Log(logger.NewLogMessageWithFormat(logger.Info, "Has Hardware Time: %v\n", hasHardwareTime))
+	if hasHardwareTime {
+		log.Log(logger.NewLogMessageWithFormat(logger.Info, "Hardware Time: %d ns\n", sdr.GetHardwareTime("")))
+		curTime := time.Now().UTC().Nanosecond()
+		log.Log(logger.NewLogMessageWithFormat(logger.Info, "Setting Hardware Time to %d\n", curTime))
+		sdr.SetHardwareTime(uint(curTime), "")
+		log.Log(logger.NewLogMessageWithFormat(logger.Info, "Hardware Time Now: %d\n", sdr.GetHardwareTime("")))
+		log.Log(logger.NewLogMessage(logger.Info, "Waiting 1 second\n"))
+		time.Sleep(time.Second)
+		log.Log(logger.NewLogMessageWithFormat(logger.Info, "Hardware Time Now: %d\n", sdr.GetHardwareTime("")))
 	}
 }
