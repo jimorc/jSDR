@@ -269,7 +269,7 @@ func logDirectionChannelDetails(sdr *device.SDRDevice, direction device.Directio
 	logChannelSettingsInfo(sdr, direction, channel, log)
 	logChannelInfo(sdr, direction, channel, log)
 	logAntennaInfo(sdr, direction, channel, log)
-	logChannelBandwidth(sdr, direction, channel, log)
+	exerciseChannelBandwidth(sdr, direction, channel, log)
 	exerciseGain(sdr, direction, channel, log)
 }
 
@@ -314,7 +314,7 @@ func logAntennaInfo(sdr *device.SDRDevice, direction device.Direction, channel u
 	}
 }
 
-func logChannelBandwidth(sdr *device.SDRDevice, direction device.Direction, channel uint, log *logger.Logger) {
+func exerciseChannelBandwidth(sdr *device.SDRDevice, direction device.Direction, channel uint, log *logger.Logger) {
 	log.Log(logger.NewLogMessageWithFormat(logger.Info,
 		"Channel#%d Baseband filter width: %.0f Hz\n", channel, sdr.GetBandwidth(direction, channel)))
 
@@ -330,7 +330,11 @@ func logChannelBandwidth(sdr *device.SDRDevice, direction device.Direction, chan
 		log.Log(logger.NewLogMessage(logger.Info, bMsg.String()))
 
 		log.Log(logger.NewLogMessage(logger.Info, "Setting bandwidth to one half first range\n"))
-		sdr.SetBandwidth(direction, channel, bandwidthRanges[0].Maximum/2.0)
+		err := sdr.SetBandwidth(direction, channel, bandwidthRanges[0].Maximum/2.0)
+		if err != nil {
+			log.Log(logger.NewLogMessageWithFormat(logger.Error, "Error encountered while trying to set bandwidth: %sn",
+				err.Error()))
+		}
 		log.Log(logger.NewLogMessageWithFormat(logger.Info, "Bandwidth is now %.0f\n", sdr.GetBandwidth(direction, channel)))
 	}
 }
