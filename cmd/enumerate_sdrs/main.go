@@ -327,5 +327,9 @@ func logChannelBandwidth(sdr *device.SDRDevice, direction device.Direction, chan
 			bMsg.WriteString(fmt.Sprintf("         Bandwidth Range#%d: %v\n", i, bRange))
 		}
 		log.Log(logger.NewLogMessage(logger.Info, bMsg.String()))
+
+		log.Log(logger.NewLogMessage(logger.Info, "Setting bandwidth to one half first range\n"))
+		sdr.SetBandwidth(direction, channel, bandwidthRanges[0].Maximum/2.0)
+		log.Log(logger.NewLogMessageWithFormat(logger.Info, "Bandwidth is now %.0f\n", sdr.GetBandwidth(direction, channel)))
 	}
 }
