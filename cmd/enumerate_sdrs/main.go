@@ -59,6 +59,7 @@ func main() {
 		logGPIOBanks(sdr, log)
 		logSettingInfo(sdr, log)
 		logUARTs(sdr, log)
+		logMasterClockRate(sdr, log)
 	}
 }
 
@@ -149,5 +150,20 @@ func logUARTs(sdr *device.SDRDevice, log *logger.Logger) {
 			umsg.WriteString(fmt.Sprintf("         UART#%d: %s", i, uart))
 		}
 		log.Log(logger.NewLogMessage(logger.Info, umsg.String()))
+	}
+}
+
+func logMasterClockRate(sdr *device.SDRDevice, log *logger.Logger) {
+	clockRates := sdr.GetMasterClockRates()
+	if len(clockRates) == 0 {
+		log.Log(logger.NewLogMessage(logger.Info, "Master Clock Rates: none\n"))
+	} else {
+		log.Log(logger.NewLogMessageWithFormat(logger.Info, "Master Clock Rate: %f\n", sdr.GetMasterClockRate()))
+		var rMsg strings.Builder
+		rMsg.WriteString("Master Clock Rates:\n")
+		for _, rate := range clockRates {
+			rMsg.WriteString(fmt.Sprintf("         %v\n", rate))
+		}
+		log.Log(logger.NewLogMessage(logger.Info, rMsg.String()))
 	}
 }
