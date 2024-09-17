@@ -270,6 +270,7 @@ func logDirectionChannelDetails(sdr *device.SDRDevice, direction device.Directio
 	logChannelInfo(sdr, direction, channel, log)
 	logAntennaInfo(sdr, direction, channel, log)
 	logChannelBandwidth(sdr, direction, channel, log)
+	logGain(sdr, direction, channel, log)
 }
 
 func logChannelSettingsInfo(sdr *device.SDRDevice, direction device.Direction, channel uint, log *logger.Logger) {
@@ -331,5 +332,20 @@ func logChannelBandwidth(sdr *device.SDRDevice, direction device.Direction, chan
 		log.Log(logger.NewLogMessage(logger.Info, "Setting bandwidth to one half first range\n"))
 		sdr.SetBandwidth(direction, channel, bandwidthRanges[0].Maximum/2.0)
 		log.Log(logger.NewLogMessageWithFormat(logger.Info, "Bandwidth is now %.0f\n", sdr.GetBandwidth(direction, channel)))
+	}
+}
+
+func logGain(sdr *device.SDRDevice, direction device.Direction, channel uint, log *logger.Logger) {
+	hasAutoGainMode := sdr.HasGainMode(direction, channel)
+	log.Log(logger.NewLogMessageWithFormat(logger.Info, "Channel#%d HasGainMode (Automatic gain possible): %v\n",
+		channel, hasAutoGainMode))
+	if hasAutoGainMode {
+		autoGainEnabled := sdr.GetGainMode(direction, channel)
+		log.Log(logger.NewLogMessageWithFormat(logger.Info, "Channel#%d Automatic Gain Enabled: %v\n",
+			channel, autoGainEnabled))
+		log.Log(logger.NewLogMessage(logger.Info, "Toggling auto gain\n"))
+		sdr.SetGainMode(direction, channel, !autoGainEnabled)
+		log.Log(logger.NewLogMessageWithFormat(logger.Info, "Channel#%d Automatic Gain Enabled now: %v\n",
+			channel, sdr.GetGainMode(direction, channel)))
 	}
 }
