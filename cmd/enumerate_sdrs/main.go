@@ -269,6 +269,7 @@ func logDirectionChannelDetails(sdr *device.SDRDevice, direction device.Directio
 	logChannelSettingsInfo(sdr, direction, channel, log)
 	logChannelInfo(sdr, direction, channel, log)
 	logAntennaInfo(sdr, direction, channel, log)
+	logChannelBandwidth(sdr, direction, channel, log)
 }
 
 func logChannelSettingsInfo(sdr *device.SDRDevice, direction device.Direction, channel uint, log *logger.Logger) {
@@ -309,5 +310,22 @@ func logAntennaInfo(sdr *device.SDRDevice, direction device.Direction, channel u
 			aMsg.WriteString(fmt.Sprintf("         Antenna#%d: %s\n", i, antenna))
 		}
 		log.Log(logger.NewLogMessage(logger.Info, aMsg.String()))
+	}
+}
+
+func logChannelBandwidth(sdr *device.SDRDevice, direction device.Direction, channel uint, log *logger.Logger) {
+	log.Log(logger.NewLogMessageWithFormat(logger.Info,
+		"Channel#%d Baseband filter width: %.0f Hz\n", channel, sdr.GetBandwidth(direction, channel)))
+
+	bandwidthRanges := sdr.GetBandwidthRanges(direction, channel)
+	if len(bandwidthRanges) == 0 {
+		log.Log(logger.NewLogMessageWithFormat(logger.Info, "Channel#%d Bandwidth Ranges: none\n", channel))
+	} else {
+		var bMsg strings.Builder
+		bMsg.WriteString(fmt.Sprintf("Channel#%d Bandwidth Ranges:\n", channel))
+		for i, bRange := range bandwidthRanges {
+			bMsg.WriteString(fmt.Sprintf("         Bandwidth Range#%d: %v\n", i, bRange))
+		}
+		log.Log(logger.NewLogMessage(logger.Info, bMsg.String()))
 	}
 }
