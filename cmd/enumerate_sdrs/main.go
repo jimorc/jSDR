@@ -58,6 +58,7 @@ func main() {
 		logHardwareInfo(sdr, log)
 		logGPIOBanks(sdr, log)
 		logSettingInfo(sdr, log)
+		logUARTs(sdr, log)
 	}
 }
 
@@ -134,5 +135,19 @@ func logSettingInfo(sdr *device.SDRDevice, log *logger.Logger) {
 			}
 		}
 		log.Log(logger.NewLogMessage(logger.Info, settings.String()))
+	}
+}
+
+func logUARTs(sdr *device.SDRDevice, log *logger.Logger) {
+	uarts := sdr.ListUARTs()
+	if len(uarts) == 0 {
+		log.Log(logger.NewLogMessage(logger.Info, "UARTs: none\n"))
+	} else {
+		var umsg strings.Builder
+		umsg.WriteString("UARTs:\n")
+		for i, uart := range uarts {
+			umsg.WriteString(fmt.Sprintf("         UART#%d: %s", i, uart))
+		}
+		log.Log(logger.NewLogMessage(logger.Info, umsg.String()))
 	}
 }
