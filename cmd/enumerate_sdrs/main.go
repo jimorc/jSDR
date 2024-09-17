@@ -63,6 +63,7 @@ func main() {
 		logClockSources(sdr, log)
 		logRegisters(sdr, log)
 		logSensors(sdr, log)
+		logTimeSources(sdr, log)
 	}
 }
 
@@ -210,5 +211,19 @@ func logSensors(sdr *device.SDRDevice, log *logger.Logger) {
 			sMsg.WriteString(fmt.Sprintf("         Sensor#%d: %s\n", i, sensor))
 		}
 		log.Log(logger.NewLogMessage(logger.Info, sMsg.String()))
+	}
+}
+
+func logTimeSources(sdr *device.SDRDevice, log *logger.Logger) {
+	sources := sdr.ListTimeSources()
+	if len(sources) == 0 {
+		log.Log(logger.NewLogMessage(logger.Info, "Time Sources: none\n"))
+	} else {
+		var tMsg strings.Builder
+		tMsg.WriteString("Time Sources:\n")
+		for i, source := range sources {
+			tMsg.WriteString(fmt.Sprintf("         Time Source#%d: %s\n", i, source))
+		}
+		log.Log(logger.NewLogMessage(logger.Info, tMsg.String()))
 	}
 }
