@@ -355,4 +355,15 @@ func logGain(sdr *device.SDRDevice, direction device.Direction, channel uint, lo
 		log.Log(logger.NewLogMessageWithFormat(logger.Info, "Current gain = %f\n",
 			sdr.GetGain(direction, channel)))
 	}
+	gains := sdr.ListGains(direction, channel)
+	if len(gains) == 0 {
+		log.Log(logger.NewLogMessageWithFormat(logger.Info, "Channel#%d has no gain elements\n", channel))
+	} else {
+		var gMsg strings.Builder
+		gMsg.WriteString(fmt.Sprintf("Channel#%d Gain Elements:\n", channel))
+		for _, gain := range gains {
+			gMsg.WriteString(fmt.Sprintf("         %s\n", gain))
+		}
+		log.Log(logger.NewLogMessage(logger.Info, gMsg.String()))
+	}
 }
