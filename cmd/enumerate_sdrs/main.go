@@ -343,9 +343,16 @@ func logGain(sdr *device.SDRDevice, direction device.Direction, channel uint, lo
 		autoGainEnabled := sdr.GetGainMode(direction, channel)
 		log.Log(logger.NewLogMessageWithFormat(logger.Info, "Channel#%d Automatic Gain Enabled: %v\n",
 			channel, autoGainEnabled))
+		log.Log(logger.NewLogMessageWithFormat(logger.Info, "Current gain = %f\n",
+			sdr.GetGain(direction, channel)))
 		log.Log(logger.NewLogMessage(logger.Info, "Toggling auto gain\n"))
-		sdr.SetGainMode(direction, channel, !autoGainEnabled)
+		err := sdr.SetGainMode(direction, channel, !autoGainEnabled)
+		if err != nil {
+			log.Log(logger.NewLogMessageWithFormat(logger.Error, "Error in call to SetGainMode: %s\n", err.Error()))
+		}
 		log.Log(logger.NewLogMessageWithFormat(logger.Info, "Channel#%d Automatic Gain Enabled now: %v\n",
 			channel, sdr.GetGainMode(direction, channel)))
+		log.Log(logger.NewLogMessageWithFormat(logger.Info, "Current gain = %f\n",
+			sdr.GetGain(direction, channel)))
 	}
 }
