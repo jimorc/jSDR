@@ -60,6 +60,7 @@ func main() {
 		logSettingInfo(sdr, log)
 		logUARTs(sdr, log)
 		logMasterClockRate(sdr, log)
+		logClockSources(sdr, log)
 	}
 }
 
@@ -165,5 +166,19 @@ func logMasterClockRate(sdr *device.SDRDevice, log *logger.Logger) {
 			rMsg.WriteString(fmt.Sprintf("         %v\n", rate))
 		}
 		log.Log(logger.NewLogMessage(logger.Info, rMsg.String()))
+	}
+}
+
+func logClockSources(sdr *device.SDRDevice, log *logger.Logger) {
+	sources := sdr.ListClockSources()
+	if len(sources) == 0 {
+		log.Log(logger.NewLogMessage(logger.Info, "Clock Sources: none\n"))
+	} else {
+		var sMsg strings.Builder
+		sMsg.WriteString("Clock Sources:\n")
+		for i, source := range sources {
+			sMsg.WriteString(fmt.Sprintf("         Source#%d: %s\n", i, source))
+		}
+		log.Log(logger.NewLogMessage(logger.Info, sMsg.String()))
 	}
 }
