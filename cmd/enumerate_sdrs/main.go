@@ -349,6 +349,7 @@ func logGain(sdr *device.SDRDevice, direction device.Direction, channel uint, lo
 		err := sdr.SetGainMode(direction, channel, !autoGainEnabled)
 		if err != nil {
 			log.Log(logger.NewLogMessageWithFormat(logger.Error, "Error in call to SetGainMode: %s\n", err.Error()))
+			return
 		}
 		log.Log(logger.NewLogMessageWithFormat(logger.Info, "Channel#%d Automatic Gain Enabled now: %v\n",
 			channel, sdr.GetGainMode(direction, channel)))
@@ -356,14 +357,32 @@ func logGain(sdr *device.SDRDevice, direction device.Direction, channel uint, lo
 			sdr.GetGain(direction, channel)))
 	}
 	gains := sdr.ListGains(direction, channel)
-	if len(gains) == 0 {
-		log.Log(logger.NewLogMessageWithFormat(logger.Info, "Channel#%d has no gain elements\n", channel))
-	} else {
+	log.Log(logger.NewLogMessageWithFormat(logger.Info, "Number of gain elements: %d\n", len(gains)))
+	if len(gains) > 0 {
 		var gMsg strings.Builder
 		gMsg.WriteString(fmt.Sprintf("Channel#%d Gain Elements:\n", channel))
 		for _, gain := range gains {
 			gMsg.WriteString(fmt.Sprintf("         %s\n", gain))
 		}
 		log.Log(logger.NewLogMessage(logger.Info, gMsg.String()))
+
+		err := sdr.SetGainMode(direction, channel, false)
+		if err != nil {
+			log.Log(logger.NewLogMessageWithFormat(logger.Error, "Error setting auto gain off: %s\n", err.Error()))
+			return
+		} else {
+			log.Log(logger.NewLogMessage(logger.Info, "Have set auto gain off\n"))
+		}
+		for _, gain := range gains {
+			log.Log(logger.NewLogMessageWithFormat(logger.Info, "Setting gain for element: %s to 20 db\n", gain))
+			err := sdr.SetGainElement(direction, channel, gain, 20.0)
+			if err != nil {
+				log.Log(logger.NewLogMessageWithFormat(logger.Error, "Error when setting gain for element: %s: %s",
+					gain, err.Error()))
+				return
+			}
+			eltGain := sdr.GetGainElement(direction, channel, gain)
+			log.Log(logger.NewLogMessageWithFormat(logger.Info, "Gain for element %s is set to %.0f db\n", gain, eltGain))
+		}
 	}
 }
