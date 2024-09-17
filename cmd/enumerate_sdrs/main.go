@@ -267,6 +267,7 @@ func logDirectionDetails(sdr *device.SDRDevice, direction device.Direction, log 
 
 func logDirectionChannelDetails(sdr *device.SDRDevice, direction device.Direction, channel uint, log *logger.Logger) {
 	logChannelSettingsInfo(sdr, direction, channel, log)
+	logChannelInfo(sdr, direction, channel, log)
 }
 
 func logChannelSettingsInfo(sdr *device.SDRDevice, direction device.Direction, channel uint, log *logger.Logger) {
@@ -281,5 +282,17 @@ func logChannelSettingsInfo(sdr *device.SDRDevice, direction device.Direction, c
 		}
 		log.Log(logger.NewLogMessage(logger.Info, sMsg.String()))
 	}
+}
 
+func logChannelInfo(sdr *device.SDRDevice, direction device.Direction, channel uint, log *logger.Logger) {
+	channelInfo := sdr.GetChannelInfo(direction, channel)
+	if len(channelInfo) == 0 {
+		log.Log(logger.NewLogMessageWithFormat(logger.Info, "Channel#%d ChannelInfo: none\n", channel))
+	} else {
+		var infoMsg strings.Builder
+		infoMsg.WriteString(fmt.Sprintf("Channel#%d ChannelInfo:\n", channel))
+		for k, v := range channelInfo {
+			infoMsg.WriteString(fmt.Sprintf("         %s: %s\n", k, v))
+		}
+	}
 }
