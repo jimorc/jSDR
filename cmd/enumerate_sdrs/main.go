@@ -65,6 +65,8 @@ func main() {
 		logRegisters(sdr, log)
 		logSensors(sdr, log)
 		logTimeSources(sdr, log)
+		logDirectionDetails(sdr, device.DirectionTX, log)
+		logDirectionDetails(sdr, device.DirectionRX, log)
 	}
 }
 
@@ -240,4 +242,23 @@ func logTimeSources(sdr *device.SDRDevice, log *logger.Logger) {
 		time.Sleep(time.Second)
 		log.Log(logger.NewLogMessageWithFormat(logger.Info, "Hardware Time Now: %d\n", sdr.GetHardwareTime("")))
 	}
+}
+
+func logDirectionDetails(sdr *device.SDRDevice, direction device.Direction, log *logger.Logger) {
+	if direction == device.DirectionTX {
+		log.Log(logger.NewLogMessage(logger.Info, "Direction TX\n"))
+	} else {
+		log.Log(logger.NewLogMessage(logger.Info, "Direction RX\n"))
+	}
+
+	frontendMapping := sdr.GetFrontendMapping(direction)
+	if len(frontendMapping) == 0 {
+		log.Log(logger.NewLogMessage(logger.Info, "Frontend Mapping: none\n"))
+	} else {
+		log.Log(logger.NewLogMessageWithFormat(logger.Info, "Frontend Mapping: %s\n", frontendMapping))
+	}
+
+	numChannels := sdr.GetNumChannels(direction)
+	log.Log(logger.NewLogMessageWithFormat(logger.Info, "Number of channels: %d\n", numChannels))
+
 }
