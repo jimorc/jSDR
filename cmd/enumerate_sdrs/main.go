@@ -61,6 +61,7 @@ func main() {
 		logUARTs(sdr, log)
 		logMasterClockRate(sdr, log)
 		logClockSources(sdr, log)
+		logRegisters(sdr, log)
 	}
 }
 
@@ -180,5 +181,19 @@ func logClockSources(sdr *device.SDRDevice, log *logger.Logger) {
 			sMsg.WriteString(fmt.Sprintf("         Source#%d: %s\n", i, source))
 		}
 		log.Log(logger.NewLogMessage(logger.Info, sMsg.String()))
+	}
+}
+
+func logRegisters(sdr *device.SDRDevice, log *logger.Logger) {
+	registers := sdr.ListRegisterInterfaces()
+	if len(registers) == 0 {
+		log.Log(logger.NewLogMessage(logger.Info, "Registers: none\n"))
+	} else {
+		var rMsg strings.Builder
+		rMsg.WriteString("Registers:\n")
+		for i, register := range registers {
+			rMsg.WriteString(fmt.Sprintf("         Register#%d: %s\n", i, register))
+		}
+		log.Log(logger.NewLogMessage(logger.Info, rMsg.String()))
 	}
 }
