@@ -270,7 +270,7 @@ func logDirectionChannelDetails(sdr *device.SDRDevice, direction device.Directio
 	logChannelInfo(sdr, direction, channel, log)
 	logAntennaInfo(sdr, direction, channel, log)
 	logChannelBandwidth(sdr, direction, channel, log)
-	logGain(sdr, direction, channel, log)
+	exerciseGain(sdr, direction, channel, log)
 }
 
 func logChannelSettingsInfo(sdr *device.SDRDevice, direction device.Direction, channel uint, log *logger.Logger) {
@@ -335,7 +335,7 @@ func logChannelBandwidth(sdr *device.SDRDevice, direction device.Direction, chan
 	}
 }
 
-func logGain(sdr *device.SDRDevice, direction device.Direction, channel uint, log *logger.Logger) {
+func exerciseGain(sdr *device.SDRDevice, direction device.Direction, channel uint, log *logger.Logger) {
 	hasAutoGainMode := sdr.HasGainMode(direction, channel)
 	log.Log(logger.NewLogMessageWithFormat(logger.Info, "Channel#%d HasGainMode (Automatic gain possible): %v\n",
 		channel, hasAutoGainMode))
@@ -383,6 +383,8 @@ func logGain(sdr *device.SDRDevice, direction device.Direction, channel uint, lo
 			}
 			eltGain := sdr.GetGainElement(direction, channel, gain)
 			log.Log(logger.NewLogMessageWithFormat(logger.Info, "Gain for element %s is set to %.0f db\n", gain, eltGain))
+			err = sdr.SetGainElement(direction, channel, gain, 0.0)
+			log.Log(logger.NewLogMessageWithFormat(logger.Info, "Have reset gain for element: %s to 0 db\n", gain))
 		}
 	}
 }
