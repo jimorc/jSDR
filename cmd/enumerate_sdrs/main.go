@@ -307,10 +307,15 @@ func exerciseAntennas(sdr *device.SDRDevice, direction device.Direction, channel
 	if len(antennas) == 0 {
 		log.Log(logger.NewLogMessage(logger.Info, "Antennas: none\n"))
 	} else {
+		log.Log(logger.NewLogMessageWithFormat(logger.Info, "Selected antenna: %s\n",
+			sdr.GetAntennas(direction, channel)))
 		var aMsg strings.Builder
 		aMsg.WriteString("Antennas:\n")
 		for i, antenna := range antennas {
 			aMsg.WriteString(fmt.Sprintf("         Antenna#%d: %s\n", i, antenna))
+			aMsg.WriteString(fmt.Sprintf("         Setting antenna to %s\n", antenna))
+			sdr.SetAntennas(direction, channel, antenna)
+			aMsg.WriteString(fmt.Sprintf("         Selected antenna now %s\n", sdr.GetAntennas(direction, channel)))
 		}
 		log.Log(logger.NewLogMessage(logger.Info, aMsg.String()))
 	}
