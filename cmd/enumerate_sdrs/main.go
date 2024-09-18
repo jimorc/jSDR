@@ -593,4 +593,18 @@ func exerciseFrontend(sdr *device.SDRDevice, direction device.Direction, channel
 		log.Log(logger.NewLogMessageWithFormat(logger.Info, "Channel#%d stream DC offset now: I: %d, Q: %f\n",
 			channel, offsetI, offsetQ))
 	}
+	available = sdr.HasIQBalance(direction, channel)
+	if !available {
+		log.Log(logger.NewLogMessageWithFormat(logger.Info, "Channel#%d does not support IQ Balance\n", channel))
+		return
+	}
+	log.Log(logger.NewLogMessageWithFormat(logger.Info, "Channel#%d supports IQ Balance\n", channel))
+	I, Q, err := sdr.GetIQBalance(direction, channel)
+	if err != nil {
+		log.Log(logger.NewLogMessageWithFormat(logger.Info, "Error encountered getting I, Q balance values\n",
+			channel))
+		return
+	}
+	log.Log(logger.NewLogMessageWithFormat(logger.Info, "Channel#%d I/Q Balance: I: %f, Q: %f\n",
+		channel, I, Q))
 }
