@@ -467,8 +467,27 @@ func exerciseFrequencies(sdr *device.SDRDevice, direction device.Direction, chan
 			comp := sdr.GetFrequencyComponent(direction, channel, elt)
 			if elt == "CORR" {
 				tMsg.WriteString(fmt.Sprintf("             Correction: %.0f PPM\n", comp))
+				tMsg.WriteString("             Setting CORR to 50 PPM\n")
+				err := sdr.SetFrequencyComponent(direction, channel, "CORR", 50.0, map[string]string{})
+				if err != nil {
+					log.Log(logger.NewLogMessageWithFormat(logger.Error,
+						"Error encountered setting CORR: %s", err.Error()))
+					return
+				}
+				tMsg.WriteString(fmt.Sprintf("             CORR now: %.0f PPM\n",
+					sdr.GetFrequencyComponent(direction, channel, "CORR")))
 			} else {
 				tMsg.WriteString(fmt.Sprintf("             Frequency: %.0f Hz\n", comp))
+				tMsg.WriteString("             Center Frequency set to 50 MHz\n")
+				err := sdr.SetFrequencyComponent(direction, channel, elt, 50000000.0, map[string]string{})
+				if err != nil {
+					log.Log(logger.NewLogMessageWithFormat(logger.Error,
+						"Error encountered setting component %d frequency: %s\n",
+						elt, err.Error()))
+					return
+				}
+				tMsg.WriteString(fmt.Sprintf("             Center Frequency now: %.0f Hz\n",
+					sdr.GetFrequencyComponent(direction, channel, elt)))
 			}
 			rngs := sdr.GetFrequencyRangeComponent(direction, channel, elt)
 			for _, rng := range rngs {
