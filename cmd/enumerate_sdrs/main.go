@@ -607,4 +607,18 @@ func exerciseFrontend(sdr *device.SDRDevice, direction device.Direction, channel
 	}
 	log.Log(logger.NewLogMessageWithFormat(logger.Info, "Channel#%d I/Q Balance: I: %f, Q: %f\n",
 		channel, I, Q))
+	log.Log(logger.NewLogMessage(logger.Info, "Setting I/Q balance to 0.1, 0.1\n"))
+	err = sdr.SetIQBalance(direction, channel, 0.1, 0.1)
+	if err != nil {
+		log.Log(logger.NewLogMessageWithFormat(logger.Info, "Error encountered setting I/Q balance: %s\n", err.Error()))
+		return
+	}
+	I, Q, err = sdr.GetIQBalance(direction, channel)
+	if err != nil {
+		log.Log(logger.NewLogMessageWithFormat(logger.Info, "Error encountered getting I, Q balance values\n",
+			channel))
+		return
+	}
+	log.Log(logger.NewLogMessageWithFormat(logger.Info, "Channel#%d I/Q balance now set to I: %f, Q: %f\n",
+		channel, I, Q))
 }
