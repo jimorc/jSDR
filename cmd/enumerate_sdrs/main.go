@@ -495,5 +495,28 @@ func exerciseFrequencies(sdr *device.SDRDevice, direction device.Direction, chan
 			}
 		}
 		log.Log(logger.NewLogMessage(logger.Info, tMsg.String()))
+
+		log.Log(logger.NewLogMessageWithFormat(logger.Info, "Current Center Frequency is: %.0f\n",
+			sdr.GetFrequency(direction, channel)))
+		log.Log(logger.NewLogMessage(logger.Info, "Setting Center Frequency to 75 MHz\n"))
+		err := sdr.SetFrequency(direction, channel, 75000000.0, map[string]string{})
+		if err != nil {
+			log.Log(logger.NewLogMessageWithFormat(logger.Error, "Error encountered setting center frequency: %s",
+				err.Error()))
+			return
+		}
+		log.Log(logger.NewLogMessageWithFormat(logger.Info, "Center Frequency is now: %.0f\n",
+			sdr.GetFrequency(direction, channel)))
+		var cMsg strings.Builder
+		cMsg.WriteString("Component frequencies:\n")
+		for _, elt := range tuneableElts {
+			freq := sdr.GetFrequencyComponent(direction, channel, elt)
+			if elt == "CORR" {
+				cMsg.WriteString(fmt.Sprintf("         CORR: %.0f PPM\n", freq))
+			} else {
+				cMsg.WriteString(fmt.Sprintf("         %s: %.0f\n", elt, freq))
+			}
+		}
+		log.Log(logger.NewLogMessage(logger.Info, cMsg.String()))
 	}
 }
