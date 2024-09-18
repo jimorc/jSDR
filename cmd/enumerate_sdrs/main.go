@@ -272,6 +272,7 @@ func logDirectionChannelDetails(sdr *device.SDRDevice, direction device.Directio
 	exerciseChannelBandwidth(sdr, direction, channel, log)
 	exerciseGain(sdr, direction, channel, log)
 	exerciseSampleRate(sdr, direction, channel, log)
+	exerciseFrequencies(sdr, direction, channel, log)
 }
 
 func logChannelSettingsInfo(sdr *device.SDRDevice, direction device.Direction, channel uint, log *logger.Logger) {
@@ -429,4 +430,18 @@ func exerciseSampleRate(sdr *device.SDRDevice, direction device.Direction, chann
 	}
 	log.Log(logger.NewLogMessageWithFormat(logger.Info, "Sample Rate is now %.0f\n",
 		sdr.GetSampleRate(direction, channel)))
+}
+
+func exerciseFrequencies(sdr *device.SDRDevice, direction device.Direction, channel uint, log *logger.Logger) {
+	tuneableElts := sdr.ListFrequencies(direction, channel)
+	if len(tuneableElts) == 0 {
+		log.Log(logger.NewLogMessageWithFormat(logger.Info, "Channel#%d has no tuneable elements\n", channel))
+	} else {
+		var tMsg strings.Builder
+		tMsg.WriteString(fmt.Sprintf("Tuneable elements for channel#%d:\n", channel))
+		for _, elt := range tuneableElts {
+			tMsg.WriteString(fmt.Sprintf("         %s\n", elt))
+		}
+		log.Log(logger.NewLogMessage(logger.Info, tMsg.String()))
+	}
 }
