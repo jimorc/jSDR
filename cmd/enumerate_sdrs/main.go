@@ -271,6 +271,7 @@ func logDirectionChannelDetails(sdr *device.SDRDevice, direction device.Directio
 	logAntennaInfo(sdr, direction, channel, log)
 	exerciseChannelBandwidth(sdr, direction, channel, log)
 	exerciseGain(sdr, direction, channel, log)
+	exerciseSampleRate(sdr, direction, channel, log)
 }
 
 func logChannelSettingsInfo(sdr *device.SDRDevice, direction device.Direction, channel uint, log *logger.Logger) {
@@ -405,4 +406,27 @@ func exerciseGain(sdr *device.SDRDevice, direction device.Direction, channel uin
 		}
 		log.Log(logger.NewLogMessage(logger.Info, gainMsg.String()))
 	}
+}
+
+func exerciseSampleRate(sdr *device.SDRDevice, direction device.Direction, channel uint, log *logger.Logger) {
+	sampleRanges := sdr.GetSampleRateRange(direction, channel)
+	if len(sampleRanges) == 0 {
+		log.Log(logger.NewLogMessageWithFormat(logger.Info, "Channel#%d has no sample rate ranges\n", channel))
+	} else {
+		var sMsg strings.Builder
+		sMsg.WriteString(fmt.Sprintf("Sample Rate Ranges for Channel#%d:\n", channel))
+		for _, rng := range sampleRanges {
+			sMsg.WriteString(fmt.Sprintf("         %v\n", rng))
+		}
+		log.Log(logger.NewLogMessage(logger.Info, sMsg.String()))
+		log.Log(logger.NewLogMessageWithFormat(logger.Info, "Channel#%d Sample Rate: %.0f\n", channel,
+			sdr.GetSampleRate(direction, channel)))
+	}
+	log.Log(logger.NewLogMessage(logger.Info, "Setting sample rate to 1024000\n"))
+	err := sdr.SetSampleRate(direction, channel, 1024000.0)
+	if err != nil {
+		log.Log(logger.NewLogMessageWithFormat(logger.Error, "Error while setting sample rate: %s", err.Error()))
+	}
+	log.Log(logger.NewLogMessageWithFormat(logger.Info, "Sample Rate is now %.0f\n",
+		sdr.GetSampleRate(direction, channel)))
 }
