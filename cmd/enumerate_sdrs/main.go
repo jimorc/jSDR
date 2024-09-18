@@ -275,6 +275,7 @@ func logDirectionChannelDetails(sdr *device.SDRDevice, direction device.Directio
 	exerciseFrequencies(sdr, direction, channel, log)
 	logStreamFormatsAndInfo(sdr, direction, channel, log)
 	exerciseFrontend(sdr, direction, channel, log)
+	exerciseChannelSensors(sdr, direction, channel, log)
 }
 
 func logChannelSettingsInfo(sdr *device.SDRDevice, direction device.Direction, channel uint, log *logger.Logger) {
@@ -641,4 +642,22 @@ func exerciseFrontend(sdr *device.SDRDevice, direction device.Direction, channel
 		correction = sdr.GetFrequencyCorrection(direction, channel)
 		log.Log(logger.NewLogMessageWithFormat(logger.Info, "Frontend frequency correction is now %f PPM\n", correction))
 	}
+}
+
+func exerciseChannelSensors(sdr *device.SDRDevice, direction device.Direction, channel uint, log *logger.Logger) {
+	sensors := sdr.ListChannelSensors(direction, channel)
+	if len(sensors) == 0 {
+		log.Log(logger.NewLogMessageWithFormat(logger.Info, "Channel#%d does not have any sensors\n", channel))
+		return
+	}
+	var sMsg strings.Builder
+	sMsg.WriteString(fmt.Sprintf("Channel#%d Sensors:\n", channel))
+	for _, sensor := range sensors {
+		sMsg.WriteString(fmt.Sprintf("         %s\n", sensor))
+		args := sdr.GetChannelSensorInfo(direction, channel, sensor)
+		sMsg.WriteString(fmt.Sprintf("            %v\n", args))
+		sensorValue := sdr.ReadChannelSensor(direction, channel, sensor)
+		sMsg.WriteString(fmt.Sprintf("            Current value: %s\n", sensorValue))
+	}
+	log.Log(logger.NewLogMessage(logger.Info, sMsg.String()))
 }
