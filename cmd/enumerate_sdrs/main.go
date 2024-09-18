@@ -273,6 +273,8 @@ func logDirectionChannelDetails(sdr *device.SDRDevice, direction device.Directio
 	exerciseGain(sdr, direction, channel, log)
 	exerciseSampleRate(sdr, direction, channel, log)
 	exerciseFrequencies(sdr, direction, channel, log)
+	logStreamFormatsAndInfo(sdr, direction, channel, log)
+	exerciseFrontend(sdr, direction, channel, log)
 }
 
 func logChannelSettingsInfo(sdr *device.SDRDevice, direction device.Direction, channel uint, log *logger.Logger) {
@@ -523,5 +525,72 @@ func exerciseFrequencies(sdr *device.SDRDevice, direction device.Direction, chan
 			}
 		}
 		log.Log(logger.NewLogMessage(logger.Info, cMsg.String()))
+	}
+}
+
+func logStreamFormatsAndInfo(sdr *device.SDRDevice, direction device.Direction, channel uint, log *logger.Logger) {
+	formats := sdr.GetStreamFormats(direction, channel)
+	if len(formats) == 0 {
+		log.Log(logger.NewLogMessageWithFormat(logger.Info, "Channel#%d has no stream formats\n", channel))
+		return
+	}
+	var fMsg strings.Builder
+	fMsg.WriteString(fmt.Sprintf("Channel#%d stream formats:\n", channel))
+	for _, format := range formats {
+		fMsg.WriteString(fmt.Sprintf("         %s\n", format))
+	}
+	log.Log(logger.NewLogMessage(logger.Info, fMsg.String()))
+
+	format, fullScale := sdr.GetNativeStreamFormat(direction, channel)
+	log.Log(logger.NewLogMessageWithFormat(logger.Info, "Native stream format: %s\n         fullScale: %f\n",
+		format, fullScale))
+
+	args := sdr.GetStreamArgsInfo(direction, channel)
+	if len(args) == 0 {
+		log.Log(logger.NewLogMessageWithFormat(logger.Info, "Stream args info for channel#%d: none\nS", channel))
+		return
+	}
+	var aMsg strings.Builder
+	aMsg.WriteString(fmt.Sprintf("Stream Args Info for channel#%d:\n", channel))
+	for _, arg := range args {
+		aMsg.WriteString(fmt.Sprintf("         %v\n", arg))
+	}
+	log.Log(logger.NewLogMessage(logger.Info, aMsg.String()))
+}
+
+func exerciseFrontend(sdr *device.SDRDevice, direction device.Direction, channel uint, log *logger.Logger) {
+	available := sdr.HasDCOffsetMode(direction, channel)
+	if !available {
+		log.Log(logger.NewLogMessageWithFormat(logger.Info, "Channel#%d does not support stream auto DC Correction available\n",
+			channel))
+	} else {
+		offsetMode := sdr.GetDCOffsetMode(direction, channel)
+		log.Log(logger.NewLogMessageWithFormat(logger.Info, "Channel#%d supports auto DC Offset correction: %v\n",
+			channel, offsetMode))
+	}
+	available = sdr.HasDCOffset(direction, channel)
+	if !available {
+		log.Log(logger.NewLogMessageWithFormat(logger.Info, "Channel#%d does not support frontend DC offset correction\n",
+			channel))
+	} else {
+		log.Log(logger.NewLogMessageWithFormat(logger.Info, "Channel#%d supports frontend DC offset correction\n",
+			channel))
+		offsetI, offsetQ, err := sdr.GetDCOffset(direction, channel)
+		if err != nil {
+			log.Log(logger.NewLogMessageWithFormat(logger.Error, "Error encountered retrieving stream DCOffset: %s\n",
+				err.Error()))
+			return
+		}
+		log.Log(logger.NewLogMessageWithFormat(logger.Info, "Channel#%d stream DC offset relative correction: I: %f, Q: %f\n",
+			offsetI, offsetQ))
+		log.Log(logger.NewLogMessage(logger.Info, "Setting stream DC offset to 0.1, 0.1\n"))
+		err = sdr.SetDCOffset(direction, channel, 0.1, 0.1)
+		if err != nil {
+			log.Log(logger.NewLogMessageWithFormat(logger.Error, "Error encountered setting stream DC offset: %s\n", err.Error()))
+			return
+		}
+		offsetI, offsetQ, err = sdr.GetDCOffset(direction, channel)
+		log.Log(logger.NewLogMessageWithFormat(logger.Info, "Channel#%d stream DC offset now: I: %d, Q: %f\n",
+			channel, offsetI, offsetQ))
 	}
 }
