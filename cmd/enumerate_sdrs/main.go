@@ -459,6 +459,10 @@ func exerciseFrequencies(sdr *device.SDRDevice, direction device.Direction, chan
 			} else {
 				tMsg.WriteString(fmt.Sprintf("             Frequency: %.0f Hz\n", comp))
 			}
+			rngs := sdr.GetFrequencyRangeComponent(direction, channel, elt)
+			for _, rng := range rngs {
+				tMsg.WriteString(fmt.Sprintf("             Range: %v\n", rng))
+			}
 		}
 		log.Log(logger.NewLogMessage(logger.Info, tMsg.String()))
 	}
