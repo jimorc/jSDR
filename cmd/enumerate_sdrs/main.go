@@ -366,7 +366,8 @@ func exerciseGain(sdr *device.SDRDevice, direction device.Direction, channel uin
 		var gMsg strings.Builder
 		gMsg.WriteString(fmt.Sprintf("Channel#%d Gain Elements:\n", channel))
 		for _, gain := range gains {
-			gMsg.WriteString(fmt.Sprintf("         %s\n", gain))
+			gMsg.WriteString(fmt.Sprintf("         Element: %s\n", gain))
+			gMsg.WriteString(fmt.Sprintf("             Range: %v\n", sdr.GetGainElementRange(direction, channel, gain)))
 		}
 		log.Log(logger.NewLogMessage(logger.Info, gMsg.String()))
 
@@ -396,9 +397,8 @@ func exerciseGain(sdr *device.SDRDevice, direction device.Direction, channel uin
 			log.Log(logger.NewLogMessageWithFormat(logger.Error, "Error when setting gain: %s", err.Error()))
 			return
 		}
-		log.Log(logger.NewLogMessageWithFormat(logger.Info, "Overall gain: %.0f\n",
-			sdr.GetGain(direction, channel)))
 		var gainMsg strings.Builder
+		gainMsg.WriteString(fmt.Sprintf("Overall gain set to: %.0f db\n", sdr.GetGain(direction, channel)))
 		for _, gain := range gains {
 			eltGain := sdr.GetGainElement(direction, channel, gain)
 			gainMsg.WriteString(fmt.Sprintf("         %s gain is %.0f db\n", gain, eltGain))
