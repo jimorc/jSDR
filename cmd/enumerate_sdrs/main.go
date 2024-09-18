@@ -268,7 +268,7 @@ func logDirectionDetails(sdr *device.SDRDevice, direction device.Direction, log 
 func logDirectionChannelDetails(sdr *device.SDRDevice, direction device.Direction, channel uint, log *logger.Logger) {
 	logChannelSettingsInfo(sdr, direction, channel, log)
 	logChannelInfo(sdr, direction, channel, log)
-	logAntennaInfo(sdr, direction, channel, log)
+	exerciseAntennas(sdr, direction, channel, log)
 	exerciseChannelBandwidth(sdr, direction, channel, log)
 	exerciseGain(sdr, direction, channel, log)
 	exerciseSampleRate(sdr, direction, channel, log)
@@ -302,7 +302,7 @@ func logChannelInfo(sdr *device.SDRDevice, direction device.Direction, channel u
 	}
 }
 
-func logAntennaInfo(sdr *device.SDRDevice, direction device.Direction, channel uint, log *logger.Logger) {
+func exerciseAntennas(sdr *device.SDRDevice, direction device.Direction, channel uint, log *logger.Logger) {
 	antennas := sdr.ListAntennas(direction, channel)
 	if len(antennas) == 0 {
 		log.Log(logger.NewLogMessage(logger.Info, "Antennas: none\n"))
