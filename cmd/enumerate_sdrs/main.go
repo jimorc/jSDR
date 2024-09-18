@@ -453,6 +453,12 @@ func exerciseFrequencies(sdr *device.SDRDevice, direction device.Direction, chan
 		tMsg.WriteString(fmt.Sprintf("Tuneable elements for channel#%d:\n", channel))
 		for _, elt := range tuneableElts {
 			tMsg.WriteString(fmt.Sprintf("         %s\n", elt))
+			comp := sdr.GetFrequencyComponent(direction, channel, elt)
+			if elt == "CORR" {
+				tMsg.WriteString(fmt.Sprintf("             Correction: %.0f PPM\n", comp))
+			} else {
+				tMsg.WriteString(fmt.Sprintf("             Frequency: %.0f Hz\n", comp))
+			}
 		}
 		log.Log(logger.NewLogMessage(logger.Info, tMsg.String()))
 	}
