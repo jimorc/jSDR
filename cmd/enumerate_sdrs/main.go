@@ -433,6 +433,17 @@ func exerciseSampleRate(sdr *device.SDRDevice, direction device.Direction, chann
 }
 
 func exerciseFrequencies(sdr *device.SDRDevice, direction device.Direction, channel uint, log *logger.Logger) {
+	args := sdr.GetFrequencyArgsInfo(direction, channel)
+	var aMsg strings.Builder
+	if len(args) == 0 {
+		log.Log(logger.NewLogMessage(logger.Info, "Frequency Args Info: none\n"))
+	} else {
+		aMsg.WriteString("Frequency Args Info:\n")
+		for _, arg := range args {
+			aMsg.WriteString(fmt.Sprintf("         %v\n", arg))
+		}
+		log.Log(logger.NewLogMessage(logger.Info, aMsg.String()))
+	}
 	freqRanges := sdr.GetFrequencyRange(direction, channel)
 	if len(freqRanges) == 0 {
 		log.Log(logger.NewLogMessageWithFormat(logger.Info, "Channel#%d has no frequency ranges\n", channel))
