@@ -721,4 +721,7 @@ func exerciseStream0(sdr *device.SDRDevice, direction device.Direction, channel 
 	mtu := stream.GetMTU()
 	log.Log(logger.NewLogMessageWithFormat(logger.Info, "Stream MTU: %d\n", mtu))
 
+	numBuffers := stream.GetNumDirectAccessBuffers()
+	log.Log(logger.NewLogMessageWithFormat(logger.Info, "Number of Direct Access Buffers: %d\n", numBuffers))
+
 }
