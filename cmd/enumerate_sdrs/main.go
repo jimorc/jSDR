@@ -276,6 +276,7 @@ func logDirectionChannelDetails(sdr *device.SDRDevice, direction device.Directio
 	logStreamFormatsAndInfo(sdr, direction, channel, log)
 	exerciseFrontend(sdr, direction, channel, log)
 	exerciseChannelSensors(sdr, direction, channel, log)
+	exerciseStream0(sdr, direction, channel, log)
 }
 
 func logChannelSettingsInfo(sdr *device.SDRDevice, direction device.Direction, channel uint, log *logger.Logger) {
@@ -660,4 +661,60 @@ func exerciseChannelSensors(sdr *device.SDRDevice, direction device.Direction, c
 		sMsg.WriteString(fmt.Sprintf("            Current value: %s\n", sensorValue))
 	}
 	log.Log(logger.NewLogMessage(logger.Info, sMsg.String()))
+}
+
+func exerciseStream0(sdr *device.SDRDevice, direction device.Direction, channel uint, log *logger.Logger) {
+	// set up stream params
+	log.Log(logger.NewLogMessage(logger.Debug, "Setting up stream params\n"))
+	log.Log(logger.NewLogMessage(logger.Debug, "Setting sample rate to 1024e3\n"))
+	sdrErr := sdr.SetSampleRate(direction, channel, 1024e3)
+	if sdrErr != nil {
+		log.Log(logger.NewLogMessageWithFormat(logger.Error, "Error encountered setting sample rate: %s\n", sdrErr.Error()))
+		return
+	}
+	log.Log(logger.NewLogMessage(logger.Debug, "Setting center frequency to 99.9 MHz\n"))
+	sdrErr = sdr.SetFrequency(direction, channel, 99900000.0, map[string]string{})
+	if sdrErr != nil {
+		log.Log(logger.NewLogMessageWithFormat(logger.Error, "Error encountered setting center frequency to 99.9 MHz: %s\n",
+			sdrErr.Error()))
+		return
+	}
+	log.Log(logger.NewLogMessage(logger.Debug, "Setting up the stream\n"))
+	stream, err := sdr.SetupSDRStreamCF32(direction, []uint{0}, nil)
+	if err != nil {
+		log.Log(logger.NewLogMessageWithFormat(logger.Error, "Error encountered in SetupSDRStreamCS8 call: %s\n", err.Error()))
+		return
+	}
+	defer func() {
+		log.Log(logger.NewLogMessage(logger.Debug, "Closing the stream\n"))
+		err = stream.Close()
+		if err != nil {
+			log.Log(logger.NewLogMessageWithFormat(logger.Error, "Error encountered closing the stream: %s\n", err.Error()))
+		}
+		log.Log(logger.NewLogMessage(logger.Debug, "Stream closed\n"))
+
+	}()
+
+	log.Log(logger.NewLogMessage(logger.Debug, "Activating the stream\n"))
+	err = stream.Activate(0, 0, 0)
+	if err != nil {
+		log.Log(logger.NewLogMessageWithFormat(logger.Error, "Error encountered activating the stream: %s\n", err.Error()))
+		return
+	}
+	log.Log(logger.NewLogMessage(logger.Debug, "Stream activated\n"))
+
+	defer func() {
+		log.Log(logger.NewLogMessage(logger.Debug, "Deactivating the stream\n"))
+		log.Log(logger.NewLogMessage(logger.Debug, "Need to wait short while to ensure that stream.Deactivate does not hang\n"))
+		// Any amount of time seems sufficient in my testing. Chose this as a compromise.
+		// Note: Deactivate never hangs when debugging.
+		time.Sleep(10 * time.Millisecond)
+		err = stream.Deactivate(0, 0)
+		if err != nil {
+			log.Log(logger.NewLogMessageWithFormat(logger.Error, "Error encountered deactivating the stream: %s\n",
+				err.Error()))
+			return
+		}
+		log.Log(logger.NewLogMessage(logger.Debug, "Stream deactivated\n"))
+	}()
 }
