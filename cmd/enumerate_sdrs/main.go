@@ -680,7 +680,7 @@ func exerciseStream0(sdr *device.SDRDevice, direction device.Direction, channel 
 		return
 	}
 	log.Log(logger.NewLogMessage(logger.Debug, "Setting up the stream\n"))
-	stream, err := sdr.SetupSDRStreamCF32(direction, []uint{0}, nil)
+	stream, err := sdr.SetupSDRStreamCS8(direction, []uint{0}, nil)
 	if err != nil {
 		log.Log(logger.NewLogMessageWithFormat(logger.Error, "Error encountered in SetupSDRStreamCS8 call: %s\n", err.Error()))
 		return
