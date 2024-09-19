@@ -717,4 +717,8 @@ func exerciseStream0(sdr *device.SDRDevice, direction device.Direction, channel 
 		}
 		log.Log(logger.NewLogMessage(logger.Debug, "Stream deactivated\n"))
 	}()
+
+	mtu := stream.GetMTU()
+	log.Log(logger.NewLogMessageWithFormat(logger.Info, "Stream MTU: %d\n", mtu))
+
 }
