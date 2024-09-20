@@ -8,16 +8,19 @@ import (
 
 	"github.com/jimorc/jsdr/internal/logger"
 	"github.com/pothosware/go-soapy-sdr/pkg/device"
+	"github.com/spf13/pflag"
+	"github.com/spf13/viper"
 )
 
 func main() {
-	logFile := os.Getenv("HOME") + "/enumerate_sdrs.log"
+	logLevel, logFile := parseCommandLine()
+
 	log, err := logger.NewFileLogger(logFile)
 	if err != nil {
 		fmt.Printf("Error trying to open log file '%s': %s\n", logFile, err.Error())
 		os.Exit(1)
 	}
-	log.SetMaxLevel(logger.Debug)
+	log.SetMaxLevel(logLevel)
 	defer log.Close()
 
 	devices := device.Enumerate(nil)
@@ -68,6 +71,20 @@ func main() {
 		logDirectionDetails(sdr, device.DirectionTX, log)
 		logDirectionDetails(sdr, device.DirectionRX, log)
 	}
+}
+
+func parseCommandLine() (logger.LoggingLevel, string) {
+	pflag.Bool("debug", false, "Log debug information")
+	pflag.String("out", os.Getenv("HOME")+"/enumerate_sdrs.log", "Log filename")
+	pflag.Parse()
+	viper.BindPFlags(pflag.CommandLine)
+	debug := viper.GetBool("debug")
+	logFile := viper.GetString("out")
+	logLevel := logger.Info
+	if debug {
+		logLevel = logger.Debug
+	}
+	return logLevel, logFile
 }
 
 func logHardwareInfo(sdr *device.SDRDevice, log *logger.Logger) {
