@@ -12,8 +12,9 @@ import (
 
 func main() {
 	logLevel, logFile := parseCommandLine()
-	fmt.Printf("logLevel = %d\n", logLevel)
-	fmt.Printf("logFile = %s\n", logFile)
+
+	log := initLogfile(logLevel, logFile)
+	defer log.Close()
 }
 
 func parseCommandLine() (logger.LoggingLevel, string) {
@@ -38,4 +39,14 @@ func parseCommandLine() (logger.LoggingLevel, string) {
 		logLevel = logger.Debug
 	}
 	return logLevel, logFile
+}
+
+func initLogfile(level logger.LoggingLevel, fileName string) *logger.Logger {
+	log, err := logger.NewFileLogger(fileName)
+	if err != nil {
+		fmt.Printf("Error trying to open log file '%s': %s\n", fileName, err.Error())
+		os.Exit(1)
+	}
+	log.SetMaxLevel(level)
+	return log
 }
