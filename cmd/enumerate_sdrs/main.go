@@ -739,7 +739,7 @@ func exerciseStream0(sdr *device.SDRDevice, direction device.Direction, channel 
 		for j := 0; j < 7; j = j + 2 {
 			rMsg.WriteString(fmt.Sprintf("[%d, %d]", buffers[0][2*j], buffers[0][2*j+1]))
 		}
-		rMsg.WriteString("\n...\n         ")
+		rMsg.WriteString("\n         ...\n         ")
 		for j := mtu - 1; j > mtu-9; j = j - 2 {
 			rMsg.WriteString(fmt.Sprintf("[%d, %d]", buffers[0][2*j-1], buffers[0][2*j]))
 		}
