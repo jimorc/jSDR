@@ -11,8 +11,8 @@ type LoggingLevel uint8
 
 // Logging levels
 const (
-	None LoggingLevel = iota
-	Fatal
+	_                  = iota
+	Fatal LoggingLevel = iota
 	Error
 	Info
 	Debug
