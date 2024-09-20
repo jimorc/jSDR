@@ -17,13 +17,23 @@ func main() {
 }
 
 func parseCommandLine() (logger.LoggingLevel, string) {
-	pflag.Bool("debug", false, "Log debug information")
+	pflag.Bool("error", false, "Log fatal and error messages")
+	pflag.Bool("info", false, "Log fatal, error, and info messages")
+	pflag.Bool("debug", false, "Log fatal, error, info, and debug messages")
 	pflag.String("out", os.Getenv("HOME")+"/jsdr.log", "Log filename")
 	pflag.Parse()
 	viper.BindPFlags(pflag.CommandLine)
 	debug := viper.GetBool("debug")
+	info := viper.GetBool("info")
+	error := viper.GetBool("error")
 	logFile := viper.GetString("out")
-	logLevel := logger.Info
+	logLevel := logger.Fatal
+	if error {
+		logLevel = logger.Error
+	}
+	if info {
+		logLevel = logger.Info
+	}
 	if debug {
 		logLevel = logger.Debug
 	}
