@@ -724,4 +724,26 @@ func exerciseStream0(sdr *device.SDRDevice, direction device.Direction, channel 
 	numBuffers := stream.GetNumDirectAccessBuffers()
 	log.Log(logger.NewLogMessageWithFormat(logger.Info, "Number of Direct Access Buffers: %d\n", numBuffers))
 
+	buffers := make([][]int8, 1)
+	buffers[0] = make([]int8, 2*mtu)
+	flags := make([]int, 1)
+
+	for i := 0; i < 10; i++ {
+		var rMsg strings.Builder
+		rMsg.WriteString(fmt.Sprintf("Reading stream (%d)\n", i))
+		timeNS, numElementsRead, err := stream.Read(buffers, uint(mtu), flags, 5000000)
+		rMsg.WriteString(fmt.Sprintf("         timestamp: %d\n", timeNS))
+		rMsg.WriteString(fmt.Sprintf("         numer of Elts read: %d\n", numElementsRead))
+		rMsg.WriteString(fmt.Sprintf("         err: %v\n", err))
+		rMsg.WriteString("         ")
+		for j := 0; j < 7; j = j + 2 {
+			rMsg.WriteString(fmt.Sprintf("[%d, %d]", buffers[0][2*j], buffers[0][2*j+1]))
+		}
+		rMsg.WriteString("\n...\n         ")
+		for j := mtu - 1; j > mtu-9; j = j - 2 {
+			rMsg.WriteString(fmt.Sprintf("[%d, %d]", buffers[0][2*j-1], buffers[0][2*j]))
+		}
+		rMsg.WriteString("\n")
+		log.Log(logger.NewLogMessage(logger.Info, rMsg.String()))
+	}
 }
