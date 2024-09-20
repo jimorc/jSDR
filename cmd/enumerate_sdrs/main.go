@@ -15,12 +15,7 @@ import (
 func main() {
 	logLevel, logFile := parseCommandLine()
 
-	log, err := logger.NewFileLogger(logFile)
-	if err != nil {
-		fmt.Printf("Error trying to open log file '%s': %s\n", logFile, err.Error())
-		os.Exit(1)
-	}
-	log.SetMaxLevel(logLevel)
+	log := initLogfile(logLevel, logFile)
 	defer log.Close()
 
 	devices := device.Enumerate(nil)
@@ -85,6 +80,16 @@ func parseCommandLine() (logger.LoggingLevel, string) {
 		logLevel = logger.Debug
 	}
 	return logLevel, logFile
+}
+
+func initLogfile(level logger.LoggingLevel, fileName string) *logger.Logger {
+	log, err := logger.NewFileLogger(fileName)
+	if err != nil {
+		fmt.Printf("Error trying to open log file '%s': %s\n", fileName, err.Error())
+		os.Exit(1)
+	}
+	log.SetMaxLevel(level)
+	return log
 }
 
 func logHardwareInfo(sdr *device.SDRDevice, log *logger.Logger) {
