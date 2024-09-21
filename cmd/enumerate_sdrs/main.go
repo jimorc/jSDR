@@ -69,7 +69,7 @@ func main() {
 
 func parseCommandLine() (logger.LoggingLevel, string) {
 	pflag.Bool("debug", false, "Log debug information")
-	pflag.String("out", os.Getenv("HOME")+"/enumerate_sdrs.log", "Log filename")
+	pflag.String("out", os.Getenv("HOME")+"/enumerate_sdrs.log", "Log filename. If 'stdout', messages are logged to 'stdout".)
 	pflag.Parse()
 	viper.BindPFlags(pflag.CommandLine)
 	debug := viper.GetBool("debug")
