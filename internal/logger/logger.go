@@ -34,11 +34,6 @@ func NewLogMessage(level LoggingLevel, msg string) *LogMessage {
 	return &LogMessage{level: level, message: msg}
 }
 
-// NewLogMessageWithFormat creates a log message with formatting info and arguments.
-func NewLogMessageWithFormat(level LoggingLevel, fmt string, args ...any) *LogMessage {
-	return &LogMessage{level: level, format: fmt, args: args}
-}
-
 // Logger is a simple logger. It provides a few functions and methods to log information
 // to any io.StringWriter.
 type Logger struct {
