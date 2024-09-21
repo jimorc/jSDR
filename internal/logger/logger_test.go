@@ -14,14 +14,13 @@ func TestLog_UnformattedMessages(t *testing.T) {
 	logBuf := new(strings.Builder)
 	l := logger.New(logBuf)
 
-	m := logger.NewLogMessage(logger.Error, "An error message\n")
-	l.Log(m)
+	l.Log(logger.Error, "An error message\n")
 	// wait for the logging to complete
 	time.Sleep(10 * time.Millisecond)
 
 	assert.Equal(t, "[Info]: Setting max logging level to 'Info'\n[Error]: An error message\n", logBuf.String())
 
-	l.Log(logger.NewLogMessage(logger.Info, "An Info message"))
+	l.Log(logger.Info, "An Info message")
 	// wait for the logging to complete
 	time.Sleep(10 * time.Millisecond)
 	l.Close()
@@ -33,7 +32,7 @@ func TestLog_FormattedMessages(t *testing.T) {
 	logBuf := new(strings.Builder)
 	l := logger.New(logBuf)
 
-	l.Log(logger.NewLogMessageWithFormat(logger.Fatal, "Test message with variable: %d\n", 16))
+	l.Logf(logger.Fatal, "Test message with variable: %d\n", 16)
 	// wait for the logging to complete
 	time.Sleep(10 * time.Millisecond)
 	l.Close()
@@ -43,7 +42,7 @@ func TestLog_FormattedMessages(t *testing.T) {
 	logBuf = new(strings.Builder)
 	l = logger.New(logBuf)
 
-	l.Log(logger.NewLogMessageWithFormat(logger.Info, "Test msg with two variables: %d, %s", 4, "str"))
+	l.Logf(logger.Info, "Test msg with two variables: %d, %s", 4, "str")
 	// wait for the logging to complete
 	time.Sleep(10 * time.Millisecond)
 	l.Close()
@@ -56,22 +55,22 @@ func TestDefaultLoggingLevel(t *testing.T) {
 	l := logger.New(logBuf)
 
 	// Default level is Info, so these messages should be logged.
-	l.Log(logger.NewLogMessage(logger.Info, "Info message 1"))
+	l.Log(logger.Info, "Info message 1")
 	// wait for the logging to complete
 	time.Sleep(10 * time.Millisecond)
 
 	assert.Equal(t, "[Info]: Setting max logging level to 'Info'\n[Info]: Info message 1", logBuf.String())
 
 	// Default logging level is Info, so these messages should not be logged.
-	l.Log(logger.NewLogMessage(logger.Debug, "Debug message 1"))
-	l.Log(logger.NewLogMessageWithFormat(logger.Debug, "Debug message %d", 2))
+	l.Log(logger.Debug, "Debug message 1")
+	l.Logf(logger.Debug, "Debug message %d", 2)
 
 	// wait for the logging to complete
 	time.Sleep(10 * time.Millisecond)
 	assert.Equal(t, "[Info]: Setting max logging level to 'Info'\n[Info]: Info message 1", logBuf.String())
 
 	// But this message should.
-	l.Log(logger.NewLogMessage(logger.Error, "An error message"))
+	l.Log(logger.Error, "An error message")
 	// wait for the logging to complete
 	time.Sleep(10 * time.Millisecond)
 	l.Close()
@@ -83,7 +82,7 @@ func TestSetLoggingLevel(t *testing.T) {
 	l := logger.New(logBuf)
 
 	// Default level is Info, so these messages should be logged.
-	l.Log(logger.NewLogMessage(logger.Info, "Info message 1"))
+	l.Log(logger.Info, "Info message 1")
 	// wait for the logging to complete
 	time.Sleep(10 * time.Millisecond)
 
@@ -92,9 +91,9 @@ func TestSetLoggingLevel(t *testing.T) {
 	l.SetMaxLevel(logger.Error)
 
 	// Default logging level is Info, so these messages should not be logged.
-	l.Log(logger.NewLogMessage(logger.Info, "Info message 4"))
-	l.Log(logger.NewLogMessageWithFormat(logger.Error, "Error message %d", 1))
-	l.Log(logger.NewLogMessage(logger.Fatal, "Fatal message"))
+	l.Log(logger.Info, "Info message 4")
+	l.Logf(logger.Error, "Error message %d", 1)
+	l.Log(logger.Fatal, "Fatal message")
 	// wait for the logging to complete
 	time.Sleep(10 * time.Millisecond)
 	l.Close()
@@ -108,7 +107,7 @@ func TestNewFileLogger_ValidFile(t *testing.T) {
 	assert.Nil(t, err)
 	assert.NotNil(t, log)
 	defer os.Remove(logFile)
-	log.Log(logger.NewLogMessage(logger.Info, "An Info message\n"))
+	log.Log(logger.Info, "An Info message\n")
 	//wait for write
 	time.Sleep(10 * time.Millisecond)
 	log.Close()

@@ -81,17 +81,24 @@ func (l *Logger) Close() {
 
 // Log queues a log message to be output to the logger. The message is queued only if
 // the message level is less than the logger's maximum logging level.
-func (l *Logger) Log(m *LogMessage) {
-	if l.level < m.level {
+func (l *Logger) Log(level LoggingLevel, message string) {
+	if l.level < level {
 		return
 	}
-	l.logCh <- *m
+	l.logCh <- *NewLogMessage(level, message)
+}
+
+func (l *Logger) Logf(level LoggingLevel, format string, args ...any) {
+	if l.level < level {
+		return
+	}
+	l.Log(level, fmt.Sprintf(format, args...))
 }
 
 // SetMaxLevel sets the max logging level.
 func (l *Logger) SetMaxLevel(level LoggingLevel) {
 	l.level = Info
-	l.Log(NewLogMessageWithFormat(Info, "Setting max logging level to '%s'\n", levelAsString(level)))
+	l.Logf(Info, "Setting max logging level to '%s'\n", levelAsString(level))
 	l.level = level
 }
 
