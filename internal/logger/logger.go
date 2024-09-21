@@ -21,17 +21,11 @@ const (
 var LevelsAsStrings [5]string = [5]string{"Undefined", "Fatal", "Error", "Info", "Debug"}
 
 // LogMessage contains the information needed to generate a log message.
-type LogMessage struct {
+type logMessage struct {
 	level   LoggingLevel
 	message string
 	format  string
 	args    []any
-}
-
-// NewLogMessage creates a log message without formatting. It is of the form:
-// "[level]: msg"
-func NewLogMessage(level LoggingLevel, msg string) *LogMessage {
-	return &LogMessage{level: level, message: msg}
 }
 
 // Logger is a simple logger. It provides a few functions and methods to log information
@@ -41,14 +35,14 @@ type Logger struct {
 	file      *os.File
 	waitGroup sync.WaitGroup
 	level     LoggingLevel
-	logCh     chan LogMessage
+	logCh     chan logMessage
 }
 
 // New creates a new Logger with a max logging level of Info.
 func New(writer io.StringWriter) *Logger {
 	l := &Logger{writer: writer}
 	l.waitGroup.Add(1)
-	l.logCh = make(chan LogMessage, 100)
+	l.logCh = make(chan logMessage, 100)
 	go l.outputMessages()
 	l.SetMaxLevel(Info)
 	return l
@@ -80,7 +74,7 @@ func (l *Logger) Log(level LoggingLevel, message string) {
 	if l.level < level {
 		return
 	}
-	l.logCh <- *NewLogMessage(level, message)
+	l.logCh <- *newLogMessage(level, message)
 }
 
 func (l *Logger) Logf(level LoggingLevel, format string, args ...any) {
@@ -102,6 +96,10 @@ func levelAsString(level LoggingLevel) string {
 		return fmt.Sprintf("%s:%d", LevelsAsStrings[0], level)
 	}
 	return LevelsAsStrings[level]
+}
+
+func newLogMessage(level LoggingLevel, msg string) *logMessage {
+	return &logMessage{level: level, message: msg}
 }
 
 func (l *Logger) outputMessages() {
