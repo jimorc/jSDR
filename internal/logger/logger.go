@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"strings"
 	"sync"
 )
 
@@ -47,9 +48,15 @@ func New(writer io.StringWriter) *Logger {
 
 // NewFileLogger creates a new Logger that logs to a file.
 func NewFileLogger(f string) (*Logger, error) {
-	file, err := os.Create(f)
-	if err != nil {
-		return nil, err
+	var file *os.File
+	var err error
+	if strings.ToLower(f) == "stdout" {
+		file = os.Stdout
+	} else {
+		file, err = os.Create(f)
+		if err != nil {
+			return nil, err
+		}
 	}
 	l := New(file)
 	l.file = file
