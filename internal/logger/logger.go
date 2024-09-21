@@ -20,12 +20,9 @@ const (
 
 var LevelsAsStrings [5]string = [5]string{"Undefined", "Fatal", "Error", "Info", "Debug"}
 
-// LogMessage contains the information needed to generate a log message.
 type logMessage struct {
 	level   LoggingLevel
 	message string
-	format  string
-	args    []any
 }
 
 // Logger is a simple logger. It provides a few functions and methods to log information
@@ -109,13 +106,6 @@ func (l *Logger) outputMessages() {
 			l.waitGroup.Done()
 			return
 		}
-		logMsg := ""
-		if msg.format == "" {
-			logMsg = msg.message
-		} else {
-			logMsg = fmt.Sprintf(msg.format, msg.args...)
-		}
-		message := fmt.Sprintf("[%s]: %s", levelAsString(msg.level), logMsg)
-		l.writer.WriteString(message)
+		l.writer.WriteString(fmt.Sprintf("[%s]: %s", levelAsString(msg.level), msg.message))
 	}
 }
