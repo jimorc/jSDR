@@ -42,8 +42,11 @@ func initLogfile(level logger.LoggingLevel, fileName string) *logger.Logger {
 	return log
 }
 
-func makeUI(_ *logger.Logger) fyne.CanvasObject {
-	return widget.NewLabel("Hello from jsdr.makeUI")
+func makeUI(log *logger.Logger) fyne.CanvasObject {
+	log.Log(logger.Debug, "Creating main window content\n")
+	ui := widget.NewLabel("Hello from jsdr.makeUI")
+	log.Log(logger.Debug, "Main window content created\n")
+	return ui
 }
 
 func parseCommandLine() (logger.LoggingLevel, string) {
