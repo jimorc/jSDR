@@ -28,7 +28,7 @@ func parseCommandLine() (logger.LoggingLevel, string) {
 	info := viper.GetBool("info")
 	error := viper.GetBool("error")
 	logFile := viper.GetString("out")
-	logLevel := logger.Fatal
+	logLevel := logger.Info
 	if error {
 		logLevel = logger.Error
 	}
