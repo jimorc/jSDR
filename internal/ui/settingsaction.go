@@ -20,8 +20,8 @@ func makeSettingsAction() *widget.ToolbarAction {
 func settingsCallback() {
 	jsdrLogger.Log(logger.Debug, "In settingsCallback\n")
 	sdrs := widget.NewSelect(sdr.EnumerateWithoutAudio(jsdrLogger), sdrChanged)
-	content := container.NewVBox(sdrs)
-	settings := dialog.NewCustomConfirm("SDR Settings", "Accept", "Close", content, settingsDialogCallback, mainWin)
+	grid := container.NewGridWithColumns(2, widget.NewLabel("SDR Device:"), sdrs)
+	settings := dialog.NewCustomConfirm("SDR Settings", "Accept", "Close", grid, settingsDialogCallback, mainWin)
 	settings.Show()
 }
 
