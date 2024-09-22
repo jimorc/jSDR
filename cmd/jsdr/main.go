@@ -5,6 +5,7 @@ import (
 	"os"
 	"time"
 
+	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/app"
 	"fyne.io/fyne/v2/widget"
 	"github.com/jimorc/jsdr/internal/logger"
@@ -23,7 +24,7 @@ func main() {
 
 	a := app.NewWithID("com.github.jimorc.jsdr")
 	win := a.NewWindow("jsdr")
-	win.SetContent(widget.NewLabel("Hello from jsdr"))
+	win.SetContent(makeUI(log))
 	log.Log(logger.Debug, "Displaying main window\n")
 	win.ShowAndRun()
 	log.Log(logger.Debug, "Terminated main window\n")
@@ -39,6 +40,10 @@ func initLogfile(level logger.LoggingLevel, fileName string) *logger.Logger {
 	}
 	log.SetMaxLevel(level)
 	return log
+}
+
+func makeUI(_ *logger.Logger) fyne.CanvasObject {
+	return widget.NewLabel("Hello from jsdr.makeUI")
 }
 
 func parseCommandLine() (logger.LoggingLevel, string) {
