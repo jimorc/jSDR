@@ -3,7 +3,10 @@ package main
 import (
 	"fmt"
 	"os"
+	"time"
 
+	"fyne.io/fyne/v2/app"
+	"fyne.io/fyne/v2/widget"
 	"github.com/jimorc/jsdr/internal/logger"
 
 	"github.com/spf13/pflag"
@@ -15,6 +18,17 @@ func main() {
 
 	log := initLogfile(logLevel, logFile)
 	defer log.Close()
+
+	log.Logf(logger.Info, "jsdr started at %v\n", time.Now().UTC())
+
+	a := app.NewWithID("com.github.jimorc.jsdr")
+	win := a.NewWindow("jsdr")
+	win.SetContent(widget.NewLabel("Hello from jsdr"))
+	log.Log(logger.Debug, "Displaying main window\n")
+	win.ShowAndRun()
+	log.Log(logger.Debug, "Terminated main window\n")
+
+	log.Logf(logger.Info, "jsdr terminated at %v\n", time.Now().UTC())
 }
 
 func parseCommandLine() (logger.LoggingLevel, string) {
