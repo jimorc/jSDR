@@ -31,6 +31,16 @@ func main() {
 	log.Logf(logger.Info, "jsdr terminated at %v\n", time.Now().UTC())
 }
 
+func initLogfile(level logger.LoggingLevel, fileName string) *logger.Logger {
+	log, err := logger.NewFileLogger(fileName)
+	if err != nil {
+		fmt.Printf("Error trying to open log file '%s': %s\n", fileName, err.Error())
+		os.Exit(1)
+	}
+	log.SetMaxLevel(level)
+	return log
+}
+
 func parseCommandLine() (logger.LoggingLevel, string) {
 	pflag.Bool("error", false, "Log fatal and error messages")
 	pflag.Bool("info", false, "Log fatal, error, and info messages")
@@ -53,14 +63,4 @@ func parseCommandLine() (logger.LoggingLevel, string) {
 		logLevel = logger.Debug
 	}
 	return logLevel, logFile
-}
-
-func initLogfile(level logger.LoggingLevel, fileName string) *logger.Logger {
-	log, err := logger.NewFileLogger(fileName)
-	if err != nil {
-		fmt.Printf("Error trying to open log file '%s': %s\n", fileName, err.Error())
-		os.Exit(1)
-	}
-	log.SetMaxLevel(level)
-	return log
 }
