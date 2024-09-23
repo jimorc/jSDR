@@ -32,6 +32,9 @@ func settingsCallback() {
 		grid := container.NewGridWithColumns(2, widget.NewLabel("SDR Device:"), sdrs)
 		settings := dialog.NewCustomConfirm("SDR Settings", "Accept", "Close", grid, settingsDialogCallback, mainWin)
 		settings.Show()
+		if len(sdrLabels) == 1 {
+			sdrs.SetSelectedIndex(0)
+		}
 	}
 }
 
