@@ -18,11 +18,21 @@ func makeSettingsAction() *widget.ToolbarAction {
 }
 
 func settingsCallback() {
+	var sdrLabels []string
 	jsdrLogger.Log(logger.Debug, "In settingsCallback\n")
-	sdrs := widget.NewSelect(sdr.EnumerateWithoutAudio(jsdrLogger), sdrChanged)
-	grid := container.NewGridWithColumns(2, widget.NewLabel("SDR Device:"), sdrs)
-	settings := dialog.NewCustomConfirm("SDR Settings", "Accept", "Close", grid, settingsDialogCallback, mainWin)
-	settings.Show()
+	sdrLabels = sdr.EnumerateWithoutAudio(jsdrLogger)
+	jsdrLogger.Logf(logger.Debug, "Number of sdr devices returned from EnumerateWithoutAudio: %d\n", len(sdrLabels))
+	if len(sdrLabels) == 0 {
+		noDevices := dialog.NewInformation("No Attached SDRs",
+			"No SDRs were found.\nAttach an SDR, then try again.",
+			mainWin)
+		noDevices.Show()
+	} else {
+		sdrs := widget.NewSelect(sdrLabels, sdrChanged)
+		grid := container.NewGridWithColumns(2, widget.NewLabel("SDR Device:"), sdrs)
+		settings := dialog.NewCustomConfirm("SDR Settings", "Accept", "Close", grid, settingsDialogCallback, mainWin)
+		settings.Show()
+	}
 }
 
 func settingsDialogCallback(accept bool) {
