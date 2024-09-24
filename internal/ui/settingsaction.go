@@ -16,6 +16,7 @@ var sdrsSelect *widget.Select
 // sdrs is a map of devices info indexed by device's label
 var sdrs map[string]map[string]string
 var selSdr *sdr.Sdr
+var sampleRatesSelect *widget.Select
 
 func makeSettingsAction() *widget.ToolbarAction {
 	jsdrLogger.Log(logger.Debug, "Entered ui.makeSettingsAction\n")
@@ -41,7 +42,10 @@ func settingsCallback() {
 		sdrsLabel := widget.NewLabel("SDR Device:")
 		sdrsLabel.Alignment = fyne.TextAlignTrailing
 		sdrsSelect := widget.NewSelect(sdrLabels, sdrChanged)
-		grid := container.NewGridWithColumns(2, sdrsLabel, sdrsSelect)
+		sampleRateLabel := widget.NewLabel("Sample Rate:")
+		sampleRateLabel.Alignment = fyne.TextAlignTrailing
+		sampleRatesSelect = widget.NewSelect([]string{}, sampleRateChanged)
+		grid := container.NewGridWithColumns(2, sdrsLabel, sdrsSelect, sampleRateLabel, sampleRatesSelect)
 		settings := dialog.NewCustomConfirm("SDR Settings", "Accept", "Close", grid, settingsDialogCallback, mainWin)
 		settings.Show()
 		if len(sdrLabels) == 1 {
@@ -57,12 +61,16 @@ func settingsDialogCallback(accept bool) {
 func sdrChanged(value string) {
 	jsdrLogger.Logf(logger.Debug, "SDR selected: %s\n", value)
 	devProps := sdrs[value]
-	_, err := sdr.Make(devProps, jsdrLogger)
+	dev, err := sdr.Make(devProps, jsdrLogger)
 	if err != nil {
 		errDialog := dialog.NewError(err, mainWin)
 		errDialog.Show()
 	} else {
-		// to be added
+		sampleRatesSelect.Options = dev.GetSampleRates(jsdrLogger)
 	}
 
+}
+
+func sampleRateChanged(rate string) {
+	jsdrLogger.Logf(logger.Debug, "Sample rate selected: %s\n", rate)
 }
