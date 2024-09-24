@@ -14,6 +14,7 @@ import (
 type Sdr struct {
 	Device      *device.SDRDevice
 	SampleRates []string
+	Antennas    []string
 }
 
 // map of possible sample rates
@@ -71,6 +72,24 @@ func Make(args map[string]string, log *logger.Logger) (*Sdr, error) {
 	sdr := &Sdr{Device: dev}
 	log.Logf(logger.Debug, "Made SDR with hardware key: %s\n", sdr.Device.GetHardwareKey())
 	return sdr, nil
+}
+
+// GetAntennas returns the list of RX antenna names for channel 0.
+func (sdr *Sdr) GetAntennas(log *logger.Logger) []string {
+	if sdr.Antennas == nil {
+		sdr.Antennas = sdr.Device.ListAntennas(device.DirectionRX, 0)
+	}
+	var aMsg strings.Builder
+	if sdr.Antennas == nil {
+		aMsg.WriteString("No antennas for this SDR\n")
+	} else {
+		aMsg.WriteString("Antennas:\n")
+		for _, antenna := range sdr.Antennas {
+			aMsg.WriteString(fmt.Sprintf("         %s\n", antenna))
+		}
+		log.Log(logger.Debug, aMsg.String())
+	}
+	return sdr.Antennas
 }
 
 // GetSampleRates retrieves a string slice of sample rates based on the sample rate ranges for the SDR.

@@ -17,6 +17,7 @@ var sdrsSelect *widget.Select
 var sdrs map[string]map[string]string
 var selSdr *sdr.Sdr
 var sampleRatesSelect *widget.Select
+var antennaSelect *widget.Select
 
 func makeSettingsAction() *widget.ToolbarAction {
 	jsdrLogger.Log(logger.Debug, "Entered ui.makeSettingsAction\n")
@@ -45,13 +46,21 @@ func settingsCallback() {
 		sampleRateLabel := widget.NewLabel("Sample Rate:")
 		sampleRateLabel.Alignment = fyne.TextAlignTrailing
 		sampleRatesSelect = widget.NewSelect([]string{}, sampleRateChanged)
-		grid := container.NewGridWithColumns(2, sdrsLabel, sdrsSelect, sampleRateLabel, sampleRatesSelect)
+		antennaLabel := widget.NewLabel("Antenna:")
+		antennaLabel.Alignment = fyne.TextAlignTrailing
+		antennaSelect = widget.NewSelect([]string{}, antennaChanged)
+		grid := container.NewGridWithColumns(2, sdrsLabel, sdrsSelect, sampleRateLabel, sampleRatesSelect,
+			antennaLabel, antennaSelect)
 		settings := dialog.NewCustomConfirm("SDR Settings", "Accept", "Close", grid, settingsDialogCallback, mainWin)
 		settings.Show()
 		if len(sdrLabels) == 1 {
 			sdrsSelect.SetSelectedIndex(0)
 		}
 	}
+}
+
+func antennaChanged(antenna string) {
+	jsdrLogger.Logf(logger.Debug, "Antenna selected: %s\n", antenna)
 }
 
 func settingsDialogCallback(accept bool) {
@@ -67,8 +76,11 @@ func sdrChanged(value string) {
 		errDialog.Show()
 	} else {
 		sampleRatesSelect.Options = dev.GetSampleRates(jsdrLogger)
+		antennaSelect.Options = dev.GetAntennas(jsdrLogger)
+		if len(antennaSelect.Options) == 1 {
+			antennaSelect.SetSelectedIndex(0)
+		}
 	}
-
 }
 
 func sampleRateChanged(rate string) {
