@@ -1,6 +1,7 @@
 package ui
 
 import (
+	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/container"
 	"fyne.io/fyne/v2/dialog"
 	"fyne.io/fyne/v2/theme"
@@ -10,8 +11,11 @@ import (
 	"github.com/jimorc/jsdr/internal/sdr"
 )
 
+var sdrsSelect *widget.Select
+
 // sdrs is a map of devices info indexed by device's label
 var sdrs map[string]map[string]string
+var selSdr *sdr.Sdr
 
 func makeSettingsAction() *widget.ToolbarAction {
 	jsdrLogger.Log(logger.Debug, "Entered ui.makeSettingsAction\n")
@@ -34,8 +38,10 @@ func settingsCallback() {
 		for k := range sdrs {
 			sdrLabels = append(sdrLabels, k)
 		}
+		sdrsLabel := widget.NewLabel("SDR Device:")
+		sdrsLabel.Alignment = fyne.TextAlignTrailing
 		sdrsSelect := widget.NewSelect(sdrLabels, sdrChanged)
-		grid := container.NewGridWithColumns(2, widget.NewLabel("SDR Device:"), sdrsSelect)
+		grid := container.NewGridWithColumns(2, sdrsLabel, sdrsSelect)
 		settings := dialog.NewCustomConfirm("SDR Settings", "Accept", "Close", grid, settingsDialogCallback, mainWin)
 		settings.Show()
 		if len(sdrLabels) == 1 {
@@ -50,4 +56,13 @@ func settingsDialogCallback(accept bool) {
 
 func sdrChanged(value string) {
 	jsdrLogger.Logf(logger.Debug, "SDR selected: %s\n", value)
+	devProps := sdrs[value]
+	_, err := sdr.Make(devProps, jsdrLogger)
+	if err != nil {
+		errDialog := dialog.NewError(err, mainWin)
+		errDialog.Show()
+	} else {
+		// to be added
+	}
+
 }
