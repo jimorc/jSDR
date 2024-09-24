@@ -9,15 +9,14 @@ import (
 	"github.com/pothosware/go-soapy-sdr/pkg/device"
 )
 
-// EnumerateWithoutAudio returns a slice of SDR device labels, not including any audio device.
-func EnumerateWithoutAudio(log *logger.Logger) []string {
-	var sdrLabels []string
-	var sdrs []map[string]string
+// EnumerateWithoutAudio returns a map of SDR devices, not including any audio device.
+func EnumerateWithoutAudio(log *logger.Logger) map[string]map[string]string {
+	var sdrs map[string]map[string]string = make(map[string]map[string]string, 0)
 
 	eSdrs := device.Enumerate(nil)
 	for _, dev := range eSdrs {
 		if dev["driver"] != "audio" {
-			sdrs = append(sdrs, dev)
+			sdrs[dev["label"]] = dev
 		}
 	}
 	var sMsg strings.Builder
@@ -25,11 +24,10 @@ func EnumerateWithoutAudio(log *logger.Logger) []string {
 		sMsg.WriteString("Attached SDRs: none\n")
 	} else {
 		sMsg.WriteString("Attached SDRs:\n")
-		for _, dev := range sdrs {
-			sdrLabels = append(sdrLabels, dev["label"])
-			sMsg.WriteString(fmt.Sprintf("         %s\n", dev["label"]))
+		for k := range sdrs {
+			sMsg.WriteString(fmt.Sprintf("         %s\n", k))
 		}
 	}
 	log.Log(logger.Debug, sMsg.String())
-	return sdrLabels
+	return sdrs
 }

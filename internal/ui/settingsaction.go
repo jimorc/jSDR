@@ -10,6 +10,9 @@ import (
 	"github.com/jimorc/jsdr/internal/sdr"
 )
 
+// sdrs is a map of devices info indexed by device's label
+var sdrs map[string]map[string]string
+
 func makeSettingsAction() *widget.ToolbarAction {
 	jsdrLogger.Log(logger.Debug, "Entered ui.makeSettingsAction\n")
 	action := widget.NewToolbarAction(theme.SettingsIcon(), settingsCallback)
@@ -18,22 +21,25 @@ func makeSettingsAction() *widget.ToolbarAction {
 }
 
 func settingsCallback() {
-	var sdrLabels []string
 	jsdrLogger.Log(logger.Debug, "In settingsCallback\n")
-	sdrLabels = sdr.EnumerateWithoutAudio(jsdrLogger)
-	jsdrLogger.Logf(logger.Debug, "Number of sdr devices returned from EnumerateWithoutAudio: %d\n", len(sdrLabels))
-	if len(sdrLabels) == 0 {
+	sdrs = sdr.EnumerateWithoutAudio(jsdrLogger)
+	jsdrLogger.Logf(logger.Debug, "Number of sdr devices returned from EnumerateWithoutAudio: %d\n", len(sdrs))
+	if len(sdrs) == 0 {
 		noDevices := dialog.NewInformation("No Attached SDRs",
 			"No SDRs were found.\nAttach an SDR, then try again.",
 			mainWin)
 		noDevices.Show()
 	} else {
-		sdrs := widget.NewSelect(sdrLabels, sdrChanged)
-		grid := container.NewGridWithColumns(2, widget.NewLabel("SDR Device:"), sdrs)
+		var sdrLabels []string
+		for k := range sdrs {
+			sdrLabels = append(sdrLabels, k)
+		}
+		sdrsSelect := widget.NewSelect(sdrLabels, sdrChanged)
+		grid := container.NewGridWithColumns(2, widget.NewLabel("SDR Device:"), sdrsSelect)
 		settings := dialog.NewCustomConfirm("SDR Settings", "Accept", "Close", grid, settingsDialogCallback, mainWin)
 		settings.Show()
 		if len(sdrLabels) == 1 {
-			sdrs.SetSelectedIndex(0)
+			sdrsSelect.SetSelectedIndex(0)
 		}
 	}
 }
