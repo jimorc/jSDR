@@ -80,6 +80,8 @@ func sdrChanged(value string) {
 		antennaSelect.Options = dev.GetAntennas(jsdrLogger)
 		if len(antennaSelect.Options) == 1 {
 			antennaSelect.SetSelectedIndex(0)
+		} else {
+			antennaSelect.SetSelected(dev.GetCurrentAntenna(jsdrLogger))
 		}
 	}
 }

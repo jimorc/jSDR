@@ -16,6 +16,7 @@ type Sdr struct {
 	SampleRates []string
 	SampleRate  float64
 	Antennas    []string
+	Antenna     string
 }
 
 // map of possible sample rates
@@ -73,6 +74,18 @@ func Make(args map[string]string, log *logger.Logger) (*Sdr, error) {
 	sdr := &Sdr{Device: dev}
 	log.Logf(logger.Debug, "Made SDR with hardware key: %s\n", sdr.Device.GetHardwareKey())
 	return sdr, nil
+}
+
+// GetCurrentAntenna returns the currently selected RX antenna for channel 0 of the SDR.
+func (sdr *Sdr) GetCurrentAntenna(log *logger.Logger) string {
+	antenna := sdr.Device.GetAntennas(device.DirectionRX, 0)
+	if antenna == sdr.Antenna {
+		log.Logf(logger.Debug, "Current antenna is the same as the selected antenna: '%s'\n", sdr.Antenna)
+	} else {
+		log.Logf(logger.Debug, "Current antenna is '%s'\n", antenna)
+		sdr.Antenna = antenna
+	}
+	return sdr.Antenna
 }
 
 // GetAntennas returns the list of RX antenna names for channel 0.
