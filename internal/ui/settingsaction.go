@@ -76,6 +76,7 @@ func sdrChanged(value string) {
 		errDialog.Show()
 	} else {
 		sampleRatesSelect.Options = dev.GetSampleRates(jsdrLogger)
+		sampleRatesSelect.Selected = dev.GetSampleRate(jsdrLogger)
 		antennaSelect.Options = dev.GetAntennas(jsdrLogger)
 		if len(antennaSelect.Options) == 1 {
 			antennaSelect.SetSelectedIndex(0)

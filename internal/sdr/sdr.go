@@ -14,6 +14,7 @@ import (
 type Sdr struct {
 	Device      *device.SDRDevice
 	SampleRates []string
+	SampleRate  float64
 	Antennas    []string
 }
 
@@ -92,6 +93,17 @@ func (sdr *Sdr) GetAntennas(log *logger.Logger) []string {
 	return sdr.Antennas
 }
 
+func (sdr *Sdr) GetSampleRate(log *logger.Logger) string {
+	sampleRate := sdr.Device.GetSampleRate(device.DirectionRX, 0)
+	if sampleRate == sdr.SampleRate {
+		log.Logf(logger.Debug, "Current sample rate is same as selected rate: %f\n", sampleRate)
+	} else {
+		sdr.SampleRate = closestSampleRate(sampleRate, log)
+	}
+	log.Logf(logger.Debug, "GetSampleRate returning %s\n", sampleRatesMap[sdr.SampleRate])
+	return sampleRatesMap[sdr.SampleRate]
+}
+
 // GetSampleRates retrieves a string slice of sample rates based on the sample rate ranges for the SDR.
 func (sdr *Sdr) GetSampleRates(log *logger.Logger) []string {
 	if sdr.SampleRates == nil {
@@ -109,6 +121,31 @@ func (sdr *Sdr) GetSampleRates(log *logger.Logger) []string {
 		sdr.SampleRates = getSampleRatesAsStrings(sampleRateRanges, log)
 	}
 	return sdr.SampleRates
+}
+
+func closestSampleRate(sampleRate float64, log *logger.Logger) float64 {
+	log.Logf(logger.Debug, "closestSampleRate called with sampleRate = %f\n", sampleRate)
+	lowerRate := 0.0
+	upperRate := 10000000.0
+	log.Logf(logger.Debug, "lowerRate = %f, upperRate = %f\n", lowerRate, upperRate)
+	for rate := range sampleRatesMap {
+		if sampleRate >= rate && rate > lowerRate {
+			lowerRate = rate
+		}
+		if sampleRate <= rate && rate < upperRate {
+			upperRate = rate
+		}
+		log.Logf(logger.Debug, "For rate = %f, lowerRate = %f, upperRate = %f\n", rate, lowerRate, upperRate)
+	}
+	lowerDiff := sampleRate - lowerRate
+	upperDiff := upperRate - sampleRate
+	if lowerDiff < upperDiff {
+		log.Logf(logger.Debug, "closestSampleRate returning %f\n", lowerRate)
+		return lowerRate
+	} else {
+		log.Logf(logger.Debug, "closestSampleRate returning %f\n", upperRate)
+		return upperRate
+	}
 }
 
 func getSampleRatesAsStrings(samplewidths []device.SDRRange, log *logger.Logger) []string {
