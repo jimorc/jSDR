@@ -18,7 +18,7 @@ func MakeMainWindow(jsdrApp *fyne.App, log *logger.Logger) fyne.Window {
 	settingsAction := makeSettingsAction()
 	toolbar := widget.NewToolbar(settingsAction)
 	mainWin.SetContent(container.NewBorder(toolbar, nil, nil, nil))
-	mainWin.Resize(fyne.NewSize(400, 200))
+	mainWin.Resize(fyne.NewSize(800, 400))
 	jsdrLogger.Log(logger.Debug, "Main window content created\n")
 	return mainWin
 }
