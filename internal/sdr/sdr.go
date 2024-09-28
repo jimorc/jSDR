@@ -93,6 +93,7 @@ func (sdr *Sdr) GetAntennas(log *logger.Logger) []string {
 	return sdr.Antennas
 }
 
+// GetSampleRate returns the sample rate that most closely matches the current sample rate for the SDR.
 func (sdr *Sdr) GetSampleRate(log *logger.Logger) string {
 	sampleRate := sdr.Device.GetSampleRate(device.DirectionRX, 0)
 	if sampleRate == sdr.SampleRate {
