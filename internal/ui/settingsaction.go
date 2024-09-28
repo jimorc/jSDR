@@ -77,12 +77,14 @@ func sdrChanged(value string) {
 	} else {
 		sampleRatesSelect.Options = dev.GetSampleRates(jsdrLogger)
 		sampleRatesSelect.Selected = dev.GetSampleRate(jsdrLogger)
+		sampleRatesSelect.Refresh()
 		antennaSelect.Options = dev.GetAntennas(jsdrLogger)
 		if len(antennaSelect.Options) == 1 {
 			antennaSelect.SetSelectedIndex(0)
 		} else {
 			antennaSelect.SetSelected(dev.GetCurrentAntenna(jsdrLogger))
 		}
+		antennaSelect.Refresh()
 	}
 }
 
