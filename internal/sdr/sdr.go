@@ -67,7 +67,7 @@ func EnumerateWithoutAudio(sdrD SdrDevice, log *logger.Logger) map[string]map[st
 
 // Make makes a new device given construction args.
 //
-// Construction args should be as explicit as possible (i.e. include all values retrieved by EnumberateWithoutAudio).
+// Construction args should be as explicit as possible (i.e. include all values retrieved by EnumerateWithoutAudio).
 func Make(args map[string]string, log *logger.Logger) (*Sdr, error) {
 	log.Logf(logger.Debug, "Making device with label: %s\n", args["label"])
 	dev, err := device.Make(args)
