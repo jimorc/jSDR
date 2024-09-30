@@ -18,6 +18,7 @@ var sdrs map[string]map[string]string
 var selSdr *sdr.Sdr
 var sampleRatesSelect *widget.Select
 var antennaSelect *widget.Select
+var soapyDevice = &sdr.SoapyDevice{}
 
 func makeSettingsAction() *widget.ToolbarAction {
 	jsdrLogger.Log(logger.Debug, "Entered ui.makeSettingsAction\n")
@@ -28,7 +29,7 @@ func makeSettingsAction() *widget.ToolbarAction {
 
 func settingsCallback() {
 	jsdrLogger.Log(logger.Debug, "In settingsCallback\n")
-	sdrs = sdr.EnumerateWithoutAudio(jsdrLogger)
+	sdrs = sdr.EnumerateWithoutAudio(soapyDevice, jsdrLogger)
 	jsdrLogger.Logf(logger.Debug, "Number of sdr devices returned from EnumerateWithoutAudio: %d\n", len(sdrs))
 	if len(sdrs) == 0 {
 		noDevices := dialog.NewInformation("No Attached SDRs",

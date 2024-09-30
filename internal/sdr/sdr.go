@@ -10,6 +10,10 @@ import (
 	"github.com/pothosware/go-soapy-sdr/pkg/device"
 )
 
+type SdrDevice interface {
+	Enumerate(args map[string]string) []map[string]string
+}
+
 // Sdr represents the SDR device.
 type Sdr struct {
 	Device      *device.SDRDevice
@@ -39,10 +43,10 @@ var sampleRatesMap = map[float64]string{
 }
 
 // EnumerateWithoutAudio returns a map of SDR devices, not including any audio device.
-func EnumerateWithoutAudio(log *logger.Logger) map[string]map[string]string {
+func EnumerateWithoutAudio(sdrD SdrDevice, log *logger.Logger) map[string]map[string]string {
 	var sdrs map[string]map[string]string = make(map[string]map[string]string, 0)
 
-	eSdrs := device.Enumerate(nil)
+	eSdrs := sdrD.Enumerate(nil)
 	for _, dev := range eSdrs {
 		if dev["driver"] != "audio" {
 			sdrs[dev["label"]] = dev
