@@ -45,3 +45,24 @@ func TestEnumerateWithoutAudio(t *testing.T) {
 		assert.NotEqual(t, "Built-in Audio", k)
 	}
 }
+
+func TestEnumerateWithoutAudio_NoOtherDevices(t *testing.T) {
+	testLogger, _ := logger.NewFileLogger("stdout")
+	stub := sdr.StubDevice{Devices: []map[string]string{
+		{"default_output": "False",
+			"device_id":     "0",
+			"driver":        "audio",
+			"label":         "Built-in Audio",
+			"default_input": "False"},
+	},
+	}
+	sdrs := sdr.EnumerateWithoutAudio(&stub, testLogger)
+	assert.Equal(t, 0, len(sdrs))
+}
+
+func TestEnumerateWithoutAudio_NoAudio(t *testing.T) {
+	testLogger, _ := logger.NewFileLogger("stdout")
+	stub := sdr.StubDevice{}
+	sdrs := sdr.EnumerateWithoutAudio(&stub, testLogger)
+	assert.Equal(t, 0, len(sdrs))
+}
