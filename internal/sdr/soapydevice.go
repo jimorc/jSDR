@@ -37,10 +37,19 @@ func (sD *SoapyDevice) Unmake() error {
 	if sD.Device == nil {
 		return errors.New("Attempted to Unmake an SDR that was not successfully created")
 	}
-	return sD.Device.Device.Unmake()
+	err := sD.Device.Device.Unmake()
+	if err == nil {
+		sD.Device = nil
+	}
+	return err
 }
 
 // GetHardwareKey returns the hardware key for the specified device.
 func (sD SoapyDevice) GetHardwareKey() string {
 	return sD.Device.Device.GetHardwareKey()
+}
+
+// GetSampleRateRange returns a slice of sample rate ranges for the specified device.
+func (sD *SoapyDevice) GetSampleRateRange(direction device.Direction, channel uint) []device.SDRRange {
+	return sD.Device.Device.GetSampleRateRange(direction, channel)
 }

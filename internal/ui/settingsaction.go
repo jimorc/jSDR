@@ -80,7 +80,7 @@ func sdrChanged(value string) {
 		errDialog.Show()
 	} else {
 
-		sampleRatesSelect.Options = SoapyDev.Device.GetSampleRates(jsdrLogger)
+		sampleRatesSelect.Options = sdr.GetSampleRates(SoapyDev, jsdrLogger)
 		sampleRatesSelect.Selected = SoapyDev.Device.GetSampleRate(jsdrLogger)
 		sampleRatesSelect.Refresh()
 		antennaSelect.Options = SoapyDev.Device.GetAntennas(jsdrLogger)

@@ -42,6 +42,7 @@ func (dev *StubDevice) Unmake() error {
 	if dev.Device == nil {
 		return errors.New("No device to unmake")
 	} else {
+		dev.Device = nil
 		return nil
 	}
 }
@@ -49,4 +50,14 @@ func (dev *StubDevice) Unmake() error {
 // GetHardwareKey returns a string containing a fake hardware key.
 func (dev StubDevice) GetHardwareKey() string {
 	return "hardKey"
+}
+
+// GetSampleRateRange returns sample rate ranges that match an RTLSDR dongle.
+// If the Make has not been called for the device, then an empty slice is returned.
+func (dev StubDevice) GetSampleRateRange(_ device.Direction, _ uint) []device.SDRRange {
+	if dev.Device == nil {
+		return []device.SDRRange{}
+	}
+	return []device.SDRRange{{Minimum: 225001, Maximum: 300000},
+		{Minimum: 900001, Maximum: 3200000}}
 }

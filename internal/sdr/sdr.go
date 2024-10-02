@@ -24,6 +24,10 @@ type KeyValues interface {
 	GetHardwareKey() string
 }
 
+type SampleRates interface {
+	GetSampleRateRange(device.Direction, uint) []device.SDRRange
+}
+
 // Sdr represents the SDR device.
 type Sdr struct {
 	Device           *device.SDRDevice
@@ -148,22 +152,19 @@ func (sdr *Sdr) GetSampleRate(log *logger.Logger) string {
 }
 
 // GetSampleRates retrieves a string slice of sample rates based on the sample rate ranges for the SDR.
-func (sdr *Sdr) GetSampleRates(log *logger.Logger) []string {
-	if sdr.SampleRates == nil {
-		sampleRateRanges := sdr.Device.GetSampleRateRange(device.DirectionRX, 0)
-		var rMsg strings.Builder
-		if len(sampleRateRanges) == 0 {
-			rMsg.WriteString("There are no sample rate ranges for the specified SDR\n")
-		} else {
-			rMsg.WriteString("Sample Rate ranges:\n")
-			for _, srR := range sampleRateRanges {
-				rMsg.WriteString(fmt.Sprintf("         %v\n", srR))
-			}
+func GetSampleRates(sdrD SampleRates, log *logger.Logger) []string {
+	sampleRateRanges := sdrD.GetSampleRateRange(device.DirectionRX, 0)
+	var rMsg strings.Builder
+	if len(sampleRateRanges) == 0 {
+		rMsg.WriteString("There are no sample rate ranges for the specified SDR\n")
+	} else {
+		rMsg.WriteString("Sample Rate ranges:\n")
+		for _, srR := range sampleRateRanges {
+			rMsg.WriteString(fmt.Sprintf("         %v\n", srR))
 		}
 		log.Log(logger.Debug, rMsg.String())
-		sdr.SampleRates = getSampleRatesAsStrings(sampleRateRanges, log)
 	}
-	return sdr.SampleRates
+	return getSampleRatesAsStrings(sampleRateRanges, log)
 }
 
 func closestSampleRate(sampleRate float64, log *logger.Logger) float64 {
