@@ -18,7 +18,7 @@ var sdrs map[string]map[string]string
 var selSdr *sdr.Sdr
 var sampleRatesSelect *widget.Select
 var antennaSelect *widget.Select
-var soapyDevice = &sdr.SoapyDevice{}
+var SoapyDev = &sdr.SoapyDevice{}
 
 func makeSettingsAction() *widget.ToolbarAction {
 	jsdrLogger.Log(logger.Debug, "Entered ui.makeSettingsAction\n")
@@ -29,7 +29,7 @@ func makeSettingsAction() *widget.ToolbarAction {
 
 func settingsCallback() {
 	jsdrLogger.Log(logger.Debug, "In settingsCallback\n")
-	sdrs = sdr.EnumerateWithoutAudio(soapyDevice, jsdrLogger)
+	sdrs = sdr.EnumerateWithoutAudio(SoapyDev, jsdrLogger)
 	jsdrLogger.Logf(logger.Debug, "Number of sdr devices returned from EnumerateWithoutAudio: %d\n", len(sdrs))
 	if len(sdrs) == 0 {
 		noDevices := dialog.NewInformation("No Attached SDRs",
@@ -71,23 +71,23 @@ func settingsDialogCallback(accept bool) {
 func sdrChanged(value string) {
 	jsdrLogger.Logf(logger.Debug, "SDR selected: %s\n", value)
 	devProps := sdrs[value]
-	if soapyDevice.Device != nil {
-		sdr.Unmake(soapyDevice, jsdrLogger)
+	if SoapyDev.Device != nil {
+		sdr.Unmake(SoapyDev, jsdrLogger)
 	}
-	err := sdr.Make(soapyDevice, devProps, jsdrLogger)
+	err := sdr.Make(SoapyDev, devProps, jsdrLogger)
 	if err != nil {
 		errDialog := dialog.NewError(err, mainWin)
 		errDialog.Show()
 	} else {
 
-		sampleRatesSelect.Options = soapyDevice.Device.GetSampleRates(jsdrLogger)
-		sampleRatesSelect.Selected = soapyDevice.Device.GetSampleRate(jsdrLogger)
+		sampleRatesSelect.Options = SoapyDev.Device.GetSampleRates(jsdrLogger)
+		sampleRatesSelect.Selected = SoapyDev.Device.GetSampleRate(jsdrLogger)
 		sampleRatesSelect.Refresh()
-		antennaSelect.Options = soapyDevice.Device.GetAntennas(jsdrLogger)
+		antennaSelect.Options = SoapyDev.Device.GetAntennas(jsdrLogger)
 		if len(antennaSelect.Options) == 1 {
 			antennaSelect.SetSelectedIndex(0)
 		} else {
-			antennaSelect.SetSelected(soapyDevice.Device.GetCurrentAntenna(jsdrLogger))
+			antennaSelect.SetSelected(SoapyDev.Device.GetCurrentAntenna(jsdrLogger))
 		}
 		antennaSelect.Refresh()
 	}
