@@ -71,19 +71,20 @@ func settingsDialogCallback(accept bool) {
 func sdrChanged(value string) {
 	jsdrLogger.Logf(logger.Debug, "SDR selected: %s\n", value)
 	devProps := sdrs[value]
-	dev, err := sdr.Make(devProps, jsdrLogger)
+	err := sdr.Make(soapyDevice, devProps, jsdrLogger)
 	if err != nil {
 		errDialog := dialog.NewError(err, mainWin)
 		errDialog.Show()
 	} else {
-		sampleRatesSelect.Options = dev.GetSampleRates(jsdrLogger)
-		sampleRatesSelect.Selected = dev.GetSampleRate(jsdrLogger)
+
+		sampleRatesSelect.Options = soapyDevice.Device.GetSampleRates(jsdrLogger)
+		sampleRatesSelect.Selected = soapyDevice.Device.GetSampleRate(jsdrLogger)
 		sampleRatesSelect.Refresh()
-		antennaSelect.Options = dev.GetAntennas(jsdrLogger)
+		antennaSelect.Options = soapyDevice.Device.GetAntennas(jsdrLogger)
 		if len(antennaSelect.Options) == 1 {
 			antennaSelect.SetSelectedIndex(0)
 		} else {
-			antennaSelect.SetSelected(dev.GetCurrentAntenna(jsdrLogger))
+			antennaSelect.SetSelected(soapyDevice.Device.GetCurrentAntenna(jsdrLogger))
 		}
 		antennaSelect.Refresh()
 	}

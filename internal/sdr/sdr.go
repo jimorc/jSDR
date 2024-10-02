@@ -10,8 +10,17 @@ import (
 	"github.com/pothosware/go-soapy-sdr/pkg/device"
 )
 
-type SdrDevice interface {
+type Enumerate interface {
 	Enumerate(args map[string]string) []map[string]string
+}
+
+type MakeDevice interface {
+	Make(args map[string]string) error
+	GetHardwareKey() string
+}
+
+type KeyValues interface {
+	GetHardwareKey() string
 }
 
 // Sdr represents the SDR device.
@@ -43,7 +52,7 @@ var sampleRatesMap = map[float64]string{
 }
 
 // EnumerateWithoutAudio returns a map of SDR devices, not including any audio device.
-func EnumerateWithoutAudio(sdrD SdrDevice, log *logger.Logger) map[string]map[string]string {
+func EnumerateWithoutAudio(sdrD Enumerate, log *logger.Logger) map[string]map[string]string {
 	var sdrs map[string]map[string]string = make(map[string]map[string]string, 0)
 
 	eSdrs := sdrD.Enumerate(nil)
@@ -68,16 +77,15 @@ func EnumerateWithoutAudio(sdrD SdrDevice, log *logger.Logger) map[string]map[st
 // Make makes a new device given construction args.
 //
 // Construction args should be as explicit as possible (i.e. include all values retrieved by EnumerateWithoutAudio).
-func Make(args map[string]string, log *logger.Logger) (*Sdr, error) {
+func Make(sdrD MakeDevice, args map[string]string, log *logger.Logger) error {
 	log.Logf(logger.Debug, "Making device with label: %s\n", args["label"])
-	dev, err := device.Make(args)
+	err := sdrD.Make(args)
 	if err != nil {
 		log.Logf(logger.Error, "Error encountered trying to make device: %s\n", err.Error())
-		return nil, err
+		return err
 	}
-	sdr := &Sdr{Device: dev}
-	log.Logf(logger.Debug, "Made SDR with hardware key: %s\n", sdr.Device.GetHardwareKey())
-	return sdr, nil
+	log.Logf(logger.Debug, "Made SDR with hardware key: %s\n", sdrD.GetHardwareKey())
+	return nil
 }
 
 // GetCurrentAntenna returns the currently selected RX antenna for channel 0 of the SDR.
@@ -108,6 +116,11 @@ func (sdr *Sdr) GetAntennas(log *logger.Logger) []string {
 		log.Log(logger.Debug, aMsg.String())
 	}
 	return sdr.Antennas
+}
+
+// GetHardwareKey returns the hardware key for the SDR device.
+func (sdr *Sdr) GetHardwareKey(sdrD KeyValues) string {
+	return sdrD.GetHardwareKey()
 }
 
 // GetSampleRate returns the sample rate that most closely matches the current sample rate for the SDR.

@@ -66,3 +66,43 @@ func TestEnumerateWithoutAudio_NoAudio(t *testing.T) {
 	sdrs := sdr.EnumerateWithoutAudio(&stub, testLogger)
 	assert.Equal(t, 0, len(sdrs))
 }
+
+func TestMake(t *testing.T) {
+	testLogger, _ := logger.NewFileLogger("stdout")
+	stub := sdr.StubDevice{}
+	err := sdr.Make(&stub, map[string]string{
+		"driver":       "rtlsdr",
+		"label":        "Generic RTL2832U OEM :: 00000102",
+		"manufacturer": "Realtek",
+		"product":      "RTL2838UHIDIR",
+		"serial":       "00000102",
+		"tuner":        "Rafael Micro R820T"}, testLogger)
+	assert.NotNil(t, stub.Device)
+	assert.NotNil(t, stub.Device.Device)
+	assert.Nil(t, err)
+}
+
+func TestBadMake(t *testing.T) {
+	testLogger, _ := logger.NewFileLogger("stdout")
+	stub := sdr.StubDevice{}
+	err := sdr.Make(&stub, map[string]string{}, testLogger)
+	assert.Nil(t, stub.Device)
+	assert.NotNil(t, err)
+	// The following error message is returned from StubDevice only. SoapyDevice would return
+	// a different error message in case of error.
+	assert.Equal(t, "No arguments provided", err.Error())
+}
+
+func TestGetHardwareKey(t *testing.T) {
+	testLogger, _ := logger.NewFileLogger("stdout")
+	stub := sdr.StubDevice{}
+	_ = sdr.Make(&stub, map[string]string{
+		"driver":       "rtlsdr",
+		"label":        "Generic RTL2832U OEM :: 00000102",
+		"manufacturer": "Realtek",
+		"product":      "RTL2838UHIDIR",
+		"serial":       "00000102",
+		"tuner":        "Rafael Micro R820T"}, testLogger)
+	hwKey := stub.GetHardwareKey()
+	assert.Equal(t, "hardKey", hwKey)
+}
