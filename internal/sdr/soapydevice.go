@@ -32,6 +32,7 @@ func (sD *SoapyDevice) Make(args map[string]string) error {
 	return err
 }
 
+// Unmake unmakes the SDR device if Make previously called for it.
 func (sD *SoapyDevice) Unmake() error {
 	if sD.Device == nil {
 		return errors.New("Attempted to Unmake an SDR that was not successfully created")
