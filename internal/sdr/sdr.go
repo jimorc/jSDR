@@ -16,6 +16,7 @@ type Enumerate interface {
 
 type MakeDevice interface {
 	Make(args map[string]string) error
+	Unmake() error
 	GetHardwareKey() string
 }
 
@@ -25,11 +26,12 @@ type KeyValues interface {
 
 // Sdr represents the SDR device.
 type Sdr struct {
-	Device      *device.SDRDevice
-	SampleRates []string
-	SampleRate  float64
-	Antennas    []string
-	Antenna     string
+	Device           *device.SDRDevice
+	DeviceProperties map[string]string
+	SampleRates      []string
+	SampleRate       float64
+	Antennas         []string
+	Antenna          string
 }
 
 // map of possible sample rates
@@ -76,7 +78,8 @@ func EnumerateWithoutAudio(sdrD Enumerate, log *logger.Logger) map[string]map[st
 
 // Make makes a new device given construction args.
 //
-// Construction args should be as explicit as possible (i.e. include all values retrieved by EnumerateWithoutAudio).
+// Construction args should be as explicit as possible (i.e. include all values retrieved by
+// EnumerateWithoutAudio). args should contain a label value.
 func Make(sdrD MakeDevice, args map[string]string, log *logger.Logger) error {
 	log.Logf(logger.Debug, "Making device with label: %s\n", args["label"])
 	err := sdrD.Make(args)
@@ -86,6 +89,15 @@ func Make(sdrD MakeDevice, args map[string]string, log *logger.Logger) error {
 	}
 	log.Logf(logger.Debug, "Made SDR with hardware key: %s\n", sdrD.GetHardwareKey())
 	return nil
+}
+
+func Unmake(sdrD MakeDevice, log *logger.Logger) error {
+	log.Log(logger.Debug, "Attempting to unmake an SDR device\n")
+	err := sdrD.Unmake()
+	if err != nil {
+		log.Logf(logger.Error, "Error attempting to unmake an SDR device: %s\n", err.Error())
+	}
+	return err
 }
 
 // GetCurrentAntenna returns the currently selected RX antenna for channel 0 of the SDR.

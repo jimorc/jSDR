@@ -71,6 +71,9 @@ func settingsDialogCallback(accept bool) {
 func sdrChanged(value string) {
 	jsdrLogger.Logf(logger.Debug, "SDR selected: %s\n", value)
 	devProps := sdrs[value]
+	if soapyDevice.Device != nil {
+		sdr.Unmake(soapyDevice, jsdrLogger)
+	}
 	err := sdr.Make(soapyDevice, devProps, jsdrLogger)
 	if err != nil {
 		errDialog := dialog.NewError(err, mainWin)

@@ -1,6 +1,8 @@
 package sdr
 
 import (
+	"errors"
+
 	"github.com/pothosware/go-soapy-sdr/pkg/device"
 )
 
@@ -24,8 +26,17 @@ func (sD SoapyDevice) Enumerate(args map[string]string) []map[string]string {
 // Return a pointer to a new Device object or nil for error
 func (sD *SoapyDevice) Make(args map[string]string) error {
 	dev, err := device.Make(args)
-	sD.Device = &Sdr{Device: dev}
+	if err == nil {
+		sD.Device = &Sdr{Device: dev, DeviceProperties: args}
+	}
 	return err
+}
+
+func (sD *SoapyDevice) Unmake() error {
+	if sD.Device == nil {
+		return errors.New("Attempted to Unmake an SDR that was not successfully created")
+	}
+	return sD.Device.Device.Unmake()
 }
 
 // GetHardwareKey returns the hardware key for the specified device.

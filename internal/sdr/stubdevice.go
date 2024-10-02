@@ -30,7 +30,18 @@ func (dev *StubDevice) Make(args map[string]string) error {
 		return errors.New("No arguments provided")
 	} else {
 		fakeDev := 127
-		dev.Device = &Sdr{Device: (*device.SDRDevice)(unsafe.Pointer(&fakeDev))}
+		dev.Device = &Sdr{Device: (*device.SDRDevice)(unsafe.Pointer(&fakeDev)),
+			DeviceProperties: args}
+		return nil
+	}
+}
+
+// Unmake returns nil if previous call to Make was successful; otherwise, returns an error.
+// Since StubDevice is used for testing, an actual SDR is never created.
+func (dev *StubDevice) Unmake() error {
+	if dev.Device == nil {
+		return errors.New("No device to unmake")
+	} else {
 		return nil
 	}
 }
