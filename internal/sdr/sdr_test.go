@@ -162,3 +162,26 @@ func TestGetSampleRates_NoDevice(t *testing.T) {
 	rates := sdr.GetSampleRates(&stub, testLogger)
 	require.Equal(t, 0, len(rates))
 }
+
+func TestGetSampleRate(t *testing.T) {
+	testLogger, _ := logger.NewFileLogger("stdout")
+	stub := sdr.StubDevice{}
+	err := sdr.Make(&stub, map[string]string{
+		"driver":       "rtlsdr",
+		"label":        "Generic RTL2832U OEM :: 00000102",
+		"manufacturer": "Realtek",
+		"product":      "RTL2838UHIDIR",
+		"serial":       "00000102",
+		"tuner":        "Rafael Micro R820T"}, testLogger)
+	require.Nil(t, err)
+	sampleRate := sdr.GetSampleRate(&stub, testLogger)
+	assert.Equal(t, "2.048 MS/s", sampleRate)
+}
+
+func TestSampleRate_BadDevice(t *testing.T) {
+	testLogger, _ := logger.NewFileLogger("stdout")
+	stub := sdr.StubDevice{}
+	// stub.Make not called, so no sample rate returned by sdr.GetSampleRate.
+	sampleRate := sdr.GetSampleRate(&stub, testLogger)
+	assert.Equal(t, "", sampleRate)
+}

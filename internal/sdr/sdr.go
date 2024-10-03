@@ -26,6 +26,7 @@ type KeyValues interface {
 
 type SampleRates interface {
 	GetSampleRateRange(device.Direction, uint) []device.SDRRange
+	GetSampleRate(device.Direction, uint) float64
 }
 
 // Sdr represents the SDR device.
@@ -140,15 +141,13 @@ func (sdr *Sdr) GetHardwareKey(sdrD KeyValues) string {
 }
 
 // GetSampleRate returns the sample rate that most closely matches the current sample rate for the SDR.
-func (sdr *Sdr) GetSampleRate(log *logger.Logger) string {
-	sampleRate := sdr.Device.GetSampleRate(device.DirectionRX, 0)
-	if sampleRate == sdr.SampleRate {
-		log.Logf(logger.Debug, "Current sample rate is same as selected rate: %f\n", sampleRate)
-	} else {
-		sdr.SampleRate = closestSampleRate(sampleRate, log)
-	}
-	log.Logf(logger.Debug, "GetSampleRate returning %s\n", sampleRatesMap[sdr.SampleRate])
-	return sampleRatesMap[sdr.SampleRate]
+func GetSampleRate(sdrD SampleRates, log *logger.Logger) string {
+	sampleRate := sdrD.GetSampleRate(device.DirectionRX, 0)
+	log.Logf(logger.Debug, "Current sample rate: %f\n", sampleRate)
+	closestRate := closestSampleRate(sampleRate, log)
+	log.Logf(logger.Debug, "Closest sample rate: %f\n", closestRate)
+	log.Logf(logger.Debug, "GetSampleRate returning %s\n", sampleRatesMap[closestRate])
+	return sampleRatesMap[closestRate]
 }
 
 // GetSampleRates retrieves a string slice of sample rates based on the sample rate ranges for the SDR.
