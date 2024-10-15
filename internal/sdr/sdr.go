@@ -33,6 +33,10 @@ type SampleRates interface {
 	SetSampleRate(device.Direction, uint, float64) error
 }
 
+type Antenna interface {
+	ListAntennas(device.Direction, uint) []string
+}
+
 // Sdr represents the SDR device.
 type Sdr struct {
 	Device           *device.SDRDevice
@@ -122,21 +126,19 @@ func (sdr *Sdr) GetCurrentAntenna(log *logger.Logger) string {
 }
 
 // GetAntennas returns the list of RX antenna names for channel 0.
-func (sdr *Sdr) GetAntennas(log *logger.Logger) []string {
-	if sdr.Antennas == nil {
-		sdr.Antennas = sdr.Device.ListAntennas(device.DirectionRX, 0)
-	}
+func GetAntennas(sdrD Antenna, log *logger.Logger) []string {
+	antennas := sdrD.ListAntennas(device.DirectionRX, 0)
 	var aMsg strings.Builder
-	if sdr.Antennas == nil {
+	if len(antennas) == 0 {
 		aMsg.WriteString("No antennas for this SDR\n")
 	} else {
 		aMsg.WriteString("Antennas:\n")
-		for _, antenna := range sdr.Antennas {
+		for _, antenna := range antennas {
 			aMsg.WriteString(fmt.Sprintf("         %s\n", antenna))
 		}
 		log.Log(logger.Debug, aMsg.String())
 	}
-	return sdr.Antennas
+	return antennas
 }
 
 // GetHardwareKey returns the hardware key for the SDR device.

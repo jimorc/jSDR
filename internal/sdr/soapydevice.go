@@ -64,3 +64,7 @@ func (sD *SoapyDevice) GetSampleRate(direction device.Direction, channel uint) f
 func (sD *SoapyDevice) SetSampleRate(direction device.Direction, channel uint, rate float64) error {
 	return sD.Device.Device.SetSampleRate(direction, channel, rate)
 }
+
+func (sD *SoapyDevice) ListAntennas(direction device.Direction, channel uint) []string {
+	return sD.Device.Device.ListAntennas(direction, channel)
+}

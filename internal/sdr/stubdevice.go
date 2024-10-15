@@ -98,3 +98,11 @@ func (dev *StubDevice) SetSampleRate(_ device.Direction, _ uint, rate float64) e
 	}
 	return nil
 }
+
+func (dev *StubDevice) ListAntennas(direction device.Direction, _ uint) []string {
+	if direction == device.DirectionRX {
+		return []string{"RX"}
+	} else {
+		return []string{}
+	}
+}

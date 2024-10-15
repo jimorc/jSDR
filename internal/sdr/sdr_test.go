@@ -223,3 +223,11 @@ func TestSetSampleRate_Mismatch(t *testing.T) {
 	assert.NotNil(t, err)
 	assert.Equal(t, "Attempt to set sample rate to 1024000.0 failed. Sample rate is 2048000.0", err.Error())
 }
+
+func TestListAntennas(t *testing.T) {
+	testLogger, _ := logger.NewFileLogger("stdout")
+	stub := sdr.StubDevice{}
+	antennas := sdr.GetAntennas(&stub, testLogger)
+	assert.Equal(t, []string{"RX"}, antennas)
+
+}
