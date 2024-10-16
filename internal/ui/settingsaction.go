@@ -83,11 +83,11 @@ func sdrChanged(value string) {
 		sampleRatesSelect.Options = sdr.GetSampleRates(SoapyDev, jsdrLogger)
 		sampleRatesSelect.Selected = sdr.GetSampleRate(SoapyDev, jsdrLogger)
 		sampleRatesSelect.Refresh()
-		antennaSelect.Options = SoapyDev.Device.GetAntennas(SoapyDev, jsdrLogger)
+		antennaSelect.Options = sdr.GetAntennas(SoapyDev, jsdrLogger)
 		if len(antennaSelect.Options) == 1 {
 			antennaSelect.SetSelectedIndex(0)
 		} else {
-			antennaSelect.SetSelected(SoapyDev.Device.GetCurrentAntenna(jsdrLogger))
+			antennaSelect.SetSelected(sdr.GetCurrentAntenna(SoapyDev, jsdrLogger))
 		}
 		antennaSelect.Refresh()
 	}

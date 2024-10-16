@@ -35,6 +35,7 @@ type SampleRates interface {
 
 type Antenna interface {
 	ListAntennas(device.Direction, uint) []string
+	GetAntennas(device.Direction, uint) string
 }
 
 // Sdr represents the SDR device.
@@ -114,15 +115,10 @@ func Unmake(sdrD MakeDevice, log *logger.Logger) error {
 }
 
 // GetCurrentAntenna returns the currently selected RX antenna for channel 0 of the SDR.
-func (sdr *Sdr) GetCurrentAntenna(log *logger.Logger) string {
-	antenna := sdr.Device.GetAntennas(device.DirectionRX, 0)
-	if antenna == sdr.Antenna {
-		log.Logf(logger.Debug, "Current antenna is the same as the selected antenna: '%s'\n", sdr.Antenna)
-	} else {
-		log.Logf(logger.Debug, "Current antenna is '%s'\n", antenna)
-		sdr.Antenna = antenna
-	}
-	return sdr.Antenna
+func GetCurrentAntenna(sdrD Antenna, log *logger.Logger) string {
+	antenna := sdrD.GetAntennas(device.DirectionRX, 0)
+	log.Logf(logger.Debug, "Current antenna is %s\n", antenna)
+	return antenna
 }
 
 // GetAntennas returns the list of RX antenna names for channel 0.

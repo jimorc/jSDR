@@ -229,5 +229,11 @@ func TestListAntennas(t *testing.T) {
 	stub := sdr.StubDevice{}
 	antennas := sdr.GetAntennas(&stub, testLogger)
 	assert.Equal(t, []string{"RX"}, antennas)
+}
 
+func TestGetCurrentAntenna(t *testing.T) {
+	testLogger, _ := logger.NewFileLogger("stdout")
+	stub := sdr.StubDevice{}
+	ant := sdr.GetCurrentAntenna(&stub, testLogger)
+	assert.Equal(t, "RX", ant)
 }
