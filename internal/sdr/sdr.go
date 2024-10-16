@@ -41,6 +41,7 @@ type Antenna interface {
 type Gain interface {
 	SupportsAGC(device.Direction, uint) bool
 	AgcIsEnabled(device.Direction, uint) bool
+	EnableAgc(device.Direction, uint, bool) error
 }
 
 // Sdr represents the SDR device.
@@ -190,6 +191,21 @@ func AgcIsEnabled(sdrD Gain, log *logger.Logger) bool {
 	enabled := sdrD.AgcIsEnabled(device.DirectionRX, 0)
 	log.Logf(logger.Debug, "AgcIsEnabled: %v\n", enabled)
 	return enabled
+}
+
+func EnableAgc(sdrD Gain, log *logger.Logger, enable bool) error {
+	err := sdrD.EnableAgc(device.DirectionRX, 0, enable)
+	if err != nil {
+		log.Logf(logger.Debug, "Error returned trying to set AGC mode: %v: %s\n", enable, err.Error())
+		return err
+	}
+	enabled := sdrD.AgcIsEnabled(device.DirectionRX, 0)
+	if enable == enabled {
+		log.Logf(logger.Debug, "AGC mode set to %v\n", enable)
+	} else {
+		log.Logf(logger.Debug, "Error attempting to set AGC mode to %v\n", enable)
+	}
+	return err
 }
 
 func SetSampleRate(sdrD SampleRates, log *logger.Logger, rate float64) error {

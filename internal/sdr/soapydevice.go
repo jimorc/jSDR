@@ -90,3 +90,8 @@ func (sD *SoapyDevice) SupportsAGC(direction device.Direction, channel uint) boo
 func (sD *SoapyDevice) AgcIsEnabled(sdrD Gain, log *logger.Logger) bool {
 	return sD.Device.Device.GetGainMode(device.DirectionRX, 0)
 }
+
+func (sD *SoapyDevice) EnableAgc(sdrD Gain, log *logger.Logger, enable bool) error {
+	return sD.Device.Device.SetGainMode(device.DirectionRX, 0, enable)
+
+}

@@ -17,6 +17,9 @@ type StubDevice struct {
 	sampleRate float64
 }
 
+// agcEnabled stores current AGC enabled value.
+var agcEnabled bool
+
 // Enumerate returns a slice of map[string]string values representing the available devices. These
 // values must be preloaded into the Devices property of the StubDevice struct before Enumerate is called.
 func (dev StubDevice) Enumerate(args map[string]string) []map[string]string {
@@ -134,7 +137,20 @@ func (dev *StubDevice) AgcIsEnabled(direction device.Direction, _ uint) bool {
 	switch dev.Args["serial"] {
 	case "1":
 		return true
+	case "2":
+		return agcEnabled
 	default:
 		return false
 	}
+}
+
+func (dev *StubDevice) EnableAgc(_ device.Direction, _ uint, enable bool) error {
+	switch dev.Args["serial"] {
+	case "1":
+		return errors.New("Could not enable Agc")
+	case "2":
+		agcEnabled = enable
+		return nil
+	}
+	return errors.New("Invalid serial number for StubDevice.EnableAgc")
 }
