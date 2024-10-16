@@ -126,3 +126,15 @@ func (dev *StubDevice) SupportsAGC(direction device.Direction, _ uint) bool {
 	}
 	return false
 }
+
+// AgcIsEnabled returns whether AGC is currently enabled or not.
+//
+// Value returned is based on the device's serial number to allow testing of sdr.AgcIsEnabled.
+func (dev *StubDevice) AgcIsEnabled(direction device.Direction, _ uint) bool {
+	switch dev.Args["serial"] {
+	case "1":
+		return true
+	default:
+		return false
+	}
+}

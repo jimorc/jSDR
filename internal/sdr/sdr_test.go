@@ -244,3 +244,17 @@ func TestSupportsAGC(t *testing.T) {
 	supportsAGC := sdr.SupportsAGC(&stub, testLogger)
 	assert.True(t, supportsAGC)
 }
+
+func TestAgcIsEnabled(t *testing.T) {
+	testLogger, _ := logger.NewFileLogger("stdout")
+	stub := sdr.StubDevice{Args: map[string]string{"serial": "1"}}
+	agcEnabled := sdr.AgcIsEnabled(&stub, testLogger)
+	assert.True(t, agcEnabled)
+}
+
+func TestAgcIsNotEnabled(t *testing.T) {
+	testLogger, _ := logger.NewFileLogger("stdout")
+	stub := sdr.StubDevice{Args: map[string]string{"serial": "2"}}
+	agcEnabled := sdr.AgcIsEnabled(&stub, testLogger)
+	assert.False(t, agcEnabled)
+}

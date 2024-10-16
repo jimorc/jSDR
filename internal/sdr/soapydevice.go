@@ -3,6 +3,7 @@ package sdr
 import (
 	"errors"
 
+	"github.com/jimorc/jsdr/internal/logger"
 	"github.com/pothosware/go-soapy-sdr/pkg/device"
 )
 
@@ -80,4 +81,12 @@ func (sD *SoapyDevice) GetAntennas(direction device.Direction, channel uint) str
 // Returns true if device supports automatic gain control.
 func (sD *SoapyDevice) SupportsAGC(direction device.Direction, channel uint) bool {
 	return sD.Device.Device.HasGainMode(direction, channel)
+}
+
+// AgcIsEnabled returns whether AGC is enabled for receive channel 0 of the device.
+// You should call SupportsAGC to determine if the device supports AGC before calling AgcIsEnabled.
+//
+// Returns true if AGC is enabled.
+func (sD *SoapyDevice) AgcIsEnabled(sdrD Gain, log *logger.Logger) bool {
+	return sD.Device.Device.GetGainMode(device.DirectionRX, 0)
 }
