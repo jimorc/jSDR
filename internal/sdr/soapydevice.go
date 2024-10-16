@@ -74,3 +74,10 @@ func (sD *SoapyDevice) ListAntennas(direction device.Direction, channel uint) []
 func (sD *SoapyDevice) GetAntennas(direction device.Direction, channel uint) string {
 	return sD.Device.Device.GetAntennas(direction, channel)
 }
+
+// SupportsAGC returns whether the device supports AGC or not.
+//
+// Returns true if device supports automatic gain control.
+func (sD *SoapyDevice) SupportsAGC(direction device.Direction, channel uint) bool {
+	return sD.Device.Device.HasGainMode(direction, channel)
+}

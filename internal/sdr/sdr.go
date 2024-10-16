@@ -38,6 +38,10 @@ type Antenna interface {
 	GetAntennas(device.Direction, uint) string
 }
 
+type Gain interface {
+	SupportsAGC(device.Direction, uint) bool
+}
+
 // Sdr represents the SDR device.
 type Sdr struct {
 	Device           *device.SDRDevice
@@ -166,6 +170,15 @@ func GetSampleRates(sdrD SampleRates, log *logger.Logger) []string {
 		log.Log(logger.Debug, rMsg.String())
 	}
 	return getSampleRatesAsStrings(sampleRateRanges, log)
+}
+
+// SupportsAGC returns whether the device supports AGC or not.
+//
+// Returns true if device supports automatic gain control for RX channel 0.
+func SupportsAGC(sdrD Gain, log *logger.Logger) bool {
+	supportsAGC := sdrD.SupportsAGC(device.DirectionRX, 0)
+	log.Logf(logger.Debug, "Device has gain mode: %v\n", supportsAGC)
+	return supportsAGC
 }
 
 func SetSampleRate(sdrD SampleRates, log *logger.Logger, rate float64) error {

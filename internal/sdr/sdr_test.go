@@ -237,3 +237,10 @@ func TestGetCurrentAntenna(t *testing.T) {
 	ant := sdr.GetCurrentAntenna(&stub, testLogger)
 	assert.Equal(t, "RX", ant)
 }
+
+func TestSupportsAGC(t *testing.T) {
+	testLogger, _ := logger.NewFileLogger("stdout")
+	stub := sdr.StubDevice{}
+	supportsAGC := sdr.SupportsAGC(&stub, testLogger)
+	assert.True(t, supportsAGC)
+}

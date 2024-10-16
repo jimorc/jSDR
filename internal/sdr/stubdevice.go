@@ -116,3 +116,13 @@ func (dev *StubDevice) GetAntennas(direction device.Direction, _ uint) string {
 		return ""
 	}
 }
+
+// SupportsAGC returns whether the device supports AGC or not.
+//
+// Returns true if device supports automatic gain control.
+func (dev *StubDevice) SupportsAGC(direction device.Direction, _ uint) bool {
+	if direction == device.DirectionRX {
+		return true
+	}
+	return false
+}
