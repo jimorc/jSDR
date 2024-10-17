@@ -44,6 +44,10 @@ type Agc interface {
 	EnableAgc(device.Direction, uint, bool) error
 }
 
+type Gain interface {
+	GetGainElementNames(device.Direction, uint) []string
+}
+
 // Sdr represents the SDR device.
 type Sdr struct {
 	Device           *device.SDRDevice
@@ -206,6 +210,12 @@ func EnableAgc(sdrD Agc, log *logger.Logger, enable bool) error {
 		log.Logf(logger.Debug, "Error attempting to set AGC mode to %v\n", enable)
 	}
 	return err
+}
+
+func GetGainElementNames(sdrD Gain, log *logger.Logger) []string {
+	elts := sdrD.GetGainElementNames(device.DirectionRX, 0)
+	log.Logf(logger.Debug, "Gain Elements: %v\n", elts)
+	return elts
 }
 
 func SetSampleRate(sdrD SampleRates, log *logger.Logger, rate float64) error {

@@ -154,3 +154,8 @@ func (dev *StubDevice) EnableAgc(_ device.Direction, _ uint, enable bool) error 
 	}
 	return errors.New("Invalid serial number for StubDevice.EnableAgc")
 }
+
+// GetGainElementNames returns a list of names for the gain elements for the specified direction and channel.
+func (dev *StubDevice) GetGainElementNames(_ device.Direction, _ uint) []string {
+	return []string{"RX"}
+}

@@ -279,3 +279,12 @@ func TestEnableAgc(t *testing.T) {
 	assert.Nil(t, err)
 	assert.False(t, sdr.AgcIsEnabled(&stub, testLogger))
 }
+
+func TestGetGainElementNames(t *testing.T) {
+	testLogger, _ := logger.NewFileLogger("stdout")
+	// serial number of "2" will enable Agc
+	stub := sdr.StubDevice{Args: map[string]string{"serial": "2"}}
+	elements := sdr.GetGainElementNames(&stub, testLogger)
+	assert.Equal(t, 1, len(elements))
+	assert.Equal(t, "RX", elements[0])
+}

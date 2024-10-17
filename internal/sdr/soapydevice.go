@@ -93,5 +93,9 @@ func (sD *SoapyDevice) AgcIsEnabled(direction device.Direction, channel uint) bo
 // EnableAgc enables AGC mode for the specified direction and channel.
 func (sD *SoapyDevice) EnableAgc(direction device.Direction, channel uint, enable bool) error {
 	return sD.Device.Device.SetGainMode(direction, channel, enable)
+}
 
+// GetGainElementNames returns a list of names for the gain elements for the specified direction and channel.
+func (sD *SoapyDevice) GetGainElementNames(direction device.Direction, channel uint) []string {
+	return sD.Device.Device.ListGains(direction, channel)
 }
