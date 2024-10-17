@@ -33,11 +33,6 @@ type SampleRates interface {
 	SetSampleRate(device.Direction, uint, float64) error
 }
 
-type Antenna interface {
-	ListAntennas(device.Direction, uint) []string
-	GetAntennas(device.Direction, uint) string
-}
-
 type Agc interface {
 	SupportsAGC(device.Direction, uint) bool
 	AgcIsEnabled(device.Direction, uint) bool
@@ -123,29 +118,6 @@ func Unmake(sdrD MakeDevice, log *logger.Logger) error {
 		log.Logf(logger.Error, "Error attempting to unmake an SDR device: %s\n", err.Error())
 	}
 	return err
-}
-
-// GetCurrentAntenna returns the currently selected RX antenna for channel 0 of the SDR.
-func GetCurrentAntenna(sdrD Antenna, log *logger.Logger) string {
-	antenna := sdrD.GetAntennas(device.DirectionRX, 0)
-	log.Logf(logger.Debug, "Current antenna is %s\n", antenna)
-	return antenna
-}
-
-// GetAntennas returns the list of RX antenna names for channel 0.
-func GetAntennas(sdrD Antenna, log *logger.Logger) []string {
-	antennas := sdrD.ListAntennas(device.DirectionRX, 0)
-	var aMsg strings.Builder
-	if len(antennas) == 0 {
-		aMsg.WriteString("No antennas for this SDR\n")
-	} else {
-		aMsg.WriteString("Antennas:\n")
-		for _, antenna := range antennas {
-			aMsg.WriteString(fmt.Sprintf("         %s\n", antenna))
-		}
-		log.Log(logger.Debug, aMsg.String())
-	}
-	return antennas
 }
 
 // GetHardwareKey returns the hardware key for the SDR device.

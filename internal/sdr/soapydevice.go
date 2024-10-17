@@ -65,16 +65,6 @@ func (sD *SoapyDevice) SetSampleRate(direction device.Direction, channel uint, r
 	return sD.Device.Device.SetSampleRate(direction, channel, rate)
 }
 
-func (sD *SoapyDevice) ListAntennas(direction device.Direction, channel uint) []string {
-	return sD.Device.Device.ListAntennas(direction, channel)
-}
-
-// GetAntennas returns the currently selected antenna for the specified direction and channel number.
-// GetAntennas is misnamed as only one antenna can be selected at a time.
-func (sD *SoapyDevice) GetAntennas(direction device.Direction, channel uint) string {
-	return sD.Device.Device.GetAntennas(direction, channel)
-}
-
 // SupportsAGC returns whether the device supports AGC or not.
 //
 // Returns true if device supports automatic gain control.

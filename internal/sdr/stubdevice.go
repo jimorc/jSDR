@@ -102,24 +102,6 @@ func (dev *StubDevice) SetSampleRate(_ device.Direction, _ uint, rate float64) e
 	return nil
 }
 
-func (dev *StubDevice) ListAntennas(direction device.Direction, _ uint) []string {
-	if direction == device.DirectionRX {
-		return []string{"RX"}
-	} else {
-		return []string{}
-	}
-}
-
-// GetAntennas returns the currently selected antenna for the specified direction and channel number.
-// GetAntennas is misnamed as only one antenna can be selected at a time.
-func (dev *StubDevice) GetAntennas(direction device.Direction, _ uint) string {
-	if direction == device.DirectionRX {
-		return "RX"
-	} else {
-		return ""
-	}
-}
-
 // SupportsAGC returns whether the device supports AGC or not.
 //
 // Returns true if device supports automatic gain control.
