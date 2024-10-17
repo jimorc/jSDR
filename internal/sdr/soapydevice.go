@@ -3,7 +3,6 @@ package sdr
 import (
 	"errors"
 
-	"github.com/jimorc/jsdr/internal/logger"
 	"github.com/pothosware/go-soapy-sdr/pkg/device"
 )
 
@@ -87,11 +86,12 @@ func (sD *SoapyDevice) SupportsAGC(direction device.Direction, channel uint) boo
 // You should call SupportsAGC to determine if the device supports AGC before calling AgcIsEnabled.
 //
 // Returns true if AGC is enabled.
-func (sD *SoapyDevice) AgcIsEnabled(sdrD Agc, log *logger.Logger) bool {
-	return sD.Device.Device.GetGainMode(device.DirectionRX, 0)
+func (sD *SoapyDevice) AgcIsEnabled(direction device.Direction, channel uint) bool {
+	return sD.Device.Device.GetGainMode(direction, channel)
 }
 
-func (sD *SoapyDevice) EnableAgc(sdrD Agc, log *logger.Logger, enable bool) error {
-	return sD.Device.Device.SetGainMode(device.DirectionRX, 0, enable)
+// EnableAgc enables AGC mode for the specified direction and channel.
+func (sD *SoapyDevice) EnableAgc(direction device.Direction, channel uint, enable bool) error {
+	return sD.Device.Device.SetGainMode(direction, channel, enable)
 
 }
