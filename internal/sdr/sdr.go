@@ -48,25 +48,6 @@ type Sdr struct {
 	Antenna          string
 }
 
-// map of possible sample rates
-var sampleRatesMap = map[float64]string{
-	256000.0:   "0.256 MS/s",
-	512000.0:   "0.512 MS/s",
-	1024000.0:  "1.024 MS/s",
-	1600000.0:  "1.6 MS/s",
-	2048000.0:  "2.048 MS/s",
-	2400000.0:  "2.4 MS/s",
-	2800000.0:  "2.8 MS/s",
-	3200000.0:  "3.2 MS/s",
-	4000000.0:  "4.0 MS/s",
-	5000000.0:  "5.0 MS/s",
-	6000000.0:  "6.0 MS/s",
-	7000000.0:  "7.0 MS/s",
-	8000000.0:  "8.0 MS/s",
-	9000000.0:  "9.0 MS/s",
-	10000000.0: "10.0 MS/s",
-}
-
 // EnumerateWithoutAudio returns a map of SDR devices, not including any audio device.
 func EnumerateWithoutAudio(sdrD Enumerate, log *logger.Logger) map[string]map[string]string {
 	var sdrs map[string]map[string]string = make(map[string]map[string]string, 0)
