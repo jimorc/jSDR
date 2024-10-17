@@ -10,7 +10,7 @@ import (
 )
 
 type Antenna interface {
-	ListAntennas(device.Direction, uint) []string
+	GetAntennaNames(device.Direction, uint) []string
 	GetAntennas(device.Direction, uint) string
 }
 
@@ -22,8 +22,8 @@ func GetCurrentAntenna(sdrD Antenna, log *logger.Logger) string {
 }
 
 // GetAntennas returns the list of RX antenna names for channel 0.
-func ListAntennas(sdrD Antenna, log *logger.Logger) []string {
-	antennas := sdrD.ListAntennas(device.DirectionRX, 0)
+func GetAntennaNames(sdrD Antenna, log *logger.Logger) []string {
+	antennas := sdrD.GetAntennaNames(device.DirectionRX, 0)
 	var aMsg strings.Builder
 	if len(antennas) == 0 {
 		aMsg.WriteString("No antennas for this SDR\n")

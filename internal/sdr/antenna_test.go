@@ -12,7 +12,7 @@ import (
 func TestListAntennas(t *testing.T) {
 	testLogger, _ := logger.NewFileLogger("stdout")
 	stub := sdr.StubDevice{}
-	antennas := sdr.ListAntennas(&stub, testLogger)
+	antennas := sdr.GetAntennaNames(&stub, testLogger)
 	assert.Equal(t, []string{"RX"}, antennas)
 }
 

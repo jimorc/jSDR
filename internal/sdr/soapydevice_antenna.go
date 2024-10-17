@@ -4,7 +4,7 @@ import (
 	"github.com/pothosware/go-soapy-sdr/pkg/device"
 )
 
-func (sD *SoapyDevice) ListAntennas(direction device.Direction, channel uint) []string {
+func (sD *SoapyDevice) GetAntennaNames(direction device.Direction, channel uint) []string {
 	return sD.Device.Device.ListAntennas(direction, channel)
 }
 
