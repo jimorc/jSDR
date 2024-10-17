@@ -99,3 +99,8 @@ func (sD *SoapyDevice) EnableAgc(direction device.Direction, channel uint, enabl
 func (sD *SoapyDevice) GetGainElementNames(direction device.Direction, channel uint) []string {
 	return sD.Device.Device.ListGains(direction, channel)
 }
+
+// GetOverallGain returns the overall gain for the specified direction and channel.
+func (sD *SoapyDevice) GetOverallGain(direction device.Direction, channel uint) float64 {
+	return sD.Device.Device.GetGain(direction, channel)
+}

@@ -46,6 +46,7 @@ type Agc interface {
 
 type Gain interface {
 	GetGainElementNames(device.Direction, uint) []string
+	GetOverallGain(device.Direction, uint) float64
 }
 
 // Sdr represents the SDR device.
@@ -216,6 +217,15 @@ func GetGainElementNames(sdrD Gain, log *logger.Logger) []string {
 	elts := sdrD.GetGainElementNames(device.DirectionRX, 0)
 	log.Logf(logger.Debug, "Gain Elements: %v\n", elts)
 	return elts
+}
+
+// GetOverallGain gets the overall value of the gain elements in the chain for RX channel 0.
+//
+// Returns value of the gain in dB.
+func GetOverallGain(sdrD Gain, log *logger.Logger) float64 {
+	gain := sdrD.GetOverallGain(device.DirectionRX, 0)
+	log.Logf(logger.Debug, "Overall gain: %.1f\n", gain)
+	return gain
 }
 
 func SetSampleRate(sdrD SampleRates, log *logger.Logger, rate float64) error {
