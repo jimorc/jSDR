@@ -38,7 +38,7 @@ type Antenna interface {
 	GetAntennas(device.Direction, uint) string
 }
 
-type Gain interface {
+type Agc interface {
 	SupportsAGC(device.Direction, uint) bool
 	AgcIsEnabled(device.Direction, uint) bool
 	EnableAgc(device.Direction, uint, bool) error
@@ -177,7 +177,7 @@ func GetSampleRates(sdrD SampleRates, log *logger.Logger) []string {
 // SupportsAGC returns whether the device supports AGC or not.
 //
 // Returns true if device supports automatic gain control for RX channel 0.
-func SupportsAGC(sdrD Gain, log *logger.Logger) bool {
+func SupportsAGC(sdrD Agc, log *logger.Logger) bool {
 	supportsAGC := sdrD.SupportsAGC(device.DirectionRX, 0)
 	log.Logf(logger.Debug, "Device has gain mode: %v\n", supportsAGC)
 	return supportsAGC
@@ -187,13 +187,13 @@ func SupportsAGC(sdrD Gain, log *logger.Logger) bool {
 // You should call SupportsAGC to determine if the device supports AGC before calling AgcIsEnabled.
 //
 // Returns true if AGC is enabled.
-func AgcIsEnabled(sdrD Gain, log *logger.Logger) bool {
+func AgcIsEnabled(sdrD Agc, log *logger.Logger) bool {
 	enabled := sdrD.AgcIsEnabled(device.DirectionRX, 0)
 	log.Logf(logger.Debug, "AgcIsEnabled: %v\n", enabled)
 	return enabled
 }
 
-func EnableAgc(sdrD Gain, log *logger.Logger, enable bool) error {
+func EnableAgc(sdrD Agc, log *logger.Logger, enable bool) error {
 	err := sdrD.EnableAgc(device.DirectionRX, 0, enable)
 	if err != nil {
 		log.Logf(logger.Debug, "Error returned trying to set AGC mode: %v: %s\n", enable, err.Error())

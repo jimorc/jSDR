@@ -87,11 +87,11 @@ func (sD *SoapyDevice) SupportsAGC(direction device.Direction, channel uint) boo
 // You should call SupportsAGC to determine if the device supports AGC before calling AgcIsEnabled.
 //
 // Returns true if AGC is enabled.
-func (sD *SoapyDevice) AgcIsEnabled(sdrD Gain, log *logger.Logger) bool {
+func (sD *SoapyDevice) AgcIsEnabled(sdrD Agc, log *logger.Logger) bool {
 	return sD.Device.Device.GetGainMode(device.DirectionRX, 0)
 }
 
-func (sD *SoapyDevice) EnableAgc(sdrD Gain, log *logger.Logger, enable bool) error {
+func (sD *SoapyDevice) EnableAgc(sdrD Agc, log *logger.Logger, enable bool) error {
 	return sD.Device.Device.SetGainMode(device.DirectionRX, 0, enable)
 
 }
