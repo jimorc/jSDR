@@ -9,7 +9,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestListAntennas(t *testing.T) {
+func TestGetAntennaNames(t *testing.T) {
 	testLogger, _ := logger.NewFileLogger("stdout")
 	stub := sdr.StubDevice{}
 	antennas := sdr.GetAntennaNames(&stub, testLogger)

@@ -11,17 +11,17 @@ import (
 
 type Antenna interface {
 	GetAntennaNames(device.Direction, uint) []string
-	GetAntennas(device.Direction, uint) string
+	GetCurrentAntenna(device.Direction, uint) string
 }
 
 // GetCurrentAntenna returns the currently selected RX antenna for channel 0 of the SDR.
 func GetCurrentAntenna(sdrD Antenna, log *logger.Logger) string {
-	antenna := sdrD.GetAntennas(device.DirectionRX, 0)
+	antenna := sdrD.GetCurrentAntenna(device.DirectionRX, 0)
 	log.Logf(logger.Debug, "Current antenna is %s\n", antenna)
 	return antenna
 }
 
-// GetAntennas returns the list of RX antenna names for channel 0.
+// GetAntennaNames returns the list of RX antenna names for channel 0.
 func GetAntennaNames(sdrD Antenna, log *logger.Logger) []string {
 	antennas := sdrD.GetAntennaNames(device.DirectionRX, 0)
 	var aMsg strings.Builder
