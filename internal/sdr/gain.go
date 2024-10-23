@@ -19,6 +19,7 @@ type Agc interface {
 type Gain interface {
 	GetGainElementNames(device.Direction, uint) []string
 	GetOverallGain(device.Direction, uint) float64
+	SetOverallGain(device.Direction, uint, float64) error
 }
 
 // SupportsAGC returns whether the device supports AGC or not.
@@ -68,6 +69,19 @@ func GetOverallGain(sdrD Gain, log *logger.Logger) float64 {
 	gain := sdrD.GetOverallGain(device.DirectionRX, 0)
 	log.Logf(logger.Debug, "Overall gain: %.1f\n", gain)
 	return gain
+}
+
+// SetOverallGain sets the total overall gain of the various gain elements in the chain to the specified value in dB.
+//
+// Returns nil on success, or error on failure.
+func SetOverallGain(sdrD Gain, log *logger.Logger, gain float64) error {
+	err := sdrD.SetOverallGain(device.DirectionRX, 0, gain)
+	if err != nil {
+		log.Logf(logger.Error, "Could not set overall gain to %.1f: %s\n", gain, err.Error())
+	} else {
+		log.Logf(logger.Debug, "Have set overall gain to %.1f\n", gain)
+	}
+	return err
 }
 
 func closestSampleRate(sampleRate float64, log *logger.Logger) float64 {

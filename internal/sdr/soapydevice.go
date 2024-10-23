@@ -78,3 +78,10 @@ func (sD *SoapyDevice) GetGainElementNames(direction device.Direction, channel u
 func (sD *SoapyDevice) GetOverallGain(direction device.Direction, channel uint) float64 {
 	return sD.Device.Device.GetGain(direction, channel)
 }
+
+// SetOverallGain sets the overall gain for the specified direction and channel.
+//
+// The overall gain is distributed automatically across the available elements.
+func (sD *SoapyDevice) SetOverallGain(direction device.Direction, channel uint, gain float64) error {
+	return sD.Device.Device.SetGain(direction, channel, gain)
+}

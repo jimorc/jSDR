@@ -2,6 +2,7 @@ package sdr
 
 import (
 	"errors"
+	"fmt"
 	"unsafe"
 
 	"github.com/pothosware/go-soapy-sdr/pkg/device"
@@ -18,6 +19,9 @@ type StubDevice struct {
 
 // agcEnabled stores current AGC enabled value.
 var agcEnabled bool
+
+// overallGain stores the current overall gain value.
+var overallGain float64 = 50.
 
 // Enumerate returns a slice of map[string]string values representing the available devices. These
 // values must be preloaded into the Devices property of the StubDevice struct before Enumerate is called.
@@ -101,5 +105,16 @@ func (dev *StubDevice) GetGainElementNames(_ device.Direction, _ uint) []string 
 
 // GetOverallGain returns the overall gain for the specified direction and channel.
 func (dev *StubDevice) GetOverallGain(_ device.Direction, _ uint) float64 {
-	return 50.
+	return overallGain
+}
+
+// SetOverallGain sets the overall gain for the specified direction and channel.
+//
+// The overall gain is distributed automatically across the available elements. This is currently not done in StubDevice.
+func (dev *StubDevice) SetOverallGain(_ device.Direction, _ uint, gain float64) error {
+	if gain < 0. || gain > 50. {
+		return errors.New(fmt.Sprintf("Requested overall gain = %.1f dB, but must be between 0. and 50. dB.", gain))
+	}
+	overallGain = gain
+	return nil
 }

@@ -65,3 +65,31 @@ func TestGetOverallGain(t *testing.T) {
 	gain := sdr.GetOverallGain(&stub, testLogger)
 	assert.Equal(t, 50., gain)
 }
+
+func TestSetOverallGain_TooLarge(t *testing.T) {
+	testLogger, _ := logger.NewFileLogger("stdout")
+	stub := sdr.StubDevice{Args: map[string]string{"serial": "2"}}
+	// attempting to set gain to 50.1 dB but stub only allows values up to 50.0 dB.
+	err := sdr.SetOverallGain(&stub, testLogger, 50.1)
+	assert.NotNil(t, err)
+	assert.Equal(t, "Requested overall gain = 50.1 dB, but must be between 0. and 50. dB.", err.Error())
+}
+
+func TestSetOverallGain_Negative(t *testing.T) {
+	testLogger, _ := logger.NewFileLogger("stdout")
+	stub := sdr.StubDevice{Args: map[string]string{"serial": "2"}}
+	// attempting to set overall gain to a negative value.
+	err := sdr.SetOverallGain(&stub, testLogger, -2.0)
+	assert.NotNil(t, err)
+	assert.Equal(t, "Requested overall gain = -2.0 dB, but must be between 0. and 50. dB.", err.Error())
+
+}
+
+func TestSetOverallGain(t *testing.T) {
+	testLogger, _ := logger.NewFileLogger("stdout")
+	stub := sdr.StubDevice{Args: map[string]string{"serial": "2"}}
+	err := sdr.SetOverallGain(&stub, testLogger, 40.)
+	assert.Nil(t, err)
+	gain := sdr.GetOverallGain(&stub, testLogger)
+	assert.Equal(t, 40.0, gain)
+}
