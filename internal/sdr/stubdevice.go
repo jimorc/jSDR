@@ -23,6 +23,8 @@ var agcEnabled bool
 // overallGain stores the current overall gain value.
 var overallGain float64 = 50.
 
+var eltGains map[string]float64 = map[string]float64{"RX": 40}
+
 // Enumerate returns a slice of map[string]string values representing the available devices. These
 // values must be preloaded into the Devices property of the StubDevice struct before Enumerate is called.
 func (dev StubDevice) Enumerate(args map[string]string) []map[string]string {
@@ -117,4 +119,15 @@ func (dev *StubDevice) SetOverallGain(_ device.Direction, _ uint, gain float64) 
 	}
 	overallGain = gain
 	return nil
+}
+
+// GetElementGain returns the gain in dB for the specified element name.
+//
+// If an error occurs, such as the element name does not exist, then 0.0 and an error are returned. Note that 0.0 may also be a valid value,
+// so don't just check the gain value.
+func (dev *StubDevice) GetElementGain(_ device.Direction, _ uint, eltName string) (float64, error) {
+	if gain, ok := eltGains[eltName]; ok {
+		return gain, nil
+	}
+	return 0.0, errors.New(fmt.Sprintf("Gain element '%s' is invalid", eltName))
 }

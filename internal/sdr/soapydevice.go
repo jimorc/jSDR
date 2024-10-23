@@ -85,3 +85,10 @@ func (sD *SoapyDevice) GetOverallGain(direction device.Direction, channel uint) 
 func (sD *SoapyDevice) SetOverallGain(direction device.Direction, channel uint, gain float64) error {
 	return sD.Device.Device.SetGain(direction, channel, gain)
 }
+
+// GetElementGain gets the gain value in dB for the specified element.
+//
+// The returned error is always nil.
+func (sD *SoapyDevice) GetElementGain(direction device.Direction, channel uint, eltName string) (float64, error) {
+	return sD.Device.Device.GetGainElement(direction, channel, eltName), nil
+}

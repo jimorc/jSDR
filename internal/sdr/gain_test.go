@@ -93,3 +93,21 @@ func TestSetOverallGain(t *testing.T) {
 	gain := sdr.GetOverallGain(&stub, testLogger)
 	assert.Equal(t, 40.0, gain)
 }
+
+func TestGetElementGain(t *testing.T) {
+	testLogger, _ := logger.NewFileLogger("stdout")
+	stub := sdr.StubDevice{Args: map[string]string{"serial": "2"}}
+	gain, err := sdr.GetElementGain(&stub, testLogger, "RX")
+	assert.Nil(t, err)
+	assert.Equal(t, 40., gain)
+}
+
+func TestGetElementGain_InvalidElement(t *testing.T) {
+	testLogger, _ := logger.NewFileLogger("stdout")
+	stub := sdr.StubDevice{Args: map[string]string{"serial": "2"}}
+	gain, err := sdr.GetElementGain(&stub, testLogger, "Audio")
+	assert.NotNil(t, err)
+	assert.Equal(t, "Gain element 'Audio' is invalid", err.Error())
+	assert.Equal(t, 0.0, gain)
+
+}

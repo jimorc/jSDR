@@ -18,6 +18,7 @@ type Agc interface {
 
 type Gain interface {
 	GetGainElementNames(device.Direction, uint) []string
+	GetElementGain(device.Direction, uint, string) (float64, error)
 	GetOverallGain(device.Direction, uint) float64
 	SetOverallGain(device.Direction, uint, float64) error
 }
@@ -60,6 +61,20 @@ func GetGainElementNames(sdrD Gain, log *logger.Logger) []string {
 	elts := sdrD.GetGainElementNames(device.DirectionRX, 0)
 	log.Logf(logger.Debug, "Gain Elements: %v\n", elts)
 	return elts
+}
+
+// GetElementGain gets the gain for the named element in the chain for RX channel 0.
+//
+// Returns the gain for the specified element in dB and nil, or 0.0 and an error on error.
+// Do not just check if the gain is 0.0 because this may be a valid value for the named element.
+func GetElementGain(sdrD Gain, log *logger.Logger, elementName string) (float64, error) {
+	gain, err := sdrD.GetElementGain(device.DirectionRX, 0, elementName)
+	if err != nil {
+		log.Logf(logger.Error, "Error getting gain for element: %s: %s\n", elementName, err.Error())
+		return 0.0, err
+	}
+	log.Logf(logger.Debug, "Gain for element %s is %.1f\n", elementName, gain)
+	return gain, nil
 }
 
 // GetOverallGain gets the overall value of the gain elements in the chain for RX channel 0.
