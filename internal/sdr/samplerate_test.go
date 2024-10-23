@@ -1,7 +1,9 @@
 package sdr_test
 
 import (
+	"regexp"
 	"slices"
+	"strconv"
 	"testing"
 
 	"github.com/jimorc/jsdr/internal/logger"
@@ -62,4 +64,40 @@ func TestGetSampleRate_BadDevice(t *testing.T) {
 	// stub.Make not called, so no sample rate returned by sdr.GetSampleRate.
 	sampleRate := sdr.GetSampleRate(&stub, testLogger)
 	assert.Equal(t, "", sampleRate)
+}
+
+func TestSetSampleRate_SameAsCurrentRate(t *testing.T) {
+	testLogger, _ := logger.NewFileLogger("stdout")
+	stub := sdr.StubDevice{}
+	err := sdr.Make(&stub, map[string]string{
+		"driver":       "rtlsdr",
+		"label":        "Generic RTL2832U OEM :: 00000102",
+		"manufacturer": "Realtek",
+		"product":      "RTL2838UHIDIR",
+		"serial":       "1",
+		"tuner":        "Rafael Micro R820T"}, testLogger)
+	require.Nil(t, err)
+	re, err := regexp.Compile("\\d+\\.\\d+")
+	require.Nil(t, err)
+	rate := re.FindString(sdr.GetSampleRate(&stub, testLogger))
+	sampleRate, err := strconv.ParseFloat(rate, 64)
+	sampleRate *= 1e6
+	err = sdr.SetSampleRate(&stub, testLogger, sampleRate)
+	assert.Nil(t, err)
+}
+
+func TestSetSampleRate_Mismatch(t *testing.T) {
+	testLogger, _ := logger.NewFileLogger("stdout")
+	stub := sdr.StubDevice{}
+	err := sdr.Make(&stub, map[string]string{
+		"driver":       "rtlsdr",
+		"label":        "Generic RTL2832U OEM :: 00000102",
+		"manufacturer": "Realtek",
+		"product":      "RTL2838UHIDIR",
+		"serial":       "0",
+		"tuner":        "Rafael Micro R820T"}, testLogger)
+	require.Nil(t, err)
+	err = sdr.SetSampleRate(&stub, testLogger, 1.024*1e6)
+	assert.NotNil(t, err)
+	assert.Equal(t, "Attempt to set sample rate to 1024000.0 failed. Sample rate is 2048000.0", err.Error())
 }
