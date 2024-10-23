@@ -1,11 +1,8 @@
 package sdr
 
 import (
-	"errors"
 	"fmt"
-	"regexp"
 	"sort"
-	"strconv"
 	"strings"
 
 	"github.com/jimorc/jsdr/internal/logger"
@@ -71,42 +68,6 @@ func GetOverallGain(sdrD Gain, log *logger.Logger) float64 {
 	gain := sdrD.GetOverallGain(device.DirectionRX, 0)
 	log.Logf(logger.Debug, "Overall gain: %.1f\n", gain)
 	return gain
-}
-
-func SetSampleRate(sdrD SampleRates, log *logger.Logger, rate float64) error {
-	GetSampleRates(sdrD, log)
-	currentRate := GetSampleRate(sdrD, log)
-	re, err := regexp.Compile(`[0-9]+\.[0-9]+`)
-	match := re.FindString(currentRate)
-	sampleRate, err := strconv.ParseFloat(match, 64)
-	if err != nil {
-		log.Logf(logger.Error, "Error parsing sample rate: %s\n", err.Error())
-	}
-	sampleRate *= 1e6
-	rate = closestSampleRate(rate, log)
-	if rate == sampleRate {
-		log.Log(logger.Debug, "Requested rate is same as current sample rate.\n")
-		return nil
-	} else {
-		log.Logf(logger.Debug, "Setting sample rate to %f\n", rate)
-		err := sdrD.SetSampleRate(device.DirectionRX, 0, rate)
-		if err != nil {
-			log.Logf(logger.Error, "Error attempting to set sample rate: %s\n", err.Error())
-			return err
-		} else {
-			match = re.FindString(GetSampleRate(sdrD, log))
-			setRate, _ := strconv.ParseFloat(match, 64)
-			setRate *= 1e6
-			if setRate != rate {
-				errMsg := fmt.Sprintf("Attempt to set sample rate to %.1f failed. Sample rate is %.1f", rate, setRate)
-				log.Log(logger.Error, errMsg)
-				return errors.New(errMsg)
-			} else {
-				log.Logf(logger.Debug, "Sample rate has been set to %f\n", setRate)
-				return nil
-			}
-		}
-	}
 }
 
 func closestSampleRate(sampleRate float64, log *logger.Logger) float64 {
