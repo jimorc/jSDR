@@ -92,3 +92,8 @@ func (sD *SoapyDevice) SetOverallGain(direction device.Direction, channel uint, 
 func (sD *SoapyDevice) GetElementGain(direction device.Direction, channel uint, eltName string) (float64, error) {
 	return sD.Device.Device.GetGainElement(direction, channel, eltName), nil
 }
+
+// GetElementGainRange returns the SDRRange for the specified gain element.
+func (sD *SoapyDevice) GetElementGainRange(direction device.Direction, channel uint, eltName string) device.SDRRange {
+	return sD.Device.Device.GetGainElementRange(direction, channel, eltName)
+}

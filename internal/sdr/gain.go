@@ -1,6 +1,7 @@
 package sdr
 
 import (
+	"errors"
 	"fmt"
 	"sort"
 	"strings"
@@ -19,6 +20,7 @@ type Agc interface {
 type Gain interface {
 	GetGainElementNames(device.Direction, uint) []string
 	GetElementGain(device.Direction, uint, string) (float64, error)
+	GetElementGainRange(device.Direction, uint, string) device.SDRRange
 	GetOverallGain(device.Direction, uint) float64
 	SetOverallGain(device.Direction, uint, float64) error
 }
@@ -75,6 +77,23 @@ func GetElementGain(sdrD Gain, log *logger.Logger, elementName string) (float64,
 	}
 	log.Logf(logger.Debug, "Gain for element %s is %.1f\n", elementName, gain)
 	return gain, nil
+}
+
+func GetElementGainRange(sdrD Gain, log *logger.Logger, elementName string) (device.SDRRange, error) {
+	elts := sdrD.GetGainElementNames(device.DirectionRX, 0)
+	valid := false
+	for _, elt := range elts {
+		if elementName == elt {
+			valid = true
+			break
+		}
+	}
+	if !valid {
+		errStr := fmt.Sprintf("Gain element name: %s is invalid\n", elementName)
+		log.Logf(logger.Error, errStr+"\n")
+		return device.SDRRange{Minimum: 0, Maximum: 0, Step: 0}, errors.New(errStr)
+	}
+	return sdrD.GetElementGainRange(device.DirectionRX, 0, elementName), nil
 }
 
 // GetOverallGain gets the overall value of the gain elements in the chain for RX channel 0.
