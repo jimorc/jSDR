@@ -162,11 +162,25 @@ func (dev *StubDevice) GetElementGain(_ device.Direction, _ uint, eltName string
 	}
 }
 
+// SetElementGain sets the gain for the specified element to the specified value.
+//
+// Returns an error if the requested gain is outside the allowable range.
+func (dev *StubDevice) SetElementGain(direction device.Direction, channel uint, eltName string, gain float64) error {
+	gainRange := dev.GetElementGainRange(direction, channel, eltName)
+	if gain < gainRange.Minimum || gain > gainRange.Maximum {
+		return errors.New(fmt.Sprintf("Cannot set gain for element: %s to %.1f. Requested gain is outside the allowable range: %.1f to %.1f",
+			eltName, gain, gainRange.Minimum, gainRange.Maximum))
+	}
+	eltGains[eltName] = eltInfo{gain, eltGains[eltName].gainRange}
+	return nil
+}
+
 // GetElementGainRange returns the SDRRange for the specified gain element.
 func (dev *StubDevice) GetElementGainRange(_ device.Direction, _ uint, eltName string) device.SDRRange {
 	switch dev.Args["serial"] {
 	case "2":
-		return device.SDRRange{Minimum: 0, Maximum: 25, Step: 0}
+		gain, _ := eltGains[eltName]
+		return gain.gainRange
 	}
 	return device.SDRRange{Minimum: 0, Maximum: 0, Step: 0}
 }

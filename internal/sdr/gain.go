@@ -3,6 +3,7 @@ package sdr
 import (
 	"errors"
 	"fmt"
+	"slices"
 	"sort"
 	"strings"
 
@@ -20,6 +21,7 @@ type Agc interface {
 type Gain interface {
 	GetGainElementNames(device.Direction, uint) []string
 	GetElementGain(device.Direction, uint, string) (float64, error)
+	SetElementGain(device.Direction, uint, string, float64) error
 	GetElementGainRange(device.Direction, uint, string) device.SDRRange
 	GetOverallGain(device.Direction, uint) float64
 	SetOverallGain(device.Direction, uint, float64) error
@@ -94,6 +96,26 @@ func GetElementGainRange(sdrD Gain, log *logger.Logger, elementName string) (dev
 		return device.SDRRange{Minimum: 0, Maximum: 0, Step: 0}, errors.New(errStr)
 	}
 	return sdrD.GetElementGainRange(device.DirectionRX, 0, elementName), nil
+}
+
+// SetElementGain attempts to set the gain for the specified element to the requested value.
+//
+// Returns an error if:
+//
+//		The gain element does not exist.
+//	 The requested gain is outside the gain range for the element.
+func SetElementGain(sdrD Gain, log *logger.Logger, elementName string, gain float64) error {
+	eltNames := sdrD.GetGainElementNames(device.DirectionRX, 0)
+	if !slices.Contains(eltNames, elementName) {
+		log.Logf(logger.Error, "Attempting to set gain for element: %s, but that gain element does not exist.\n"+
+			"Gain elements are: %v\n", elementName, eltNames)
+		return errors.New(fmt.Sprintf("Cannot set gain for non-existent gain element: %s", elementName))
+	}
+	err := sdrD.SetElementGain(device.DirectionRX, 0, elementName, gain)
+	if err != nil {
+		log.Logf(logger.Error, fmt.Sprintf("Unable to set gain for element: %s: %s\n", elementName, err))
+	}
+	return err
 }
 
 // GetOverallGain gets the overall value of the gain elements in the chain for RX channel 0.
