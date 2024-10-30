@@ -29,3 +29,11 @@ func TestGetStreamFormats_NoFormats(t *testing.T) {
 	assert.Equal(t, "No stream formats retrieved for channel 0", err.Error())
 	assert.Equal(t, 0, len(formats))
 }
+
+func TestGetNativeStreamFormat(t *testing.T) {
+	testLogger, _ := logger.NewFileLogger("stdout")
+	stub := sdr.StubDevice{Args: map[string]string{"serial": "1"}}
+	format, fullScale := sdr.GetNativeStreamFormat(&stub, testLogger)
+	assert.Equal(t, "CS8", format)
+	assert.Equal(t, 0.0, fullScale)
+}

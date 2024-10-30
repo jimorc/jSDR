@@ -15,3 +15,10 @@ func (dev *StubDevice) GetStreamFormats(_ device.Direction, _ uint) []string {
 		return []string{}
 	}
 }
+
+// GetNativeStreamFormat returns the native stream format and its full scale value.
+//
+// The returned values match those for an RTL_SDR device.
+func (dev *StubDevice) GetNativeStreamFormat(_ device.Direction, _ uint) (string, float64) {
+	return "CS8", 0.0
+}

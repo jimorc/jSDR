@@ -13,6 +13,7 @@ import (
 // Stream interface specifies stream related functionality.
 type Stream interface {
 	GetStreamFormats(device.Direction, uint) []string
+	GetNativeStreamFormat(device.Direction, uint) (string, float64)
 }
 
 // GetStreamFormats retrieves the stream formats for RX channel 0.
@@ -32,4 +33,9 @@ func GetStreamFormats(sdrD Stream, log *logger.Logger) ([]string, error) {
 	}
 	log.Log(logger.Debug, formatStr.String())
 	return formats, nil
+}
+
+// GetNativeStreamFormat retrieves the native format for RX channel 0 and its full scale value.
+func GetNativeStreamFormat(sdrD Stream, log *logger.Logger) (string, float64) {
+	return sdrD.GetNativeStreamFormat(device.DirectionRX, 0)
 }
