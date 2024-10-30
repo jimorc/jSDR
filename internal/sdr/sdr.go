@@ -5,6 +5,12 @@
 //	SoapyDevice for SoapySDR devices.
 //
 //	StubDevice for testing of the various sdr functions.
+//
+// Many of the function and method names are changed from those provided in go-soapy-sdr.go.
+// I find many of the function and method names to be confusing in go-soapy-sdr.go For example:
+// device.SetAntennas sets a single antenna on a device, not multiple antennas.
+//
+// These name changes are an attempt to clarify what the functions and methods do,
 package sdr
 
 import (
