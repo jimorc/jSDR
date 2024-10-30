@@ -12,6 +12,7 @@ import (
 	"github.com/pothosware/go-soapy-sdr/pkg/device"
 )
 
+// SampleRates interface specifies the SDR device methods related to sample rates.
 type SampleRates interface {
 	GetSampleRateRange(device.Direction, uint) []device.SDRRange
 	GetSampleRate(device.Direction, uint) float64
@@ -63,6 +64,9 @@ func GetSampleRates(sdrD SampleRates, log *logger.Logger) []string {
 	return getSampleRatesAsStrings(sampleRateRanges, log)
 }
 
+// SetSampleRate sets the sample rate to the specified value.
+//
+// Returns error if an error occured while trying to set the requested sample rate.
 func SetSampleRate(sdrD SampleRates, log *logger.Logger, rate float64) error {
 	GetSampleRates(sdrD, log)
 	currentRate := GetSampleRate(sdrD, log)

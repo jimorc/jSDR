@@ -9,6 +9,7 @@ import (
 	"github.com/pothosware/go-soapy-sdr/pkg/device"
 )
 
+// Antenna interface specifies the antenna related methods for an SDR device.
 type Antenna interface {
 	GetAntennaNames(device.Direction, uint) []string
 	GetCurrentAntenna(device.Direction, uint) string

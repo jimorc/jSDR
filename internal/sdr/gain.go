@@ -12,12 +12,14 @@ import (
 	"github.com/pothosware/go-soapy-sdr/pkg/device"
 )
 
+// Agc interface specifies the AGC methods.
 type Agc interface {
 	SupportsAGC(device.Direction, uint) bool
 	AgcIsEnabled(device.Direction, uint) bool
 	EnableAgc(device.Direction, uint, bool) error
 }
 
+// Gain interface specifies the gain related methods.
 type Gain interface {
 	GetGainElementNames(device.Direction, uint) []string
 	GetElementGain(device.Direction, uint, string) (float64, error)
@@ -46,6 +48,7 @@ func AgcIsEnabled(sdrD Agc, log *logger.Logger) bool {
 	return enabled
 }
 
+// EnableAge enables or disables the device's AGC.
 func EnableAgc(sdrD Agc, log *logger.Logger, enable bool) error {
 	err := sdrD.EnableAgc(device.DirectionRX, 0, enable)
 	if err != nil {
@@ -61,6 +64,7 @@ func EnableAgc(sdrD Agc, log *logger.Logger, enable bool) error {
 	return err
 }
 
+// GetGainElementNames retrieves the list of gain elements for the SDR.
 func GetGainElementNames(sdrD Gain, log *logger.Logger) []string {
 	elts := sdrD.GetGainElementNames(device.DirectionRX, 0)
 	log.Logf(logger.Debug, "Gain Elements: %v\n", elts)
@@ -81,6 +85,9 @@ func GetElementGain(sdrD Gain, log *logger.Logger, elementName string) (float64,
 	return gain, nil
 }
 
+// GetElementGainRange retrieves the gain range for the specified device.
+//
+// Returns an error if the requested element does not exist.
 func GetElementGainRange(sdrD Gain, log *logger.Logger, elementName string) (device.SDRRange, error) {
 	elts := sdrD.GetGainElementNames(device.DirectionRX, 0)
 	valid := false

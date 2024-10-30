@@ -1,3 +1,10 @@
+// Package sdr provides interfaces and functions that allow multiple device types.
+//
+// The initial device types are:
+//
+//	SoapyDevice for SoapySDR devices.
+//
+//	StubDevice for testing of the various sdr functions.
 package sdr
 
 import (
@@ -9,16 +16,19 @@ import (
 	"github.com/pothosware/go-soapy-sdr/pkg/device"
 )
 
+// Enumerate interface specifies the function for enumerating attached devices.
 type Enumerate interface {
 	Enumerate(args map[string]string) []map[string]string
 }
 
+// MakeDevice interface specifies the methods for creating and destroying an SDR device.
 type MakeDevice interface {
 	Make(args map[string]string) error
 	Unmake() error
 	GetHardwareKey() string
 }
 
+// KeyValues interface specifies the methods for retrieving SDR information.
 type KeyValues interface {
 	GetHardwareKey() string
 }
@@ -71,6 +81,9 @@ func Make(sdrD MakeDevice, args map[string]string, log *logger.Logger) error {
 	return nil
 }
 
+// Unmake frees up any assets associated with the SDR device.
+//
+// No sdr calls should be made after Unmake is called.
 func Unmake(sdrD MakeDevice, log *logger.Logger) error {
 	log.Log(logger.Debug, "Attempting to unmake an SDR device\n")
 	err := sdrD.Unmake()
