@@ -49,3 +49,26 @@ func TestGetTunableElements(t *testing.T) {
 	assert.Equal(t, 1, len(tElts))
 	assert.Equal(t, "RF", tElts[0])
 }
+
+func TestGetTunableElementsFrequencyRanges(t *testing.T) {
+	testLogger, _ := logger.NewFileLogger("stdout")
+	stub := sdr.StubDevice{Args: map[string]string{"serial": "1"}}
+	fRanges, err := sdr.GetTunableElementFrequencyRanges(&stub, testLogger, "RF")
+	assert.Nil(t, err)
+	assert.Equal(t, 2, len(fRanges))
+	assert.Equal(t, 0.0, fRanges[0].Minimum)
+	assert.Equal(t, 6e+09, fRanges[0].Maximum)
+	assert.Equal(t, 0.0, fRanges[0].Step)
+	assert.Equal(t, 6.1e+09, fRanges[1].Minimum)
+	assert.Equal(t, 1e+10, fRanges[1].Maximum)
+	assert.Equal(t, 0.0, fRanges[1].Step)
+}
+
+func TestGetTunableElementsFrequencyRanges_BadElement(t *testing.T) {
+	testLogger, _ := logger.NewFileLogger("stdout")
+	stub := sdr.StubDevice{Args: map[string]string{"serial": "1"}}
+	fRanges, err := sdr.GetTunableElementFrequencyRanges(&stub, testLogger, "IF")
+	assert.NotNil(t, err)
+	assert.Equal(t, "Invalid tunable element name: IF", err.Error())
+	assert.Equal(t, 0, len(fRanges))
+}

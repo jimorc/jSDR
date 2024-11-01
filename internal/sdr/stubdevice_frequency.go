@@ -19,3 +19,9 @@ func (dev *StubDevice) GetFrequencyRanges(_ device.Direction, _ uint) []device.S
 func (dev *StubDevice) GetTunableElements(_ device.Direction, _ uint) []string {
 	return []string{"RF"}
 }
+
+// GetTunableElementFrequencyRanges retrieves a slice of frequency ranges for the specified tunable element.
+func (dev *StubDevice) GetTunableElementFrequencyRanges(_ device.Direction, _ uint, _ string) []device.SDRRange {
+	return []device.SDRRange{{Minimum: 0, Maximum: 6e+09, Step: 0},
+		{Minimum: 6.1e+09, Maximum: 1e+10, Step: 0}}
+}

@@ -3,6 +3,7 @@ package sdr
 import (
 	"errors"
 	"fmt"
+	"slices"
 	"strings"
 
 	"github.com/jimorc/jsdr/internal/logger"
@@ -13,6 +14,7 @@ import (
 type Frequency interface {
 	GetFrequencyRanges(device.Direction, uint) []device.SDRRange
 	GetTunableElements(device.Direction, uint) []string
+	GetTunableElementFrequencyRanges(device.Direction, uint, string) []device.SDRRange
 }
 
 // GetFrequencyRanges retrieves the slice of frequency ranges that the specified devices supports.
@@ -50,4 +52,26 @@ func GetTunableElements(sdrD Frequency, log *logger.Logger) []string {
 		}
 	}
 	return elts
+}
+
+// GetTunableElementFrequencyRanges retrieves the freequency ranges for the specified tunable element.
+//
+// Ranges are retrieved for RX channel 0 only.
+func GetTunableElementFrequencyRanges(sdrD Frequency, log *logger.Logger, tunableElement string) ([]device.SDRRange, error) {
+	tElts := sdrD.GetTunableElements(device.DirectionRX, 0)
+	if !slices.Contains(tElts, tunableElement) {
+		var eMsg strings.Builder
+		eMsg.WriteString(fmt.Sprintf("Invalid tunable element name: %s\n", tunableElement))
+		eMsg.WriteString(fmt.Sprintf("Tunable element names are: %v\n", tElts))
+		log.Logf(logger.Error, fmt.Sprintf("Invalid "))
+		return []device.SDRRange{}, errors.New(fmt.Sprintf("Invalid tunable element name: %s", tunableElement))
+	}
+	fRanges := sdrD.GetTunableElementFrequencyRanges(device.DirectionRX, 0, tunableElement)
+	var rMsg strings.Builder
+	rMsg.WriteString(fmt.Sprintf("FrequencyRanges for tunable element: %s\n", tunableElement))
+	for _, fR := range fRanges {
+		rMsg.WriteString(fmt.Sprintf("         %v\n", fR))
+	}
+	log.Log(logger.Debug, rMsg.String())
+	return fRanges, nil
 }

@@ -14,3 +14,8 @@ func (sD *SoapyDevice) GetFrequencyRanges(direction device.Direction, channel ui
 func (sD *SoapyDevice) GetTunableElements(direction device.Direction, channel uint) []string {
 	return sD.Device.Device.ListFrequencies(direction, channel)
 }
+
+// GetTunableElementFrequencyRanges retrieves a slice of frequency ranges for the specified tunable element.
+func (sD *SoapyDevice) GetTunableElementFrequencyRanges(direction device.Direction, channel uint, name string) []device.SDRRange {
+	return sD.Device.Device.GetFrequencyRangeComponent(direction, channel, name)
+}
