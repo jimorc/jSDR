@@ -118,3 +118,10 @@ func TestSetTunableElementFrequency_BadFreq(t *testing.T) {
 	assert.NotNil(t, err)
 	assert.Equal(t, "Cannot set frequency. Requested frequency not within element's frequency ranges", err.Error())
 }
+
+func TestGetOverallCenterFrequency(t *testing.T) {
+	testLogger, _ := logger.NewFileLogger("stdout")
+	stub := sdr.StubDevice{Args: map[string]string{"serial": "1"}}
+	centerFreq := sdr.GetOverallCenterFrequency(&stub, testLogger)
+	assert.Equal(t, 100000000., centerFreq)
+}

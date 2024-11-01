@@ -40,3 +40,8 @@ func (dev *StubDevice) SetTunableElementFrequency(_ device.Direction, _ uint, na
 	tunableFrequencies[name] = newFreq
 	return nil
 }
+
+// GetOverallCenterFrequency sets the overall center frequency for the device.
+func (dev *StubDevice) GetOverallCenterFrequency(_ device.Direction, _ uint) float64 {
+	return 100000000.
+}

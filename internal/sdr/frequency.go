@@ -17,6 +17,7 @@ type Frequency interface {
 	GetTunableElementFrequencyRanges(device.Direction, uint, string) []device.SDRRange
 	GetTunableElementFrequency(device.Direction, uint, string) float64
 	SetTunableElementFrequency(device.Direction, uint, string, float64) error
+	GetOverallCenterFrequency(device.Direction, uint) float64
 }
 
 // GetFrequencyRanges retrieves the slice of frequency ranges that the specified devices supports.
@@ -126,6 +127,13 @@ func SetTunableElementFrequency(sdrD Frequency, log *logger.Logger, name string,
 	log.Logf(logger.Debug, fmt.Sprintf("Setting element %s frequency to %.1f\n", name, freq))
 	sdrD.GetTunableElementFrequency(device.DirectionRX, 0, name)
 	return nil
+}
+
+// GetOverallCenterFrequency retrieves the overall center frequency for RX channel 0.
+func GetOverallCenterFrequency(sdrD Frequency, log *logger.Logger) float64 {
+	centerFreq := sdrD.GetOverallCenterFrequency(device.DirectionRX, 0)
+	log.Logf(logger.Debug, fmt.Sprintf("Overall center frequency: %.1f\n", centerFreq))
+	return centerFreq
 }
 
 func withinRanges(ranges []device.SDRRange, value float64) bool {

@@ -35,3 +35,8 @@ func (sD *SoapyDevice) GetTunableElementFrequency(direction device.Direction, ch
 func (sD *SoapyDevice) SetTunableElementFrequency(direction device.Direction, channel uint, name string, newFreq float64) error {
 	return sD.Device.Device.SetFrequencyComponent(direction, channel, name, newFreq, map[string]string{})
 }
+
+// GetOverallCenterFrequency retrieves the overall center frequency of the tunable element chain.
+func (sD *SoapyDevice) GetOverallCenterFrequency(direction device.Direction, channel uint) float64 {
+	return sD.Device.Device.GetFrequency(direction, channel)
+}
