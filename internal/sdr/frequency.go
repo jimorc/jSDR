@@ -15,6 +15,7 @@ type Frequency interface {
 	GetFrequencyRanges(device.Direction, uint) []device.SDRRange
 	GetTunableElementNames(device.Direction, uint) []string
 	GetTunableElementFrequencyRanges(device.Direction, uint, string) []device.SDRRange
+	GetTunableElementFrequency(device.Direction, uint, string) float64
 }
 
 // GetFrequencyRanges retrieves the slice of frequency ranges that the specified devices supports.
@@ -74,4 +75,21 @@ func GetTunableElementFrequencyRanges(sdrD Frequency, log *logger.Logger, tunabl
 	}
 	log.Log(logger.Debug, rMsg.String())
 	return fRanges, nil
+}
+
+// GetTunableElementFrequency retrieves the tuned frequency in Hz for the named tunable element.
+//
+// Frequency is retrieved for RX channel 0 only.
+// If the requested tunable element name does not match a name returned by GetTunableElementNames,
+// then an error is returned.
+func GetTunableElementFrequency(sdrD Frequency, log *logger.Logger, name string) (float64, error) {
+	tElts := sdrD.GetTunableElementNames(device.DirectionRX, 0)
+	if !slices.Contains(tElts, name) {
+		var eMsg strings.Builder
+		eMsg.WriteString(fmt.Sprintf("Invalid tunable element name: %s\n", name))
+		eMsg.WriteString(fmt.Sprintf("Tunable element names are: %v\n", tElts))
+		log.Logf(logger.Error, fmt.Sprintf("Invalid "))
+		return 0.0, errors.New(fmt.Sprintf("Invalid tunable element name: %s", name))
+	}
+	return sdrD.GetTunableElementFrequency(device.DirectionRX, 0, name), nil
 }

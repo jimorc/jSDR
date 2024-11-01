@@ -19,3 +19,8 @@ func (sD *SoapyDevice) GetTunableElementNames(direction device.Direction, channe
 func (sD *SoapyDevice) GetTunableElementFrequencyRanges(direction device.Direction, channel uint, name string) []device.SDRRange {
 	return sD.Device.Device.GetFrequencyRangeComponent(direction, channel, name)
 }
+
+// GetTunableElementFrequency retrieves the current frequency value in Hz for the tunable element.
+func (sD *SoapyDevice) GetTunableElementFrequency(direction device.Direction, channel uint, name string) float64 {
+	return sD.Device.Device.GetFrequencyComponent(direction, channel, name)
+}
