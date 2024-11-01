@@ -13,11 +13,12 @@ import (
 // Frequency interface specifies the frequency methods that SDR devices must satisfy.
 type Frequency interface {
 	GetFrequencyRanges(device.Direction, uint) []device.SDRRange
+	GetOverallCenterFrequency(device.Direction, uint) float64
+	SetOverallCenterFrequency(device.Direction, uint, float64, map[string]string) error
 	GetTunableElementNames(device.Direction, uint) []string
 	GetTunableElementFrequencyRanges(device.Direction, uint, string) []device.SDRRange
 	GetTunableElementFrequency(device.Direction, uint, string) float64
 	SetTunableElementFrequency(device.Direction, uint, string, float64) error
-	GetOverallCenterFrequency(device.Direction, uint) float64
 }
 
 // GetFrequencyRanges retrieves the slice of frequency ranges that the specified devices supports.
@@ -129,11 +130,36 @@ func SetTunableElementFrequency(sdrD Frequency, log *logger.Logger, name string,
 	return nil
 }
 
-// GetOverallCenterFrequency retrieves the overall center frequency for RX channel 0.
+// GetOverallCenterFrequency retrieves the overall center frequency in Hz for RX channel 0.
 func GetOverallCenterFrequency(sdrD Frequency, log *logger.Logger) float64 {
-	centerFreq := sdrD.GetOverallCenterFrequency(device.DirectionRX, 0)
-	log.Logf(logger.Debug, fmt.Sprintf("Overall center frequency: %.1f\n", centerFreq))
-	return centerFreq
+	currentFreq := sdrD.GetOverallCenterFrequency(device.DirectionRX, 0)
+	log.Logf(logger.Debug, "Center frequency: %.1f\n", currentFreq)
+	return currentFreq
+}
+
+// SetOverallCenterFrequency sets the overall center frequency for RX channel 0.
+func SetOverallCenterFrequency(sdrD Frequency, log *logger.Logger, newFreq float64, args map[string]string) error {
+	freqRanges, err := GetFrequencyRanges(sdrD, log)
+	if err != nil {
+		log.Logf(logger.Error, "There are no frequency ranges for this device.\n")
+		return errors.New(fmt.Sprintf("Cannot set overall center frequency to %.1f.\nThere are no frequency ranges for this device.", newFreq))
+	}
+	if !withinRanges(freqRanges, newFreq) {
+		var rMsg strings.Builder
+		rMsg.WriteString(fmt.Sprintf("Cannot set overall center frequency to %.1f\n"+
+			"Requested frequency is not within the overall frequency ranges:\n", newFreq))
+		for _, fR := range freqRanges {
+			rMsg.WriteString(fmt.Sprintf("         %v\n", fR))
+		}
+		log.Log(logger.Error, rMsg.String())
+		return errors.New(fmt.Sprintf("Requested frequency: %.1f is not within the frequency ranges for this device.", newFreq))
+	}
+	err = sdrD.SetOverallCenterFrequency(device.DirectionRX, 0, newFreq, args)
+	if err != nil {
+		log.Logf(logger.Error, "Cannot set requested overall center frequency: %.1f: %s\n", newFreq, err.Error())
+		return errors.New(fmt.Sprintf("Cannot set requested overall center frequency: %.1f: %s", newFreq, err.Error()))
+	}
+	return nil
 }
 
 func withinRanges(ranges []device.SDRRange, value float64) bool {

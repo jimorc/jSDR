@@ -125,3 +125,40 @@ func TestGetOverallCenterFrequency(t *testing.T) {
 	centerFreq := sdr.GetOverallCenterFrequency(&stub, testLogger)
 	assert.Equal(t, 100000000., centerFreq)
 }
+
+func TestSetOverallCenterFrequency(t *testing.T) {
+	testLogger, _ := logger.NewFileLogger("stdout")
+	stub := sdr.StubDevice{Args: map[string]string{"serial": "3"}}
+	newFreq := 50000000.
+	err := sdr.SetOverallCenterFrequency(&stub, testLogger, newFreq, map[string]string{})
+	assert.Nil(t, err)
+	centerFreq := sdr.GetOverallCenterFrequency(&stub, testLogger)
+	assert.Equal(t, newFreq, centerFreq)
+}
+
+func TestSetOverallCenterFrequency_NoRanges(t *testing.T) {
+	testLogger, _ := logger.NewFileLogger("stdout")
+	stub := sdr.StubDevice{Args: map[string]string{"serial": "1"}}
+	newFreq := 50000000.
+	err := sdr.SetOverallCenterFrequency(&stub, testLogger, newFreq, map[string]string{})
+	assert.NotNil(t, err)
+	assert.Equal(t, "Cannot set overall center frequency to 50000000.0.\nThere are no frequency ranges for this device.", err.Error())
+}
+
+func TestSetOverallCenterFrequency_OutsideRanges(t *testing.T) {
+	testLogger, _ := logger.NewFileLogger("stdout")
+	stub := sdr.StubDevice{Args: map[string]string{"serial": "2"}}
+	newFreq := 7e+09
+	err := sdr.SetOverallCenterFrequency(&stub, testLogger, newFreq, map[string]string{})
+	assert.NotNil(t, err)
+	assert.Equal(t, "Requested frequency: 7000000000.0 is not within the frequency ranges for this device.", err.Error())
+}
+
+func TestSetOverallCenterFrequency_ErrorSettingFrequency(t *testing.T) {
+	testLogger, _ := logger.NewFileLogger("stdout")
+	stub := sdr.StubDevice{Args: map[string]string{"serial": "4"}}
+	newFreq := 50000000.
+	err := sdr.SetOverallCenterFrequency(&stub, testLogger, newFreq, map[string]string{})
+	assert.NotNil(t, err)
+	assert.Equal(t, "Cannot set requested overall center frequency: 50000000.0: Serial # = 4", err.Error())
+}

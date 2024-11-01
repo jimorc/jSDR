@@ -1,15 +1,21 @@
 package sdr
 
-import "github.com/pothosware/go-soapy-sdr/pkg/device"
+import (
+	"errors"
+
+	"github.com/pothosware/go-soapy-sdr/pkg/device"
+)
 
 var tunableFrequencies = map[string]float64{
 	"RF": 100000000.0,
 }
 
+var overallCenterFrequency = 100000000.
+
 // GetFrequencyRanges retrieves the frequency ranges supported by the device.
 func (dev *StubDevice) GetFrequencyRanges(_ device.Direction, _ uint) []device.SDRRange {
 	switch dev.Args["serial"] {
-	case "2":
+	case "2", "4":
 		return []device.SDRRange{{Minimum: 0.0, Maximum: 6e+09, Step: 0.0}}
 	case "3":
 		return []device.SDRRange{{Minimum: 0.0, Maximum: 6e+09, Step: 0.0},
@@ -41,7 +47,20 @@ func (dev *StubDevice) SetTunableElementFrequency(_ device.Direction, _ uint, na
 	return nil
 }
 
-// GetOverallCenterFrequency sets the overall center frequency for the device.
+// GetOverallCenterFrequency retrieves the overall center frequency for the device.
 func (dev *StubDevice) GetOverallCenterFrequency(_ device.Direction, _ uint) float64 {
-	return 100000000.
+	return overallCenterFrequency
+}
+
+// SetOverallCenterFrequency sets the overall center frequency for the device.
+//
+// Returns error if serial number for the device is "4". This is purely for testing purposes.
+func (dev *StubDevice) SetOverallCenterFrequency(_ device.Direction, _ uint, newFreq float64, _ map[string]string) error {
+	switch dev.Args["serial"] {
+	case "4":
+		return errors.New("Serial # = 4")
+	default:
+		overallCenterFrequency = newFreq
+		return nil
+	}
 }
