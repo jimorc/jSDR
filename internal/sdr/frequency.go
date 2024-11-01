@@ -12,6 +12,7 @@ import (
 // Frequency interface specifies the frequency methods that SDR devices must satisfy.
 type Frequency interface {
 	GetFrequencyRanges(device.Direction, uint) []device.SDRRange
+	GetTunableElements(device.Direction, uint) []string
 }
 
 // GetFrequencyRanges retrieves the slice of frequency ranges that the specified devices supports.
@@ -32,4 +33,21 @@ func GetFrequencyRanges(sdrD Frequency, log *logger.Logger) ([]device.SDRRange, 
 	}
 	log.Log(logger.Debug, frequenciesStr.String())
 	return frequencyRanges, nil
+}
+
+// GetTunableElements retrieves the list of tunable elements by name for the device.
+//
+// These elements will be in the order from RF to baseband.
+func GetTunableElements(sdrD Frequency, log *logger.Logger) []string {
+	elts := sdrD.GetTunableElements(device.DirectionRX, 0)
+	if len(elts) == 0 {
+		log.Log(logger.Debug, "Device has no tunable frequency elements.\n")
+	} else {
+		var tMsg strings.Builder
+		tMsg.WriteString("Tunable elements:\n")
+		for _, elt := range elts {
+			tMsg.WriteString(fmt.Sprintf("         %s\n", elt))
+		}
+	}
+	return elts
 }

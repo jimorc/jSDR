@@ -41,3 +41,11 @@ func TestGetFrequencyRanges_NoRanges(t *testing.T) {
 	assert.Equal(t, "The attached SDR seems defective; there are no specified frequency ranges.", err.Error())
 	assert.Equal(t, 0, len(ranges))
 }
+
+func TestGetTunableElements(t *testing.T) {
+	testLogger, _ := logger.NewFileLogger("stdout")
+	stub := sdr.StubDevice{Args: map[string]string{"serial": "1"}}
+	tElts := sdr.GetTunableElements(&stub, testLogger)
+	assert.Equal(t, 1, len(tElts))
+	assert.Equal(t, "RF", tElts[0])
+}

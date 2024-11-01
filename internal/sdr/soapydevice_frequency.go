@@ -7,3 +7,10 @@ import "github.com/pothosware/go-soapy-sdr/pkg/device"
 func (sD *SoapyDevice) GetFrequencyRanges(direction device.Direction, channel uint) []device.SDRRange {
 	return sD.Device.Device.GetFrequencyRange(direction, channel)
 }
+
+// GetTunableElements retrieves the list of tunable elements bu name for the device.
+//
+// The list of tunable elements is expected to be in order from RF to baseband.
+func (sD *SoapyDevice) GetTunableElements(direction device.Direction, channel uint) []string {
+	return sD.Device.Device.ListFrequencies(direction, channel)
+}
