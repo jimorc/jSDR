@@ -13,7 +13,7 @@ import (
 // Frequency interface specifies the frequency methods that SDR devices must satisfy.
 type Frequency interface {
 	GetFrequencyRanges(device.Direction, uint) []device.SDRRange
-	GetTunableElements(device.Direction, uint) []string
+	GetTunableElementNames(device.Direction, uint) []string
 	GetTunableElementFrequencyRanges(device.Direction, uint, string) []device.SDRRange
 }
 
@@ -37,11 +37,11 @@ func GetFrequencyRanges(sdrD Frequency, log *logger.Logger) ([]device.SDRRange, 
 	return frequencyRanges, nil
 }
 
-// GetTunableElements retrieves the list of tunable elements by name for the device.
+// GetTunableElementNames retrieves the list of tunable elements by name for the device.
 //
 // These elements will be in the order from RF to baseband.
-func GetTunableElements(sdrD Frequency, log *logger.Logger) []string {
-	elts := sdrD.GetTunableElements(device.DirectionRX, 0)
+func GetTunableElementNames(sdrD Frequency, log *logger.Logger) []string {
+	elts := sdrD.GetTunableElementNames(device.DirectionRX, 0)
 	if len(elts) == 0 {
 		log.Log(logger.Debug, "Device has no tunable frequency elements.\n")
 	} else {
@@ -58,7 +58,7 @@ func GetTunableElements(sdrD Frequency, log *logger.Logger) []string {
 //
 // Ranges are retrieved for RX channel 0 only.
 func GetTunableElementFrequencyRanges(sdrD Frequency, log *logger.Logger, tunableElement string) ([]device.SDRRange, error) {
-	tElts := sdrD.GetTunableElements(device.DirectionRX, 0)
+	tElts := sdrD.GetTunableElementNames(device.DirectionRX, 0)
 	if !slices.Contains(tElts, tunableElement) {
 		var eMsg strings.Builder
 		eMsg.WriteString(fmt.Sprintf("Invalid tunable element name: %s\n", tunableElement))

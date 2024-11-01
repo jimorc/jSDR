@@ -15,8 +15,8 @@ func (dev *StubDevice) GetFrequencyRanges(_ device.Direction, _ uint) []device.S
 	}
 }
 
-// GetTunableElements returns the list of tunable elements for this device.
-func (dev *StubDevice) GetTunableElements(_ device.Direction, _ uint) []string {
+// GetTunableElementNames returns the list of tunable elements for this device.
+func (dev *StubDevice) GetTunableElementNames(_ device.Direction, _ uint) []string {
 	return []string{"RF"}
 }
 

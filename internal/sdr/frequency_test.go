@@ -42,10 +42,10 @@ func TestGetFrequencyRanges_NoRanges(t *testing.T) {
 	assert.Equal(t, 0, len(ranges))
 }
 
-func TestGetTunableElements(t *testing.T) {
+func TestGetTunableElementNames(t *testing.T) {
 	testLogger, _ := logger.NewFileLogger("stdout")
 	stub := sdr.StubDevice{Args: map[string]string{"serial": "1"}}
-	tElts := sdr.GetTunableElements(&stub, testLogger)
+	tElts := sdr.GetTunableElementNames(&stub, testLogger)
 	assert.Equal(t, 1, len(tElts))
 	assert.Equal(t, "RF", tElts[0])
 }

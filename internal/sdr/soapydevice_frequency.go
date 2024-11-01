@@ -8,10 +8,10 @@ func (sD *SoapyDevice) GetFrequencyRanges(direction device.Direction, channel ui
 	return sD.Device.Device.GetFrequencyRange(direction, channel)
 }
 
-// GetTunableElements retrieves the list of tunable elements bu name for the device.
+// GetTunableElementNames retrieves the list of tunable elements bu name for the device.
 //
 // The list of tunable elements is expected to be in order from RF to baseband.
-func (sD *SoapyDevice) GetTunableElements(direction device.Direction, channel uint) []string {
+func (sD *SoapyDevice) GetTunableElementNames(direction device.Direction, channel uint) []string {
 	return sD.Device.Device.ListFrequencies(direction, channel)
 }
 
