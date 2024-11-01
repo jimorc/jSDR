@@ -89,3 +89,32 @@ func TestGetTunableElementFrequency_BadElement(t *testing.T) {
 	assert.Equal(t, "Invalid tunable element name: IF", err.Error())
 	assert.Equal(t, 0.0, freq)
 }
+
+func TestSetTunableElementFrequency(t *testing.T) {
+	testLogger, _ := logger.NewFileLogger("stdout")
+	stub := sdr.StubDevice{Args: map[string]string{"serial": "1"}}
+	newFreq := 50000000.
+	err := sdr.SetTunableElementFrequency(&stub, testLogger, "RF", newFreq)
+	assert.Nil(t, err)
+	freq, err := sdr.GetTunableElementFrequency(&stub, testLogger, "RF")
+	assert.Nil(t, err)
+	assert.Equal(t, newFreq, freq)
+}
+
+func TestSetTunableElementFrequency_BadElement(t *testing.T) {
+	testLogger, _ := logger.NewFileLogger("stdout")
+	stub := sdr.StubDevice{Args: map[string]string{"serial": "1"}}
+	newFreq := 50000000.
+	err := sdr.SetTunableElementFrequency(&stub, testLogger, "IF", newFreq)
+	assert.NotNil(t, err)
+	assert.Equal(t, "Cannot set frequency. Invalid tunable element name: IF", err.Error())
+}
+
+func TestSetTunableElementFrequency_BadFreq(t *testing.T) {
+	testLogger, _ := logger.NewFileLogger("stdout")
+	stub := sdr.StubDevice{Args: map[string]string{"serial": "1"}}
+	newFreq := -100.
+	err := sdr.SetTunableElementFrequency(&stub, testLogger, "RF", newFreq)
+	assert.NotNil(t, err)
+	assert.Equal(t, "Cannot set frequency. Requested frequency not within element's frequency ranges", err.Error())
+}

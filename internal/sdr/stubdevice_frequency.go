@@ -2,6 +2,10 @@ package sdr
 
 import "github.com/pothosware/go-soapy-sdr/pkg/device"
 
+var tunableFrequencies = map[string]float64{
+	"RF": 100000000.0,
+}
+
 // GetFrequencyRanges retrieves the frequency ranges supported by the device.
 func (dev *StubDevice) GetFrequencyRanges(_ device.Direction, _ uint) []device.SDRRange {
 	switch dev.Args["serial"] {
@@ -27,6 +31,12 @@ func (dev *StubDevice) GetTunableElementFrequencyRanges(_ device.Direction, _ ui
 }
 
 // GetTunableElementFrequency retrieves the tuned frequency in Hz for the specified tunable element.
-func (dev *StubDevice) GetTunableElementFrequency(_ device.Direction, _ uint, _ string) float64 {
-	return 100000000.
+func (dev *StubDevice) GetTunableElementFrequency(_ device.Direction, _ uint, name string) float64 {
+	return tunableFrequencies["RF"]
+}
+
+// SetTunableElementFrequency sets the frequency for the tunable element to the specified value.
+func (dev *StubDevice) SetTunableElementFrequency(_ device.Direction, _ uint, name string, newFreq float64) error {
+	tunableFrequencies[name] = newFreq
+	return nil
 }

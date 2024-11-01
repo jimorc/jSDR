@@ -16,6 +16,7 @@ type Frequency interface {
 	GetTunableElementNames(device.Direction, uint) []string
 	GetTunableElementFrequencyRanges(device.Direction, uint, string) []device.SDRRange
 	GetTunableElementFrequency(device.Direction, uint, string) float64
+	SetTunableElementFrequency(device.Direction, uint, string, float64) error
 }
 
 // GetFrequencyRanges retrieves the slice of frequency ranges that the specified devices supports.
@@ -93,5 +94,45 @@ func GetTunableElementFrequency(sdrD Frequency, log *logger.Logger, name string)
 		log.Logf(logger.Error, fmt.Sprintf("Invalid "))
 		return 0.0, errors.New(fmt.Sprintf("Invalid tunable element name: %s", name))
 	}
-	return sdrD.GetTunableElementFrequency(device.DirectionRX, 0, name), nil
+	eltFreq := sdrD.GetTunableElementFrequency(device.DirectionRX, 0, name)
+	log.Logf(logger.Debug, fmt.Sprintf("Current frequency for element %s: %.1f\n", name, eltFreq))
+	return eltFreq, nil
+}
+
+// SetTunableElementFrequency sets the frequency for the named tunable element to the specified value.
+//
+// Returns an error the element name is invalid or the requested frequency is not within the element's
+// tunable range.
+// Returns nil on success.
+func SetTunableElementFrequency(sdrD Frequency, log *logger.Logger, name string, freq float64) error {
+	tElts := sdrD.GetTunableElementNames(device.DirectionRX, 0)
+	if !slices.Contains(tElts, name) {
+		var eMsg strings.Builder
+		eMsg.WriteString(fmt.Sprintf("Invalid tunable element name: %s\n", name))
+		eMsg.WriteString(fmt.Sprintf("Tunable element names are: %v\n", tElts))
+		log.Logf(logger.Error, eMsg.String())
+		return errors.New(fmt.Sprintf("Cannot set frequency. Invalid tunable element name: %s", name))
+	}
+
+	eltRanges, err := GetTunableElementFrequencyRanges(sdrD, log, name)
+	if err != nil {
+		return errors.New("Cannot set frequency. Cannot retrieve tunable element frequency ranges\n")
+	}
+	if !withinRanges(eltRanges, freq) {
+		return errors.New("Cannot set frequency. Requested frequency not within element's frequency ranges")
+	}
+
+	sdrD.SetTunableElementFrequency(device.DirectionRX, 0, name, freq)
+	log.Logf(logger.Debug, fmt.Sprintf("Setting element %s frequency to %.1f\n", name, freq))
+	sdrD.GetTunableElementFrequency(device.DirectionRX, 0, name)
+	return nil
+}
+
+func withinRanges(ranges []device.SDRRange, value float64) bool {
+	for _, r := range ranges {
+		if value >= r.Minimum && value <= r.Maximum {
+			return true
+		}
+	}
+	return false
 }

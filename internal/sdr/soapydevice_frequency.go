@@ -24,3 +24,14 @@ func (sD *SoapyDevice) GetTunableElementFrequencyRanges(direction device.Directi
 func (sD *SoapyDevice) GetTunableElementFrequency(direction device.Direction, channel uint, name string) float64 {
 	return sD.Device.Device.GetFrequencyComponent(direction, channel, name)
 }
+
+// SetTunableElementFrequency sets the tunable element to the specified value.
+//
+// For RX, this specifies the down-conversion frequency.
+// device.SDRDevice.SetFrequencyComponent, which is called by this method, accepts a map of optional component arguments.
+// SetTunableElementFrequency passes no arguments to device.SDRDevice.SetFrequencyComponent.
+//
+// Returns an error, or nil if successful
+func (sD *SoapyDevice) SetTunableElementFrequency(direction device.Direction, channel uint, name string, newFreq float64) error {
+	return sD.Device.Device.SetFrequencyComponent(direction, channel, name, newFreq, map[string]string{})
+}
