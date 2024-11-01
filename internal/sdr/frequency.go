@@ -58,6 +58,8 @@ func GetTunableElementNames(sdrD Frequency, log *logger.Logger) []string {
 // GetTunableElementFrequencyRanges retrieves the freequency ranges for the specified tunable element.
 //
 // Ranges are retrieved for RX channel 0 only.
+// If the requested tunable element name does not match a name returned by GetTunableElementNames,
+// then an error is returned.
 func GetTunableElementFrequencyRanges(sdrD Frequency, log *logger.Logger, tunableElement string) ([]device.SDRRange, error) {
 	tElts := sdrD.GetTunableElementNames(device.DirectionRX, 0)
 	if !slices.Contains(tElts, tunableElement) {
