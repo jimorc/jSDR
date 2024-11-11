@@ -24,5 +24,14 @@ func TestSetupCS8Stream_Error(t *testing.T) {
 	assert.NotNil(t, err)
 	assert.Equal(t, "Bad args passed to SetupCS8Stream", err.Error())
 	assert.Nil(t, stream)
+}
 
+func TestCS8StreamClose(t *testing.T) {
+	testLogger, _ := logger.NewFileLogger("stdout")
+	stub := sdr.StubDevice{Args: map[string]string{"serial": "2"}}
+	stream, err := sdr.SetupCS8Stream(&stub, testLogger)
+	assert.Nil(t, err)
+	assert.NotNil(t, stream)
+	err = stream.Close(testLogger)
+	assert.Nil(t, err)
 }
