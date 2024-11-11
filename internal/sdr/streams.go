@@ -10,11 +10,8 @@ import (
 type CS8Streams interface {
 	SetupCS8Stream(device.Direction, []uint, map[string]string) (*StreamCS8, error)
 	CloseCS8Stream(*StreamCS8) error
+	GetCS8MTU(*StreamCS8) int
 }
-
-/*type CS8StreamFuncs interface {
-	Close() error
-}*/
 
 // StreamCS8 is the stream for CS8 data.
 type StreamCS8 struct {
@@ -52,4 +49,13 @@ func (stream *StreamCS8) Close(log *logger.Logger) error {
 	}
 	log.Log(logger.Debug, "Stream closed.\n")
 	return nil
+}
+
+// GetMTU gets stream's maximum transmission unit in number of elements.
+// The MTU specifies the maximum payload transfer in a stream operation. This value can be used as a stream buffer
+// allocation size that can best optimize throughput given the underlying stream implementation.
+//
+// Return the MTU in number of stream elements (never zero)
+func (stream *StreamCS8) GetMTU() int {
+	return stream.device.GetCS8MTU(stream)
 }

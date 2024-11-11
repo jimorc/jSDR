@@ -35,3 +35,13 @@ func TestCS8StreamClose(t *testing.T) {
 	err = stream.Close(testLogger)
 	assert.Nil(t, err)
 }
+
+func TestGetMTU(t *testing.T) {
+	testLogger, _ := logger.NewFileLogger("stdout")
+	stub := sdr.StubDevice{Args: map[string]string{"serial": "2"}}
+	stream, err := sdr.SetupCS8Stream(&stub, testLogger)
+	assert.Nil(t, err)
+	assert.NotNil(t, stream)
+	mtu := stream.GetMTU()
+	assert.Equal(t, 131072, mtu)
+}

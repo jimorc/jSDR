@@ -29,3 +29,10 @@ func (dev *StubDevice) CloseCS8Stream(stream *StreamCS8) error {
 	stream.stream = nil
 	return nil
 }
+
+// GetCS8MTU returns the stream's maximum transmission unit in number of elements.
+//
+// As StubDevice is a test device, the value for an RTL_SDR device is returned.
+func (dev *StubDevice) GetCS8MTU(stream *StreamCS8) int {
+	return 131072
+}

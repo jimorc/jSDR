@@ -18,3 +18,8 @@ func (sD *SoapyDevice) CloseCS8Stream(stream *StreamCS8) error {
 	stream.stream = nil
 	return err
 }
+
+// GetCS8MTU returns the CS8 stream's maximum transmission unit.
+func (sD *SoapyDevice) GetCS8MTU(stream *StreamCS8) int {
+	return stream.stream.GetMTU()
+}
