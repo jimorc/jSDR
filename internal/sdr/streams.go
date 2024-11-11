@@ -56,6 +56,8 @@ func (stream *StreamCS8) Close(log *logger.Logger) error {
 // allocation size that can best optimize throughput given the underlying stream implementation.
 //
 // Return the MTU in number of stream elements (never zero)
-func (stream *StreamCS8) GetMTU() int {
-	return stream.device.GetCS8MTU(stream)
+func (stream *StreamCS8) GetMTU(log *logger.Logger) int {
+	mtu := stream.device.GetCS8MTU(stream)
+	log.Logf(logger.Debug, "CS8 stream MTU is %d\n", mtu)
+	return mtu
 }

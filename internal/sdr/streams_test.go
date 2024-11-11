@@ -42,6 +42,6 @@ func TestGetMTU(t *testing.T) {
 	stream, err := sdr.SetupCS8Stream(&stub, testLogger)
 	assert.Nil(t, err)
 	assert.NotNil(t, stream)
-	mtu := stream.GetMTU()
+	mtu := stream.GetMTU(testLogger)
 	assert.Equal(t, 131072, mtu)
 }
