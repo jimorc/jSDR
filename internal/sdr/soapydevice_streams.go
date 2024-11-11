@@ -23,3 +23,9 @@ func (sD *SoapyDevice) CloseCS8Stream(stream *StreamCS8) error {
 func (sD *SoapyDevice) GetCS8MTU(stream *StreamCS8) int {
 	return stream.stream.GetMTU()
 }
+
+// Activate activates the CS8 stream.
+func (sD *SoapyDevice) Activate(stream *StreamCS8, flag device.StreamFlag,
+	timeNs int, numElems int) error {
+	return stream.stream.Activate(flag, timeNs, numElems)
+}

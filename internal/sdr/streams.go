@@ -11,12 +11,14 @@ type CS8Streams interface {
 	SetupCS8Stream(device.Direction, []uint, map[string]string) (*StreamCS8, error)
 	CloseCS8Stream(*StreamCS8) error
 	GetCS8MTU(*StreamCS8) int
+	Activate(*StreamCS8, device.StreamFlag, int, int) error
 }
 
 // StreamCS8 is the stream for CS8 data.
 type StreamCS8 struct {
 	stream *device.SDRStreamCS8
 	device CS8Streams
+	active bool
 }
 
 // SetupCS8Stream initializes a stream for RX channel 0.
@@ -60,4 +62,28 @@ func (stream *StreamCS8) GetMTU(log *logger.Logger) int {
 	mtu := stream.device.GetCS8MTU(stream)
 	log.Logf(logger.Debug, "CS8 stream MTU is %d\n", mtu)
 	return mtu
+}
+
+// Activate activates a stream.
+//
+// Call activate to prepare a stream before using read/write(). The implementation control switches or stimulate data
+// flow.
+//
+// Params:
+//   - flags: optional flag indicators about the stream. The StreamFlagEndBurst flag can signal end on the finite burst.
+//     Not all implementations will support the full range of options. In this case, the implementation returns
+//     ErrorNotSupported.
+//   - timeNs: optional activation time in nanoseconds. The timeNs is only valid when the flags have StreamFlagHasTime.
+//   - numElems: optional element count for burst control. The numElems count can be used to request a finite burst size.
+//
+// Return an error or nil in case of success
+func (stream *StreamCS8) Activate(log *logger.Logger, flag device.StreamFlag, timeNs int, numElems int) error {
+	err := stream.device.Activate(stream, flag, timeNs, numElems)
+	if err != nil {
+		log.Logf(logger.Error, "Error attempting to activate CS8 stream: %s\n", err.Error())
+		stream.active = false
+		return err
+	}
+	stream.active = true
+	return nil
 }

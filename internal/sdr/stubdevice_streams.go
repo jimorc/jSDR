@@ -36,3 +36,10 @@ func (dev *StubDevice) CloseCS8Stream(stream *StreamCS8) error {
 func (dev *StubDevice) GetCS8MTU(stream *StreamCS8) int {
 	return 131072
 }
+
+// Activate the specified stream. Since StubDevice is a test device, there
+// is not much activation to be done.
+func (dev *StubDevice) Activate(stream *StreamCS8, flag device.StreamFlag,
+	timeNs int, numElems int) error {
+	return nil
+}

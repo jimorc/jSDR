@@ -40,8 +40,19 @@ func TestGetMTU(t *testing.T) {
 	testLogger, _ := logger.NewFileLogger("stdout")
 	stub := sdr.StubDevice{Args: map[string]string{"serial": "2"}}
 	stream, err := sdr.SetupCS8Stream(&stub, testLogger)
+	defer stream.Close(testLogger)
 	assert.Nil(t, err)
 	assert.NotNil(t, stream)
 	mtu := stream.GetMTU(testLogger)
 	assert.Equal(t, 131072, mtu)
+}
+
+func TestActivateCS8Stream(t *testing.T) {
+	testLogger, _ := logger.NewFileLogger("stdout")
+	stub := sdr.StubDevice{Args: map[string]string{"serial": "2"}}
+	stream, err := sdr.SetupCS8Stream(&stub, testLogger)
+	assert.Nil(t, err)
+	defer stream.Close(testLogger)
+	err = stream.Activate(testLogger, 0, 0, 0)
+	assert.Nil(t, err)
 }
