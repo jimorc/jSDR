@@ -14,5 +14,7 @@ func (sD *SoapyDevice) SetupCS8Stream(direction device.Direction,
 
 // Close closes the specified stream.
 func (sD *SoapyDevice) CloseCS8Stream(stream *StreamCS8) error {
-	return stream.stream.Close()
+	err := stream.stream.Close()
+	stream.stream = nil
+	return err
 }
