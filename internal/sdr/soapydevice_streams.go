@@ -35,3 +35,28 @@ func (sD *SoapyDevice) Deactivate(stream *StreamCS8, flag device.StreamFlag,
 	timeNS int) error {
 	return stream.stream.Deactivate(flag, timeNS)
 }
+
+// ReadCS8Stream reads numElemsToRead elements from the stream.
+//
+// Params:
+//   - buff: the buffer that stream data from a single channel is stored in. This buffer must be
+//
+// initialized to [1][2 * MTU] in size before Read is called.
+//   - numElemsToRead: The number of elements to read. Because the stream is complex, the actual
+//
+// number of integers read is 2 * MTU.
+//   - outputFlags: The flag indicators of the result of the read operation.
+//   - timeoutUs: the timeout in microseconds.
+//
+// Returns:
+//   - timeNs: the timestamp for the data in buff.
+//   - numElemsRead: the number of elements read. Since this stream is complex, the total number
+//
+// of integers returned in buff is 2 times this number.
+//   - err: the error if the read is not successful, or nil if the read is successful. On error, the
+//
+// contents of buff, timeNs, and numElemsRead may not be valid.
+func (sD *SoapyDevice) ReadCS8Stream(stream *StreamCS8, buff [][]int, numElemsToRead uint, outputFlags [1]int, timeoutNs uint) (
+	timeNs uint, numElemsRead uint, err error) {
+	return 0, 0, nil
+}

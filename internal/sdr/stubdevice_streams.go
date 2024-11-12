@@ -2,6 +2,7 @@ package sdr
 
 import (
 	"errors"
+	"time"
 
 	"github.com/pothosware/go-soapy-sdr/pkg/device"
 )
@@ -42,4 +43,27 @@ func (dev *StubDevice) GetCS8MTU(stream *StreamCS8) int {
 func (dev *StubDevice) Activate(stream *StreamCS8, flag device.StreamFlag,
 	timeNs int, numElems int) error {
 	return nil
+}
+
+// Deactivate deactivates the specified stream. Since StubDevice is a test
+// device, there is not much to be done.
+func (dev *StubDevice) Deactivate(stream *StreamCS8, flag device.StreamFlag,
+	timeNs int) error {
+	switch dev.Args["serial"] {
+	case "2":
+		return errors.New("Bad device")
+	default:
+		return nil
+	}
+}
+
+func (dev *StubDevice) ReadCS8Stream(stream *StreamCS8, buff [][]int, numElemsToRead uint, outputFlags [1]int, timeoutUs uint) (
+	timeNs uint, numElemsRead uint, err error) {
+	for i := 0; i < int(numElemsToRead/2); i = i + 4 {
+		buff[0][4*i] = -2
+		buff[0][4*i+1] = 0
+		buff[0][4*i+2] = -1
+		buff[0][4*i+3] = -2
+	}
+	return uint(time.Now().UTC().Nanosecond()), numElemsToRead, nil
 }
