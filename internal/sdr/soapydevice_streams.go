@@ -29,3 +29,9 @@ func (sD *SoapyDevice) Activate(stream *StreamCS8, flag device.StreamFlag,
 	timeNs int, numElems int) error {
 	return stream.stream.Activate(flag, timeNs, numElems)
 }
+
+// Deactivate deactivates the active stream.
+func (sD *SoapyDevice) Deactivate(stream *StreamCS8, flag device.StreamFlag,
+	timeNS int) error {
+	return stream.stream.Deactivate(flag, timeNS)
+}
