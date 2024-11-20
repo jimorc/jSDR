@@ -2,6 +2,7 @@ package sdr
 
 import (
 	"errors"
+	"time"
 
 	"github.com/jimorc/jsdr/internal/logger"
 
@@ -121,28 +122,49 @@ func (stream *StreamCS8) Deactivate(log *logger.Logger, flags device.StreamFlag,
 // Data is read only from RX channel 0.
 //
 // Params:
-//   - buff: an array of buffers that will hold the data that is read. The size of buff is initialized to [1][2*MTU]
+//   - buff: an array of buffers that will hold the data that is read. buff must be sized to [1][2*mtu] in the
 //
-// inside this method, so it is not necessary to initialize the size before calling this method. In fact, doing so
-// will cause a second allocation and a free of your accolcation.
+// code that calls ReadCS8FromStream.
+//
 //   - outputFlags: The flag indicators of the result. Since data is read only from RX channel 0, this array is
 //
 // one element in size.
+//
 //   - timeoutUs: the timeout time in microseconds.
 //
 // Returns:
 //   - timeNs: the buffer's timestamp in nanoseconds.
 //   - numElemsRead: the number of elements read. This should match the stream's MTU.
 //   - err: error, or nil if the call is successful. On error, buff, numElemsRead, and timeNs may not be valid.
-func (stream *StreamCS8) ReadCS8FromStream(log *logger.Logger, buff [][]int, outputFlags [1]int, timeoutUs uint) (
+func (stream *StreamCS8) ReadCS8FromStream(log *logger.Logger, buff [][]int, elementsToRead uint, outputFlags [1]int, timeoutUs uint) (
 	timeNs uint, numElemsRead uint, err error) {
 	if !stream.active {
-		log.Log(logger.Error, " Attempting to read from an inactive stream.\n")
+		log.Log(logger.Error, "Attempting to read from an inactive stream.\n")
 		return 0, 0, errors.New("Attempting to read from an inactive stream")
 	}
+	var elemsRead uint
 	mtu := stream.GetMTU(log)
-	buff = make([][]int, 1)
-	buff[0] = make([]int, 2*mtu)
-	timeNs, numElemsRead, err = stream.device.ReadCS8Stream(stream, buff, mtu, outputFlags, timeoutUs)
-	return
+	cs8Buff := make([][]int, 1)
+	cs8Buff[0] = make([]int, 2*mtu)
+	start := time.Now()
+	for {
+		if numElemsRead < elementsToRead {
+			timeNs, elemsRead, err = stream.device.ReadCS8Stream(stream, cs8Buff, elementsToRead, outputFlags, timeoutUs)
+			if err != nil {
+				log.Logf(logger.Error, "Error encountered while reading CS8 data: %s\n", err.Error())
+				return timeNs, numElemsRead, err
+			}
+			log.Logf(logger.Debug, "Elements Read: %d\n", elemsRead)
+			// for loop used to transfer data because it is 20x to 25x as fast as append.
+			for i := uint(0); i < 2*elemsRead; i++ {
+				buff[0][i+2*numElemsRead] = cs8Buff[0][i]
+			}
+			numElemsRead += elemsRead
+		} else {
+			end := time.Now()
+			diff := end.Sub(start).Microseconds()
+			log.Logf(logger.Info, "Time to read CS8 data: %d μs\n", diff)
+			return timeNs, numElemsRead, nil
+		}
+	}
 }

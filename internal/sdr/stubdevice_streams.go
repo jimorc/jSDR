@@ -7,6 +7,8 @@ import (
 	"github.com/pothosware/go-soapy-sdr/pkg/device"
 )
 
+var cs8EltsRead uint
+
 func (dev *StubDevice) SetupCS8Stream(direction device.Direction,
 	channels []uint,
 	args map[string]string) (*StreamCS8, error) {
@@ -33,9 +35,10 @@ func (dev *StubDevice) CloseCS8Stream(stream *StreamCS8) error {
 
 // GetCS8MTU returns the stream's maximum transmission unit in number of elements.
 //
-// As StubDevice is a test device, the value for an RTL_SDR device is returned.
+// As StubDevice is a test device, 10000 is returned. This matches the MTU value for
+// use in ReadCS8Stream, below
 func (dev *StubDevice) GetCS8MTU(stream *StreamCS8) int {
-	return 131072
+	return 10000
 }
 
 // Activate the specified stream. Since StubDevice is a test device, there
@@ -59,11 +62,44 @@ func (dev *StubDevice) Deactivate(stream *StreamCS8, flag device.StreamFlag,
 
 func (dev *StubDevice) ReadCS8Stream(stream *StreamCS8, buff [][]int, numElemsToRead uint, outputFlags [1]int, timeoutUs uint) (
 	timeNs uint, numElemsRead uint, err error) {
-	for i := 0; i < int(numElemsToRead/2); i = i + 4 {
-		buff[0][4*i] = -2
-		buff[0][4*i+1] = 0
-		buff[0][4*i+2] = -1
-		buff[0][4*i+3] = -2
+	switch dev.Args["serial"] {
+	case "4":
+		switch cs8EltsRead {
+		case 0:
+			for i := 0; i < 5000/2; i++ {
+				buff[0][4*i] = -2
+				buff[0][4*i+1] = 0
+				buff[0][4*i+2] = -1
+				buff[0][4*i+3] = -2
+			}
+			cs8EltsRead = 5000
+			return uint(time.Now().UTC().Nanosecond()), 5000, nil
+		case 5000:
+			for i := 5000 / 2; i < 8000/2; i++ {
+				buff[0][4*i] = -2
+				buff[0][4*i+1] = 0
+				buff[0][4*i+2] = -1
+				buff[0][4*i+3] = -2
+			}
+			cs8EltsRead = 8000
+			return uint(time.Now().UTC().Nanosecond()), 3000, nil
+		case 8000:
+			for i := 8000 / 2; i < 10000/2; i++ {
+				buff[0][4*i] = -2
+				buff[0][4*i+1] = 0
+				buff[0][4*i+2] = -1
+				buff[0][4*i+3] = -2
+			}
+			cs8EltsRead = 0
+			return uint(time.Now().UTC().Nanosecond()), 2000, nil
+		}
+	default:
+		for i := 0; i < int(numElemsToRead/2); i++ {
+			buff[0][4*i] = -2
+			buff[0][4*i+1] = 0
+			buff[0][4*i+2] = -1
+			buff[0][4*i+3] = -2
+		}
 	}
 	return uint(time.Now().UTC().Nanosecond()), numElemsToRead, nil
 }

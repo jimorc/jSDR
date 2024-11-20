@@ -44,7 +44,7 @@ func TestGetMTU(t *testing.T) {
 	assert.Nil(t, err)
 	assert.NotNil(t, stream)
 	mtu := stream.GetMTU(testLogger)
-	assert.Equal(t, uint(131072), mtu)
+	assert.Equal(t, uint(10000), mtu)
 }
 
 func TestActivateCS8Stream(t *testing.T) {
@@ -103,11 +103,39 @@ func TestReadCS8Stream(t *testing.T) {
 	err = stream.Activate(testLogger, 0, 0, 0)
 	assert.Nil(t, err)
 	defer stream.Deactivate(testLogger, 0, 0)
-	var buffer [][]int
+	mtu := stream.GetMTU(testLogger)
+	buffer := make([][]int, 1)
+	buffer[0] = make([]int, 2*mtu)
 	var outputFlags [1]int
-	timeNs, numElemsRead, err := stream.ReadCS8FromStream(testLogger, buffer, outputFlags, 0)
+	timeNs, numElemsRead, err := stream.ReadCS8FromStream(testLogger, buffer, mtu, outputFlags, 0)
 	assert.True(t, timeNs > 0)
-	assert.Equal(t, stream.GetMTU(testLogger), numElemsRead)
+	assert.Equal(t, mtu, numElemsRead)
+	assert.Equal(t, -2, buffer[0][0])
+	assert.Equal(t, 0, buffer[0][1])
+	assert.Equal(t, -1, buffer[0][19998])
+	assert.Equal(t, -2, buffer[0][19999])
+}
+
+func TestReadCS8Stream_PartialReads(t *testing.T) {
+	testLogger, _ := logger.NewFileLogger("stdout")
+	stub := sdr.StubDevice{Args: map[string]string{"serial": "4"}}
+	stream, err := sdr.SetupCS8Stream(&stub, testLogger)
+	assert.Nil(t, err)
+	defer stream.Close(testLogger)
+	err = stream.Activate(testLogger, 0, 0, 0)
+	assert.Nil(t, err)
+	defer stream.Deactivate(testLogger, 0, 0)
+	mtu := stream.GetMTU(testLogger)
+	buffer := make([][]int, 1)
+	buffer[0] = make([]int, 2*mtu)
+	var outputFlags [1]int
+	timeNs, numElemsRead, err := stream.ReadCS8FromStream(testLogger, buffer, mtu, outputFlags, 0)
+	assert.True(t, timeNs > 0)
+	assert.Equal(t, mtu, numElemsRead)
+	assert.Equal(t, -2, buffer[0][0])
+	assert.Equal(t, 0, buffer[0][1])
+	assert.Equal(t, -1, buffer[0][19998])
+	assert.Equal(t, -2, buffer[0][19999])
 }
 
 func TestReadCS8tream_NotActivated(t *testing.T) {
@@ -116,12 +144,14 @@ func TestReadCS8tream_NotActivated(t *testing.T) {
 	stream, err := sdr.SetupCS8Stream(&stub, testLogger)
 	assert.Nil(t, err)
 	defer stream.Close(testLogger)
-	var buffer [][]int
+	mtu := stream.GetMTU(testLogger)
+	buffer := make([][]int, 1)
+	buffer[0] = make([]int, 2*mtu)
 	var outputFlags [1]int
-	timeNs, numElemsRead, err := stream.ReadCS8FromStream(testLogger, buffer, outputFlags, 0)
+	timeNs, numElemsRead, err := stream.ReadCS8FromStream(testLogger, buffer, mtu, outputFlags, 0)
 	assert.NotNil(t, err)
 	assert.Equal(t, "Attempting to read from an inactive stream", err.Error())
-	// Note: if err != nil, then there is no guarantee that timeNs and numElemsRead is valid.
+	// Note: if err != nil, then there is no guarantee that timeNs and numElemsRead are valid.
 	// The following tests are provided simply because this is what the test stream sets them to.
 	assert.Equal(t, uint(0), timeNs)
 	assert.Equal(t, uint(0), numElemsRead)
