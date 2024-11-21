@@ -16,7 +16,7 @@ type CS8Streams interface {
 	GetCS8MTU(*StreamCS8) int
 	Activate(*StreamCS8, device.StreamFlag, int, int) error
 	Deactivate(*StreamCS8, device.StreamFlag, int) error
-	ReadCS8Stream(*StreamCS8, [][]int, uint, [1]int, uint) (uint, uint, error)
+	ReadCS8Stream(*StreamCS8, [][]int, uint, *[1]int, uint) (uint, uint, error)
 }
 
 // StreamCS8 is the stream for CS8 data.
@@ -136,7 +136,7 @@ func (stream *StreamCS8) Deactivate(log *logger.Logger, flags device.StreamFlag,
 //   - timeNs: the buffer's timestamp in nanoseconds.
 //   - numElemsRead: the number of elements read. This should match the stream's MTU.
 //   - err: error, or nil if the call is successful. On error, buff, numElemsRead, and timeNs may not be valid.
-func (stream *StreamCS8) ReadCS8FromStream(log *logger.Logger, buff [][]int, elementsToRead uint, outputFlags [1]int, timeoutUs uint) (
+func (stream *StreamCS8) ReadCS8FromStream(log *logger.Logger, buff [][]int, elementsToRead uint, outputFlags *[1]int, timeoutUs uint) (
 	timeNs uint, numElemsRead uint, err error) {
 	if !stream.active {
 		log.Log(logger.Error, "Attempting to read from an inactive stream.\n")
@@ -166,7 +166,7 @@ func (stream *StreamCS8) ReadCS8FromStream(log *logger.Logger, buff [][]int, ele
 		} else {
 			end := time.Now()
 			diff := end.Sub(start).Microseconds()
-			log.Logf(logger.Info, "Time to read CS8 data: %d μs\n", diff)
+			log.Logf(logger.Debug, "Time to read CS8 data: %d μs\n", diff)
 			return timeNs, numElemsRead, nil
 		}
 	}

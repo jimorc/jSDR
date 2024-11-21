@@ -56,7 +56,7 @@ func (sD *SoapyDevice) Deactivate(stream *StreamCS8, flag device.StreamFlag,
 //   - err: the error if the read is not successful, or nil if the read is successful. On error, the
 //
 // contents of buff, timeNs, and numElemsRead may not be valid.
-func (sD *SoapyDevice) ReadCS8Stream(stream *StreamCS8, buff [][]int, numElemsToRead uint, outputFlags [1]int, timeoutNs uint) (
+func (sD *SoapyDevice) ReadCS8Stream(stream *StreamCS8, buff [][]int, numElemsToRead uint, outputFlags *[1]int, timeoutNs uint) (
 	timeNs uint, numElemsRead uint, err error) {
 	return 0, 0, nil
 }

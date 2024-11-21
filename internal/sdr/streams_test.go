@@ -1,7 +1,9 @@
 package sdr_test
 
 import (
+	"strings"
 	"testing"
+	"time"
 
 	"github.com/jimorc/jsdr/internal/sdr"
 	"github.com/stretchr/testify/assert"
@@ -10,7 +12,8 @@ import (
 )
 
 func TestSetupCS8Stream(t *testing.T) {
-	testLogger, _ := logger.NewFileLogger("stdout")
+	var log strings.Builder
+	testLogger := logger.New(&log)
 	stub := sdr.StubDevice{Args: map[string]string{"serial": "2"}}
 	stream, err := sdr.SetupCS8Stream(&stub, testLogger)
 	assert.Nil(t, err)
@@ -18,7 +21,8 @@ func TestSetupCS8Stream(t *testing.T) {
 }
 
 func TestSetupCS8Stream_Error(t *testing.T) {
-	testLogger, _ := logger.NewFileLogger("stdout")
+	var log strings.Builder
+	testLogger := logger.New(&log)
 	stub := sdr.StubDevice{Args: map[string]string{"serial": "1"}}
 	stream, err := sdr.SetupCS8Stream(&stub, testLogger)
 	assert.NotNil(t, err)
@@ -27,7 +31,8 @@ func TestSetupCS8Stream_Error(t *testing.T) {
 }
 
 func TestCS8StreamClose(t *testing.T) {
-	testLogger, _ := logger.NewFileLogger("stdout")
+	var log strings.Builder
+	testLogger := logger.New(&log)
 	stub := sdr.StubDevice{Args: map[string]string{"serial": "2"}}
 	stream, err := sdr.SetupCS8Stream(&stub, testLogger)
 	assert.Nil(t, err)
@@ -37,7 +42,8 @@ func TestCS8StreamClose(t *testing.T) {
 }
 
 func TestGetMTU(t *testing.T) {
-	testLogger, _ := logger.NewFileLogger("stdout")
+	var log strings.Builder
+	testLogger := logger.New(&log)
 	stub := sdr.StubDevice{Args: map[string]string{"serial": "2"}}
 	stream, err := sdr.SetupCS8Stream(&stub, testLogger)
 	defer stream.Close(testLogger)
@@ -48,7 +54,8 @@ func TestGetMTU(t *testing.T) {
 }
 
 func TestActivateCS8Stream(t *testing.T) {
-	testLogger, _ := logger.NewFileLogger("stdout")
+	var log strings.Builder
+	testLogger := logger.New(&log)
 	stub := sdr.StubDevice{Args: map[string]string{"serial": "2"}}
 	stream, err := sdr.SetupCS8Stream(&stub, testLogger)
 	assert.Nil(t, err)
@@ -59,7 +66,8 @@ func TestActivateCS8Stream(t *testing.T) {
 }
 
 func TestDectivateCS8Stream(t *testing.T) {
-	testLogger, _ := logger.NewFileLogger("stdout")
+	var log strings.Builder
+	testLogger := logger.New(&log)
 	stub := sdr.StubDevice{Args: map[string]string{"serial": "3"}}
 	stream, err := sdr.SetupCS8Stream(&stub, testLogger)
 	assert.Nil(t, err)
@@ -71,7 +79,8 @@ func TestDectivateCS8Stream(t *testing.T) {
 }
 
 func TestDeactivateCS8Stream_NotActive(t *testing.T) {
-	testLogger, _ := logger.NewFileLogger("stdout")
+	var log strings.Builder
+	testLogger := logger.New(&log)
 	stub := sdr.StubDevice{Args: map[string]string{"serial": "2"}}
 	stream, err := sdr.SetupCS8Stream(&stub, testLogger)
 	assert.Nil(t, err)
@@ -82,7 +91,8 @@ func TestDeactivateCS8Stream_NotActive(t *testing.T) {
 }
 
 func TestDeactivateCS8Stream_Error(t *testing.T) {
-	testLogger, _ := logger.NewFileLogger("stdout")
+	var log strings.Builder
+	testLogger := logger.New(&log)
 	stub := sdr.StubDevice{Args: map[string]string{"serial": "2"}}
 	stream, err := sdr.SetupCS8Stream(&stub, testLogger)
 	assert.Nil(t, err)
@@ -95,7 +105,9 @@ func TestDeactivateCS8Stream_Error(t *testing.T) {
 }
 
 func TestReadCS8Stream(t *testing.T) {
-	testLogger, _ := logger.NewFileLogger("stdout")
+	var log strings.Builder
+	testLogger := logger.New(&log)
+	testLogger.SetMaxLevel(logger.Debug)
 	stub := sdr.StubDevice{Args: map[string]string{"serial": "3"}}
 	stream, err := sdr.SetupCS8Stream(&stub, testLogger)
 	assert.Nil(t, err)
@@ -107,17 +119,24 @@ func TestReadCS8Stream(t *testing.T) {
 	buffer := make([][]int, 1)
 	buffer[0] = make([]int, 2*mtu)
 	var outputFlags [1]int
-	timeNs, numElemsRead, err := stream.ReadCS8FromStream(testLogger, buffer, mtu, outputFlags, 0)
+	outputFlags[0] = 0
+	timeNs, numElemsRead, err := stream.ReadCS8FromStream(testLogger, buffer, mtu, &outputFlags, 0)
 	assert.True(t, timeNs > 0)
 	assert.Equal(t, mtu, numElemsRead)
 	assert.Equal(t, -2, buffer[0][0])
 	assert.Equal(t, 0, buffer[0][1])
 	assert.Equal(t, -1, buffer[0][19998])
 	assert.Equal(t, -2, buffer[0][19999])
+	// Wait for log to update.
+	time.Sleep(100 * time.Millisecond)
+	assert.True(t, strings.Contains(log.String(), "Flags ="))
+	assert.True(t, strings.Contains(log.String(), "Elements Read: 10000"))
 }
 
 func TestReadCS8Stream_PartialReads(t *testing.T) {
-	testLogger, _ := logger.NewFileLogger("stdout")
+	var log strings.Builder
+	testLogger := logger.New(&log)
+	testLogger.SetMaxLevel(logger.Debug)
 	stub := sdr.StubDevice{Args: map[string]string{"serial": "4"}}
 	stream, err := sdr.SetupCS8Stream(&stub, testLogger)
 	assert.Nil(t, err)
@@ -129,17 +148,25 @@ func TestReadCS8Stream_PartialReads(t *testing.T) {
 	buffer := make([][]int, 1)
 	buffer[0] = make([]int, 2*mtu)
 	var outputFlags [1]int
-	timeNs, numElemsRead, err := stream.ReadCS8FromStream(testLogger, buffer, mtu, outputFlags, 0)
+	timeNs, numElemsRead, err := stream.ReadCS8FromStream(testLogger, buffer, mtu, &outputFlags, 0)
 	assert.True(t, timeNs > 0)
 	assert.Equal(t, mtu, numElemsRead)
 	assert.Equal(t, -2, buffer[0][0])
 	assert.Equal(t, 0, buffer[0][1])
 	assert.Equal(t, -1, buffer[0][19998])
 	assert.Equal(t, -2, buffer[0][19999])
+	// Wait for log to update
+	time.Sleep(100 * time.Millisecond)
+	assert.True(t, strings.Contains(log.String(), "Elements Read: 5000"))
+	assert.True(t, strings.Contains(log.String(), "Elements Read: 3000"))
+	assert.True(t, strings.Contains(log.String(), "Elements Read: 2000"))
+	assert.True(t, strings.Contains(log.String(), "Flags ="))
 }
 
 func TestReadCS8tream_NotActivated(t *testing.T) {
-	testLogger, _ := logger.NewFileLogger("stdout")
+	var log strings.Builder
+	testLogger := logger.New(&log)
+	testLogger.SetMaxLevel(logger.Debug)
 	stub := sdr.StubDevice{Args: map[string]string{"serial": "3"}}
 	stream, err := sdr.SetupCS8Stream(&stub, testLogger)
 	assert.Nil(t, err)
@@ -148,11 +175,14 @@ func TestReadCS8tream_NotActivated(t *testing.T) {
 	buffer := make([][]int, 1)
 	buffer[0] = make([]int, 2*mtu)
 	var outputFlags [1]int
-	timeNs, numElemsRead, err := stream.ReadCS8FromStream(testLogger, buffer, mtu, outputFlags, 0)
+	timeNs, numElemsRead, err := stream.ReadCS8FromStream(testLogger, buffer, mtu, &outputFlags, 0)
 	assert.NotNil(t, err)
 	assert.Equal(t, "Attempting to read from an inactive stream", err.Error())
 	// Note: if err != nil, then there is no guarantee that timeNs and numElemsRead are valid.
 	// The following tests are provided simply because this is what the test stream sets them to.
 	assert.Equal(t, uint(0), timeNs)
 	assert.Equal(t, uint(0), numElemsRead)
+	// Wait for log to update
+	time.Sleep(100 * time.Millisecond)
+	assert.True(t, strings.Contains(log.String(), "Attempting to read from an inactive stream"))
 }

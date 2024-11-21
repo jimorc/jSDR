@@ -60,7 +60,7 @@ func (dev *StubDevice) Deactivate(stream *StreamCS8, flag device.StreamFlag,
 	}
 }
 
-func (dev *StubDevice) ReadCS8Stream(stream *StreamCS8, buff [][]int, numElemsToRead uint, outputFlags [1]int, timeoutUs uint) (
+func (dev *StubDevice) ReadCS8Stream(stream *StreamCS8, buff [][]int, numElemsToRead uint, outputFlags *[1]int, timeoutUs uint) (
 	timeNs uint, numElemsRead uint, err error) {
 	switch dev.Args["serial"] {
 	case "4":
