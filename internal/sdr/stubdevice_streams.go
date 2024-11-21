@@ -73,6 +73,7 @@ func (dev *StubDevice) ReadCS8Stream(stream *StreamCS8, buff [][]int, numElemsTo
 				buff[0][4*i+3] = -2
 			}
 			cs8EltsRead = 5000
+			outputFlags[0] = 0
 			return uint(time.Now().UTC().Nanosecond()), 5000, nil
 		case 5000:
 			for i := 5000 / 2; i < 8000/2; i++ {
@@ -82,6 +83,7 @@ func (dev *StubDevice) ReadCS8Stream(stream *StreamCS8, buff [][]int, numElemsTo
 				buff[0][4*i+3] = -2
 			}
 			cs8EltsRead = 8000
+			outputFlags[0] = 0
 			return uint(time.Now().UTC().Nanosecond()), 3000, nil
 		case 8000:
 			for i := 8000 / 2; i < 10000/2; i++ {
@@ -91,6 +93,7 @@ func (dev *StubDevice) ReadCS8Stream(stream *StreamCS8, buff [][]int, numElemsTo
 				buff[0][4*i+3] = -2
 			}
 			cs8EltsRead = 0
+			outputFlags[0] = int(device.StreamFlagHasTime)
 			return uint(time.Now().UTC().Nanosecond()), 2000, nil
 		}
 	default:
@@ -101,5 +104,6 @@ func (dev *StubDevice) ReadCS8Stream(stream *StreamCS8, buff [][]int, numElemsTo
 			buff[0][4*i+3] = -2
 		}
 	}
+	outputFlags[0] = int(device.StreamFlagHasTime)
 	return uint(time.Now().UTC().Nanosecond()), numElemsToRead, nil
 }

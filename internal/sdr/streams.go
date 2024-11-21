@@ -154,6 +154,9 @@ func (stream *StreamCS8) ReadCS8FromStream(log *logger.Logger, buff [][]int, ele
 				log.Logf(logger.Error, "Error encountered while reading CS8 data: %s\n", err.Error())
 				return timeNs, numElemsRead, err
 			}
+			if outputFlags[0] != 0 {
+				log.Logf(logger.Debug, "Flags = %d\n", outputFlags[0])
+			}
 			log.Logf(logger.Debug, "Elements Read: %d\n", elemsRead)
 			// for loop used to transfer data because it is 20x to 25x as fast as append.
 			for i := uint(0); i < 2*elemsRead; i++ {
