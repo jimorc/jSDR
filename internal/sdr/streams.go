@@ -171,3 +171,23 @@ func (stream *StreamCS8) ReadCS8FromStream(log *logger.Logger, buff [][]int, ele
 		}
 	}
 }
+
+// ConvertCS8ToCF64 converts ab array containing integer values into an array containing
+// the equivalent values as float64 values.
+//
+// Params:
+//
+//   - inputBuffer is the integer array containing the values to convert.
+//
+// Returns a float64 array containing the converted values.
+func ConvertCS8ToCF64(log *logger.Logger, inputBuffer []int) []float64 {
+	start := time.Now()
+	size := len(inputBuffer)
+	cf128 := make([]float64, size)
+	for i := 0; i < size; i++ {
+		cf128[i] = float64(inputBuffer[i])
+	}
+	end := time.Now()
+	log.Logf(logger.Debug, "Time to convert CS8 data to CF128 data: %d μs\n", end.Sub(start).Microseconds())
+	return cf128
+}

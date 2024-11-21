@@ -184,5 +184,21 @@ func TestReadCS8tream_NotActivated(t *testing.T) {
 	assert.Equal(t, uint(0), numElemsRead)
 	// Wait for log to update
 	time.Sleep(100 * time.Millisecond)
+
 	assert.True(t, strings.Contains(log.String(), "Attempting to read from an inactive stream"))
+}
+
+func TestConvertCS8ToCF64(t *testing.T) {
+	var log strings.Builder
+	testLogger := logger.New(&log)
+	testLogger.SetMaxLevel(logger.Debug)
+	inputBuffer := []int{-2, 0, -1, -2}
+	cf128 := sdr.ConvertCS8ToCF64(testLogger, inputBuffer)
+	assert.Equal(t, -2., cf128[0])
+	assert.Equal(t, 0., cf128[1])
+	assert.Equal(t, -1., cf128[2])
+	assert.Equal(t, -2., cf128[3])
+	// Wait for log to update
+	time.Sleep(100 * time.Millisecond)
+	assert.True(t, strings.Contains(log.String(), "Time to convert CS8 data to CF128 data:"))
 }
