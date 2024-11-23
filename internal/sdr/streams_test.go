@@ -188,17 +188,27 @@ func TestReadCS8tream_NotActivated(t *testing.T) {
 	assert.True(t, strings.Contains(log.String(), "Attempting to read from an inactive stream"))
 }
 
-func TestConvertCS8ToCF64(t *testing.T) {
+func TestReadStreamAsCF64Data(t *testing.T) {
 	var log strings.Builder
 	testLogger := logger.New(&log)
 	testLogger.SetMaxLevel(logger.Debug)
-	inputBuffer := []int{-2, 0, -1, -2}
-	cf128 := sdr.ConvertCS8ToCF64(testLogger, inputBuffer)
-	assert.Equal(t, -2., cf128[0])
-	assert.Equal(t, 0., cf128[1])
-	assert.Equal(t, -1., cf128[2])
-	assert.Equal(t, -2., cf128[3])
-	// Wait for log to update
-	time.Sleep(100 * time.Millisecond)
-	assert.True(t, strings.Contains(log.String(), "Time to convert CS8 data to CF128 data:"))
+	stub := sdr.StubDevice{Args: map[string]string{"serial": "3"}}
+	stream, err := sdr.SetupCS8Stream(&stub, testLogger)
+	assert.Nil(t, err)
+	defer stream.Close(testLogger)
+	err = stream.Activate(testLogger, 0, 0, 0)
+	assert.Nil(t, err)
+	defer stream.Deactivate(testLogger, 0, 0)
+	mtu := stream.GetMTU(testLogger)
+	var outputFlags int
+	cf64 := make([]float64, 2*mtu)
+	timeNs, numElemsRead, err := stream.ReadStreamAsCF64Data(testLogger, cf64, mtu,
+		&outputFlags, 0)
+	assert.Nil(t, err)
+	assert.Equal(t, mtu, numElemsRead)
+	assert.True(t, timeNs > 0)
+	assert.Equal(t, -2.0, cf64[0])
+	assert.Equal(t, 0.0, cf64[1])
+	assert.Equal(t, -1.0, cf64[2*mtu-2])
+	assert.Equal(t, -2.0, cf64[2*mtu-1])
 }

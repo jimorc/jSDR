@@ -172,22 +172,50 @@ func (stream *StreamCS8) ReadCS8FromStream(log *logger.Logger, buff [][]int, ele
 	}
 }
 
-// ConvertCS8ToCF64 converts ab array containing integer values into an array containing
-// the equivalent values as float64 values.
+// ReadStreamAsCF64Data reads MTU CS8 items from the stream. Since the stream format is CS8, 2 * MTU integers values are read.
+// These are then converted to an array of float64 values.
+//
+// Data is read only from RX channel 0.
 //
 // Params:
+//   - cf64: an array that will hold the data that is read. cf64 must be sized to [2*mtu] in
 //
-//   - inputBuffer is the integer array containing the values to convert.
+// the code that calls ReadSttreamAsCF64Data.
 //
-// Returns a float64 array containing the converted values.
-func ConvertCS8ToCF64(log *logger.Logger, inputBuffer []int) []float64 {
+//   - elemsToRead: This should match the stream's MTU.
+//
+//   - outputFlags: The flag indicators of the result.
+//
+//   - timeoutUs: the timeout time in microseconds.
+//
+// Returns:
+//
+//   - timeNs: the buffer's timestamp in nanoseconds.
+//
+//   - numElemsRead: the number of elements read. This should match the stream's MTU.
+//
+//   - err: error, or nil if the call is successful. On error, cf64, numElemsRead, and timeNs are not valid.
+//
+// The error has already been logged, so it is not necessary to do so again.
+func (stream *StreamCS8) ReadStreamAsCF64Data(log *logger.Logger, cf64 []float64, elementsToRead uint,
+	outputFlags *int, timeoutUs uint) (
+	timeNs uint, numElemsRead uint, err error) {
+	mtu := stream.GetMTU(log)
+	cs8 := make([][]int, 1)
+	cs8[0] = make([]int, 2*mtu)
+	var flags [1]int
+	timeNs, numElemsRead, err = stream.ReadCS8FromStream(log, cs8, elementsToRead, &flags, timeoutUs)
+	if err != nil {
+		return 0, 0, err
+	}
+	*outputFlags = flags[0]
 	start := time.Now()
-	size := len(inputBuffer)
-	cf128 := make([]float64, size)
+	size := len(cs8[0])
+	//	cf64 = make([]float64, size)
 	for i := 0; i < size; i++ {
-		cf128[i] = float64(inputBuffer[i])
+		cf64[i] = float64(cs8[0][i])
 	}
 	end := time.Now()
 	log.Logf(logger.Debug, "Time to convert CS8 data to CF128 data: %d μs\n", end.Sub(start).Microseconds())
-	return cf128
+	return timeNs, numElemsRead, err
 }
