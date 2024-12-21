@@ -27,10 +27,7 @@ var eltGains = map[string]eltInfo{
 //
 // Returns true if device supports automatic gain control.
 func (dev *StubDevice) SupportsAGC(direction device.Direction, _ uint) bool {
-	if direction == device.DirectionRX {
-		return true
-	}
-	return false
+	return direction == device.DirectionRX
 }
 
 // AgcIsEnabled returns whether AGC is currently enabled or not.
