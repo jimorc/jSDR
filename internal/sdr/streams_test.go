@@ -46,9 +46,9 @@ func TestGetMTU(t *testing.T) {
 	testLogger := logger.New(&log)
 	stub := sdr.StubDevice{Args: map[string]string{"serial": "2"}}
 	stream, err := sdr.SetupCS8Stream(&stub, testLogger)
-	defer stream.Close(testLogger)
 	assert.Nil(t, err)
 	assert.NotNil(t, stream)
+	defer stream.Close(testLogger)
 	mtu := stream.GetMTU(testLogger)
 	assert.Equal(t, uint(10000), mtu)
 }
