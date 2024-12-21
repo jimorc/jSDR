@@ -77,7 +77,7 @@ func TestSetSampleRate_SameAsCurrentRate(t *testing.T) {
 		"serial":       "1",
 		"tuner":        "Rafael Micro R820T"}, testLogger)
 	require.Nil(t, err)
-	re, err := regexp.Compile("\\d+\\.\\d+")
+	re, err := regexp.Compile(`\d+\.\d+`)
 	require.Nil(t, err)
 	rate := re.FindString(sdr.GetSampleRate(&stub, testLogger))
 	sampleRate, _ := strconv.ParseFloat(rate, 64)
