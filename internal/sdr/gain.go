@@ -116,11 +116,11 @@ func SetElementGain(sdrD Gain, log *logger.Logger, elementName string, gain floa
 	if !slices.Contains(eltNames, elementName) {
 		log.Logf(logger.Error, "Attempting to set gain for element: %s, but that gain element does not exist.\n"+
 			"Gain elements are: %v\n", elementName, eltNames)
-		return fmt.Errorf("Cannot set gain for non-existent gain element: %s", elementName)
+		return fmt.Errorf("cannot set gain for non-existent gain element: %s", elementName)
 	}
 	err := sdrD.SetElementGain(device.DirectionRX, 0, elementName, gain)
 	if err != nil {
-		log.Logf(logger.Error, fmt.Sprintf("Unable to set gain for element: %s: %s\n", elementName, err))
+		log.Logf(logger.Error, fmt.Sprintf("unable to set gain for element: %s: %s\n", elementName, err))
 	}
 	return err
 }

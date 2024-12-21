@@ -40,7 +40,7 @@ func (dev *StubDevice) SetSampleRate(_ device.Direction, _ uint, rate float64) e
 	switch dev.Args["serial"] {
 	case "0":
 		dev.sampleRate = rate
-		return fmt.Errorf("Attempt to set sample rate to %.1f failed. Sample rate is 2048000.0", rate)
+		return fmt.Errorf("attempt to set sample rate to %.1f failed. Sample rate is 2048000.0", rate)
 	case "1":
 		dev.sampleRate = rate
 		return nil

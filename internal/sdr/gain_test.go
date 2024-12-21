@@ -83,7 +83,7 @@ func TestSetOverallGain_Negative(t *testing.T) {
 	// attempting to set overall gain to a negative value.
 	err := sdr.SetOverallGain(&stub, testLogger, -2.0)
 	assert.NotNil(t, err)
-	assert.Equal(t, "Requested overall gain = -2.0 dB, but must be between 0.0 and 50.0 dB.", err.Error())
+	assert.Equal(t, "requested overall gain = -2.0 dB, but must be between 0.0 and 50.0 dB", err.Error())
 
 }
 
@@ -146,7 +146,7 @@ func TestSetElementGain_InvalidElement(t *testing.T) {
 	stub := sdr.StubDevice{Args: map[string]string{"serial": "2"}}
 	err := sdr.SetElementGain(&stub, testLogger, "Audio", 22.0)
 	assert.NotNil(t, err)
-	assert.Equal(t, "Cannot set gain for non-existent gain element: Audio", err.Error())
+	assert.Equal(t, "cannot set gain for non-existent gain element: Audio", err.Error())
 }
 
 func TestSetElementGain_InvalidValue(t *testing.T) {

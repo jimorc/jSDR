@@ -99,5 +99,5 @@ func TestSetSampleRate_Mismatch(t *testing.T) {
 	require.Nil(t, err)
 	err = sdr.SetSampleRate(&stub, testLogger, 1.024*1e6)
 	assert.NotNil(t, err)
-	assert.Equal(t, "Attempt to set sample rate to 1024000.0 failed. Sample rate is 2048000.0", err.Error())
+	assert.Equal(t, "attempt to set sample rate to 1024000.0 failed. Sample rate is 2048000.0", err.Error())
 }

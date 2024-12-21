@@ -86,7 +86,7 @@ func (dev *StubDevice) GetOverallGain(_ device.Direction, _ uint) float64 {
 // The overall gain is distributed automatically across the available elements.
 func (dev *StubDevice) SetOverallGain(_ device.Direction, _ uint, overallGain float64) error {
 	if overallGain < 0. || overallGain > maxOverallGain {
-		return fmt.Errorf("Requested overall gain = %.1f dB, but must be between 0.0 and %.1f dB.", overallGain, maxOverallGain)
+		return fmt.Errorf("requested overall gain = %.1f dB, but must be between 0.0 and %.1f dB", overallGain, maxOverallGain)
 	}
 	numElts := len(eltGains)
 	for k := range eltGains {
