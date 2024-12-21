@@ -136,7 +136,7 @@ func TestSetElementGain(t *testing.T) {
 	stub := sdr.StubDevice{Args: map[string]string{"serial": "2"}}
 	err := sdr.SetElementGain(&stub, testLogger, "RF", 22.0)
 	assert.Nil(t, err)
-	gain, err := sdr.GetElementGain(&stub, testLogger, "RF")
+	gain, _ := sdr.GetElementGain(&stub, testLogger, "RF")
 	assert.Equal(t, 22.0, gain)
 
 }

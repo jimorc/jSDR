@@ -71,6 +71,9 @@ func SetSampleRate(sdrD SampleRates, log *logger.Logger, rate float64) error {
 	GetSampleRates(sdrD, log)
 	currentRate := GetSampleRate(sdrD, log)
 	re, err := regexp.Compile(`[0-9]+\.[0-9]+`)
+	if err != nil {
+		return err
+	}
 	match := re.FindString(currentRate)
 	sampleRate, err := strconv.ParseFloat(match, 64)
 	if err != nil {

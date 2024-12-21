@@ -80,7 +80,7 @@ func TestSetSampleRate_SameAsCurrentRate(t *testing.T) {
 	re, err := regexp.Compile("\\d+\\.\\d+")
 	require.Nil(t, err)
 	rate := re.FindString(sdr.GetSampleRate(&stub, testLogger))
-	sampleRate, err := strconv.ParseFloat(rate, 64)
+	sampleRate, _ := strconv.ParseFloat(rate, 64)
 	sampleRate *= 1e6
 	err = sdr.SetSampleRate(&stub, testLogger, sampleRate)
 	assert.Nil(t, err)

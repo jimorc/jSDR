@@ -120,7 +120,7 @@ func TestReadCS8Stream(t *testing.T) {
 	buffer[0] = make([]int, 2*mtu)
 	var outputFlags [1]int
 	outputFlags[0] = 0
-	timeNs, numElemsRead, err := stream.ReadCS8FromStream(testLogger, buffer, mtu, &outputFlags, 0)
+	timeNs, numElemsRead, _ := stream.ReadCS8FromStream(testLogger, buffer, mtu, &outputFlags, 0)
 	assert.True(t, timeNs > 0)
 	assert.Equal(t, mtu, numElemsRead)
 	assert.Equal(t, -2, buffer[0][0])
@@ -148,7 +148,7 @@ func TestReadCS8Stream_PartialReads(t *testing.T) {
 	buffer := make([][]int, 1)
 	buffer[0] = make([]int, 2*mtu)
 	var outputFlags [1]int
-	timeNs, numElemsRead, err := stream.ReadCS8FromStream(testLogger, buffer, mtu, &outputFlags, 0)
+	timeNs, numElemsRead, _ := stream.ReadCS8FromStream(testLogger, buffer, mtu, &outputFlags, 0)
 	assert.True(t, timeNs > 0)
 	assert.Equal(t, mtu, numElemsRead)
 	assert.Equal(t, -2, buffer[0][0])
