@@ -50,12 +50,12 @@ func (dev *StubDevice) AgcIsEnabled(direction device.Direction, _ uint) bool {
 func (dev *StubDevice) EnableAgc(_ device.Direction, _ uint, enable bool) error {
 	switch dev.Args["serial"] {
 	case "1":
-		return errors.New("Could not enable Agc")
+		return errors.New("could not enable Agc")
 	case "2":
 		agcEnabled = enable
 		return nil
 	}
-	return errors.New("Invalid serial number for StubDevice.EnableAgc")
+	return errors.New("invalid serial number for StubDevice.EnableAgc")
 }
 
 // GetGainElementNames returns a list of names for the gain elements for the specified direction and channel.
@@ -105,7 +105,7 @@ func (dev *StubDevice) GetElementGain(_ device.Direction, _ uint, eltName string
 		if gain, ok := eltGains[eltName]; ok {
 			return gain.gain, nil
 		} else {
-			return 0.0, errors.New(fmt.Sprintf("Gain element '%s' is invalid", eltName))
+			return 0.0, errors.New(fmt.Sprintf("gain element '%s' is invalid", eltName))
 		}
 	default:
 		return 25.0, nil
@@ -118,7 +118,7 @@ func (dev *StubDevice) GetElementGain(_ device.Direction, _ uint, eltName string
 func (dev *StubDevice) SetElementGain(direction device.Direction, channel uint, eltName string, gain float64) error {
 	gainRange := dev.GetElementGainRange(direction, channel, eltName)
 	if gain < gainRange.Minimum || gain > gainRange.Maximum {
-		return errors.New(fmt.Sprintf("Cannot set gain for element: %s to %.1f. Requested gain is outside the allowable range: %.1f to %.1f",
+		return errors.New(fmt.Sprintf("cannot set gain for element: %s to %.1f. Requested gain is outside the allowable range: %.1f to %.1f",
 			eltName, gain, gainRange.Minimum, gainRange.Maximum))
 	}
 	eltGains[eltName] = eltInfo{gain, eltGains[eltName].gainRange}

@@ -30,7 +30,7 @@ func GetFrequencyRanges(sdrD Frequency, log *logger.Logger) ([]device.SDRRange, 
 	frequencyRanges := sdrD.GetFrequencyRanges(device.DirectionRX, 0)
 	if len(frequencyRanges) == 0 {
 		log.Log(logger.Error, "The attached SDR seems defective; there are no specified frequency ranges.\n")
-		return frequencyRanges, errors.New("The attached SDR seems defective; there are no specified frequency ranges.")
+		return frequencyRanges, errors.New("the attached SDR seems defective; there are no specified frequency ranges")
 	}
 	var frequenciesStr strings.Builder
 	frequenciesStr.WriteString("Frequency Ranges:\n")
@@ -118,10 +118,10 @@ func SetTunableElementFrequency(sdrD Frequency, log *logger.Logger, name string,
 
 	eltRanges, err := GetTunableElementFrequencyRanges(sdrD, log, name)
 	if err != nil {
-		return errors.New("Cannot set frequency. Cannot retrieve tunable element frequency ranges\n")
+		return errors.New("cannot set frequency. Cannot retrieve tunable element frequency ranges")
 	}
 	if !withinRanges(eltRanges, freq) {
-		return errors.New("Cannot set frequency. Requested frequency not within element's frequency ranges")
+		return errors.New("cannot set frequency. Requested frequency not within element's frequency ranges")
 	}
 
 	sdrD.SetTunableElementFrequency(device.DirectionRX, 0, name, freq)

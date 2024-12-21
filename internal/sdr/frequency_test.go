@@ -38,7 +38,7 @@ func TestGetFrequencyRanges_NoRanges(t *testing.T) {
 	stub := sdr.StubDevice{Args: map[string]string{"serial": "1"}}
 	ranges, err := sdr.GetFrequencyRanges(&stub, testLogger)
 	assert.NotNil(t, err)
-	assert.Equal(t, "The attached SDR seems defective; there are no specified frequency ranges.", err.Error())
+	assert.Equal(t, "the attached SDR seems defective; there are no specified frequency ranges", err.Error())
 	assert.Equal(t, 0, len(ranges))
 }
 
@@ -116,7 +116,7 @@ func TestSetTunableElementFrequency_BadFreq(t *testing.T) {
 	newFreq := -100.
 	err := sdr.SetTunableElementFrequency(&stub, testLogger, "RF", newFreq)
 	assert.NotNil(t, err)
-	assert.Equal(t, "Cannot set frequency. Requested frequency not within element's frequency ranges", err.Error())
+	assert.Equal(t, "cannot set frequency. Requested frequency not within element's frequency ranges", err.Error())
 }
 
 func TestGetOverallCenterFrequency(t *testing.T) {
@@ -160,5 +160,5 @@ func TestSetOverallCenterFrequency_ErrorSettingFrequency(t *testing.T) {
 	newFreq := 50000000.
 	err := sdr.SetOverallCenterFrequency(&stub, testLogger, newFreq, map[string]string{})
 	assert.NotNil(t, err)
-	assert.Equal(t, "Cannot set requested overall center frequency: 50000000.0: Serial # = 4", err.Error())
+	assert.Equal(t, "Cannot set requested overall center frequency: 50000000.0: serial # = 4", err.Error())
 }

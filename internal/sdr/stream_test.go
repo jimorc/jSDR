@@ -26,7 +26,7 @@ func TestGetStreamFormats_NoFormats(t *testing.T) {
 	stub := sdr.StubDevice{Args: map[string]string{"serial": "1"}}
 	formats, err := sdr.GetStreamFormats(&stub, testLogger)
 	assert.NotNil(t, err)
-	assert.Equal(t, "No stream formats retrieved for channel 0", err.Error())
+	assert.Equal(t, "no stream formats retrieved for channel 0", err.Error())
 	assert.Equal(t, 0, len(formats))
 }
 

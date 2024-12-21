@@ -58,7 +58,7 @@ func (dev *StubDevice) GetOverallCenterFrequency(_ device.Direction, _ uint) flo
 func (dev *StubDevice) SetOverallCenterFrequency(_ device.Direction, _ uint, newFreq float64, _ map[string]string) error {
 	switch dev.Args["serial"] {
 	case "4":
-		return errors.New("Serial # = 4")
+		return errors.New("serial # = 4")
 	default:
 		overallCenterFrequency = newFreq
 		return nil

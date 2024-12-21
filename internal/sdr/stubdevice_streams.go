@@ -16,7 +16,7 @@ func (dev *StubDevice) SetupCS8Stream(direction device.Direction,
 	// StreamCS8 or an error.
 	switch dev.Args["serial"] {
 	case "1":
-		return nil, errors.New("Bad args passed to SetupCS8Stream")
+		return nil, errors.New("bad args passed to SetupCS8Stream")
 	default:
 		// For test purposes, we are only interested that the stream exists, not
 		// it's specific values.
@@ -54,7 +54,7 @@ func (dev *StubDevice) Deactivate(stream *StreamCS8, flag device.StreamFlag,
 	timeNs int) error {
 	switch dev.Args["serial"] {
 	case "2":
-		return errors.New("Bad device")
+		return errors.New("bad device")
 	default:
 		return nil
 	}

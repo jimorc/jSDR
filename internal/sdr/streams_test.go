@@ -26,7 +26,7 @@ func TestSetupCS8Stream_Error(t *testing.T) {
 	stub := sdr.StubDevice{Args: map[string]string{"serial": "1"}}
 	stream, err := sdr.SetupCS8Stream(&stub, testLogger)
 	assert.NotNil(t, err)
-	assert.Equal(t, "Bad args passed to SetupCS8Stream", err.Error())
+	assert.Equal(t, "bad args passed to SetupCS8Stream", err.Error())
 	assert.Nil(t, stream)
 }
 
@@ -87,7 +87,7 @@ func TestDeactivateCS8Stream_NotActive(t *testing.T) {
 	defer stream.Close(testLogger)
 	err = stream.Deactivate(testLogger, 0, 0)
 	assert.NotNil(t, err)
-	assert.Equal(t, "Attempting to deactivate a stream that is not active", err.Error())
+	assert.Equal(t, "attempting to deactivate a stream that is not active", err.Error())
 }
 
 func TestDeactivateCS8Stream_Error(t *testing.T) {
@@ -101,7 +101,7 @@ func TestDeactivateCS8Stream_Error(t *testing.T) {
 	assert.Nil(t, err)
 	err = stream.Deactivate(testLogger, 0, 0)
 	assert.NotNil(t, err)
-	assert.Equal(t, "Bad device", err.Error())
+	assert.Equal(t, "bad device", err.Error())
 }
 
 func TestReadCS8Stream(t *testing.T) {
@@ -177,7 +177,7 @@ func TestReadCS8tream_NotActivated(t *testing.T) {
 	var outputFlags [1]int
 	timeNs, numElemsRead, err := stream.ReadCS8FromStream(testLogger, buffer, mtu, &outputFlags, 0)
 	assert.NotNil(t, err)
-	assert.Equal(t, "Attempting to read from an inactive stream", err.Error())
+	assert.Equal(t, "attempting to read from an inactive stream", err.Error())
 	// Note: if err != nil, then there is no guarantee that timeNs and numElemsRead are valid.
 	// The following tests are provided simply because this is what the test stream sets them to.
 	assert.Equal(t, uint(0), timeNs)

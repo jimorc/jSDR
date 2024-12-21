@@ -23,7 +23,7 @@ func GetStreamFormats(sdrD Stream, log *logger.Logger) ([]string, error) {
 	formats := sdrD.GetStreamFormats(device.DirectionRX, 0)
 	if len(formats) == 0 {
 		log.Log(logger.Error, "Channel 0 has no stream formats\n")
-		err := errors.New("No stream formats retrieved for channel 0")
+		err := errors.New("no stream formats retrieved for channel 0")
 		return formats, err
 	}
 	var formatStr strings.Builder

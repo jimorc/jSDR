@@ -106,7 +106,7 @@ func (stream *StreamCS8) Activate(log *logger.Logger, flag device.StreamFlag, ti
 func (stream *StreamCS8) Deactivate(log *logger.Logger, flags device.StreamFlag, timeNs int) error {
 	if !stream.active {
 		log.Log(logger.Error, "Attempting to deactivate a stream that is not active.\n")
-		return errors.New("Attempting to deactivate a stream that is not active")
+		return errors.New("attempting to deactivate a stream that is not active")
 	}
 	err := stream.device.Deactivate(stream, flags, timeNs)
 	if err != nil {
@@ -140,7 +140,7 @@ func (stream *StreamCS8) ReadCS8FromStream(log *logger.Logger, buff [][]int, ele
 	timeNs uint, numElemsRead uint, err error) {
 	if !stream.active {
 		log.Log(logger.Error, "Attempting to read from an inactive stream.\n")
-		return 0, 0, errors.New("Attempting to read from an inactive stream")
+		return 0, 0, errors.New("attempting to read from an inactive stream")
 	}
 	var elemsRead uint
 	mtu := stream.GetMTU(log)

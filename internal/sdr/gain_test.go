@@ -35,7 +35,7 @@ func TestEnableAgc_Error(t *testing.T) {
 	// serial number of "1" will return an error
 	stub := sdr.StubDevice{Args: map[string]string{"serial": "1"}}
 	err := sdr.EnableAgc(&stub, testLogger, true)
-	assert.Equal(t, "Could not enable Agc", err.Error())
+	assert.Equal(t, "could not enable Agc", err.Error())
 }
 
 func TestEnableAgc(t *testing.T) {
@@ -109,7 +109,7 @@ func TestGetElementGain_InvalidElement(t *testing.T) {
 	stub := sdr.StubDevice{Args: map[string]string{"serial": "2"}}
 	gain, err := sdr.GetElementGain(&stub, testLogger, "Audio")
 	assert.NotNil(t, err)
-	assert.Equal(t, "Gain element 'Audio' is invalid", err.Error())
+	assert.Equal(t, "gain element 'Audio' is invalid", err.Error())
 	assert.Equal(t, 0.0, gain)
 }
 
@@ -154,11 +154,11 @@ func TestSetElementGain_InvalidValue(t *testing.T) {
 	stub := sdr.StubDevice{Args: map[string]string{"serial": "2"}}
 	err := sdr.SetElementGain(&stub, testLogger, "RF", -1.0)
 	assert.NotNil(t, err)
-	assert.Equal(t, "Cannot set gain for element: RF to -1.0. Requested gain is outside the allowable range: 0.0 to 25.0",
+	assert.Equal(t, "cannot set gain for element: RF to -1.0. Requested gain is outside the allowable range: 0.0 to 25.0",
 		err.Error())
 
 	err = sdr.SetElementGain(&stub, testLogger, "RF", 25.1)
 	assert.NotNil(t, err)
-	assert.Equal(t, "Cannot set gain for element: RF to 25.1. Requested gain is outside the allowable range: 0.0 to 25.0",
+	assert.Equal(t, "cannot set gain for element: RF to 25.1. Requested gain is outside the allowable range: 0.0 to 25.0",
 		err.Error())
 }

@@ -91,7 +91,7 @@ func TestBadMake(t *testing.T) {
 	assert.NotNil(t, err)
 	// The following error message is returned from StubDevice only. SoapyDevice would return
 	// a different error message in case of error.
-	assert.Equal(t, "No arguments provided", err.Error())
+	assert.Equal(t, "no arguments provided", err.Error())
 }
 
 func TestUnmake(t *testing.T) {

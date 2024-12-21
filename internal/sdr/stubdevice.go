@@ -29,7 +29,7 @@ func (dev StubDevice) Enumerate(args map[string]string) []map[string]string {
 // then an error is returned.
 func (dev *StubDevice) Make(args map[string]string) error {
 	if len(args) == 0 {
-		return errors.New("No arguments provided")
+		return errors.New("no arguments provided")
 	} else {
 		dev.Args = args
 		fakeDev := 127
@@ -43,7 +43,7 @@ func (dev *StubDevice) Make(args map[string]string) error {
 // Since StubDevice is used for testing, an actual SDR is never created.
 func (dev *StubDevice) Unmake() error {
 	if dev.Device == nil {
-		return errors.New("No device to unmake")
+		return errors.New("no device to unmake")
 	} else {
 		dev.Device = nil
 		dev.Args = nil
