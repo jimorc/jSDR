@@ -5,10 +5,10 @@ import (
 	"os"
 	"time"
 
-	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/app"
 	"github.com/jimorc/jsdr/internal/logger"
 	"github.com/jimorc/jsdr/internal/sdr"
+	"github.com/jimorc/jsdr/internal/sdrdevice"
 	"github.com/jimorc/jsdr/internal/ui"
 
 	"github.com/spf13/pflag"
@@ -16,7 +16,7 @@ import (
 )
 
 var log *logger.Logger
-var mainWin *fyne.Window
+var sdrDevice sdrdevice.SdrDevice
 
 func main() {
 	logLevel, LogFile := parseCommandLine()
@@ -27,6 +27,7 @@ func main() {
 	log.Logf(logger.Info, "jsdr started at %v\n", time.Now().UTC())
 
 	a := app.NewWithID("com.github.jimorc.jsdr")
+	sdrDevice.LoadFromApp(log)
 	mainWin := ui.MakeMainWindow(&a, log)
 	log.Log(logger.Debug, "Displaying main window\n")
 	mainWin.ShowAndRun()
@@ -34,6 +35,7 @@ func main() {
 	if ui.SoapyDev.Device != nil {
 		sdr.Unmake(ui.SoapyDev, log)
 	}
+	sdrDevice.SaveToApp(log)
 
 	log.Logf(logger.Info, "jsdr terminated at %v\n", time.Now().UTC())
 }
