@@ -70,7 +70,7 @@ func GetTunableElementFrequencyRanges(sdrD Frequency, log *logger.Logger, tunabl
 		eMsg.WriteString(fmt.Sprintf("Invalid tunable element name: %s\n", tunableElement))
 		eMsg.WriteString(fmt.Sprintf("Tunable element names are: %v\n", tElts))
 		log.Logf(logger.Error, fmt.Sprintf("Invalid "))
-		return []device.SDRRange{}, errors.New(fmt.Sprintf("Invalid tunable element name: %s", tunableElement))
+		return []device.SDRRange{}, fmt.Errorf("Invalid tunable element name: %s", tunableElement)
 	}
 	fRanges := sdrD.GetTunableElementFrequencyRanges(device.DirectionRX, 0, tunableElement)
 	var rMsg strings.Builder
@@ -94,7 +94,7 @@ func GetTunableElementFrequency(sdrD Frequency, log *logger.Logger, name string)
 		eMsg.WriteString(fmt.Sprintf("Invalid tunable element name: %s\n", name))
 		eMsg.WriteString(fmt.Sprintf("Tunable element names are: %v\n", tElts))
 		log.Logf(logger.Error, fmt.Sprintf("Invalid "))
-		return 0.0, errors.New(fmt.Sprintf("Invalid tunable element name: %s", name))
+		return 0.0, fmt.Errorf("Invalid tunable element name: %s", name)
 	}
 	eltFreq := sdrD.GetTunableElementFrequency(device.DirectionRX, 0, name)
 	log.Logf(logger.Debug, fmt.Sprintf("Current frequency for element %s: %.1f\n", name, eltFreq))
@@ -113,7 +113,7 @@ func SetTunableElementFrequency(sdrD Frequency, log *logger.Logger, name string,
 		eMsg.WriteString(fmt.Sprintf("Invalid tunable element name: %s\n", name))
 		eMsg.WriteString(fmt.Sprintf("Tunable element names are: %v\n", tElts))
 		log.Logf(logger.Error, eMsg.String())
-		return errors.New(fmt.Sprintf("Cannot set frequency. Invalid tunable element name: %s", name))
+		return fmt.Errorf("Cannot set frequency. Invalid tunable element name: %s", name)
 	}
 
 	eltRanges, err := GetTunableElementFrequencyRanges(sdrD, log, name)
@@ -142,7 +142,7 @@ func SetOverallCenterFrequency(sdrD Frequency, log *logger.Logger, newFreq float
 	freqRanges, err := GetFrequencyRanges(sdrD, log)
 	if err != nil {
 		log.Logf(logger.Error, "There are no frequency ranges for this device.\n")
-		return errors.New(fmt.Sprintf("Cannot set overall center frequency to %.1f.\nThere are no frequency ranges for this device.", newFreq))
+		return fmt.Errorf("Cannot set overall center frequency to %.1f.\nThere are no frequency ranges for this device.", newFreq)
 	}
 	if !withinRanges(freqRanges, newFreq) {
 		var rMsg strings.Builder
@@ -152,12 +152,12 @@ func SetOverallCenterFrequency(sdrD Frequency, log *logger.Logger, newFreq float
 			rMsg.WriteString(fmt.Sprintf("         %v\n", fR))
 		}
 		log.Log(logger.Error, rMsg.String())
-		return errors.New(fmt.Sprintf("Requested frequency: %.1f is not within the frequency ranges for this device.", newFreq))
+		return fmt.Errorf("Requested frequency: %.1f is not within the frequency ranges for this device.", newFreq)
 	}
 	err = sdrD.SetOverallCenterFrequency(device.DirectionRX, 0, newFreq, args)
 	if err != nil {
 		log.Logf(logger.Error, "Cannot set requested overall center frequency: %.1f: %s\n", newFreq, err.Error())
-		return errors.New(fmt.Sprintf("Cannot set requested overall center frequency: %.1f: %s", newFreq, err.Error()))
+		return fmt.Errorf("Cannot set requested overall center frequency: %.1f: %s", newFreq, err.Error())
 	}
 	return nil
 }

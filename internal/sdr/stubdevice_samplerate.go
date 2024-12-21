@@ -1,7 +1,6 @@
 package sdr
 
 import (
-	"errors"
 	"fmt"
 
 	"github.com/pothosware/go-soapy-sdr/pkg/device"
@@ -41,7 +40,7 @@ func (dev *StubDevice) SetSampleRate(_ device.Direction, _ uint, rate float64) e
 	switch dev.Args["serial"] {
 	case "0":
 		dev.sampleRate = rate
-		return errors.New(fmt.Sprintf("Attempt to set sample rate to %.1f failed. Sample rate is 2048000.0", rate))
+		return fmt.Errorf("Attempt to set sample rate to %.1f failed. Sample rate is 2048000.0", rate)
 	case "1":
 		dev.sampleRate = rate
 		return nil

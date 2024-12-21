@@ -86,7 +86,7 @@ func (dev *StubDevice) GetOverallGain(_ device.Direction, _ uint) float64 {
 // The overall gain is distributed automatically across the available elements.
 func (dev *StubDevice) SetOverallGain(_ device.Direction, _ uint, overallGain float64) error {
 	if overallGain < 0. || overallGain > maxOverallGain {
-		return errors.New(fmt.Sprintf("Requested overall gain = %.1f dB, but must be between 0.0 and %.1f dB.", overallGain, maxOverallGain))
+		return fmt.Errorf("Requested overall gain = %.1f dB, but must be between 0.0 and %.1f dB.", overallGain, maxOverallGain)
 	}
 	numElts := len(eltGains)
 	for k := range eltGains {
@@ -105,7 +105,7 @@ func (dev *StubDevice) GetElementGain(_ device.Direction, _ uint, eltName string
 		if gain, ok := eltGains[eltName]; ok {
 			return gain.gain, nil
 		} else {
-			return 0.0, errors.New(fmt.Sprintf("gain element '%s' is invalid", eltName))
+			return 0.0, fmt.Errorf("gain element '%s' is invalid", eltName)
 		}
 	default:
 		return 25.0, nil
@@ -118,8 +118,8 @@ func (dev *StubDevice) GetElementGain(_ device.Direction, _ uint, eltName string
 func (dev *StubDevice) SetElementGain(direction device.Direction, channel uint, eltName string, gain float64) error {
 	gainRange := dev.GetElementGainRange(direction, channel, eltName)
 	if gain < gainRange.Minimum || gain > gainRange.Maximum {
-		return errors.New(fmt.Sprintf("cannot set gain for element: %s to %.1f. Requested gain is outside the allowable range: %.1f to %.1f",
-			eltName, gain, gainRange.Minimum, gainRange.Maximum))
+		return fmt.Errorf("cannot set gain for element: %s to %.1f. Requested gain is outside the allowable range: %.1f to %.1f",
+			eltName, gain, gainRange.Minimum, gainRange.Maximum)
 	}
 	eltGains[eltName] = eltInfo{gain, eltGains[eltName].gainRange}
 	return nil
