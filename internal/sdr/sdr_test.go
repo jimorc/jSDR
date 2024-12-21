@@ -10,8 +10,6 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-var testLogger logger.Logger
-
 func TestEnumerateWithoutAudio(t *testing.T) {
 	testLogger, _ := logger.NewFileLogger("stdout")
 	stub := sdr.StubDevice{Devices: []map[string]string{
