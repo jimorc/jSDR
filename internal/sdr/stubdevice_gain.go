@@ -126,7 +126,7 @@ func (dev *StubDevice) SetElementGain(direction device.Direction, channel uint, 
 func (dev *StubDevice) GetElementGainRange(_ device.Direction, _ uint, eltName string) device.SDRRange {
 	switch dev.Args["serial"] {
 	case "2":
-		gain, _ := eltGains[eltName]
+		gain := eltGains[eltName]
 		return gain.gainRange
 	}
 	return device.SDRRange{Minimum: 0, Maximum: 0, Step: 0}
