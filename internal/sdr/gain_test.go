@@ -74,7 +74,7 @@ func TestSetOverallGain_TooLarge(t *testing.T) {
 	// attempting to set gain to 50.1 dB but stub only allows values up to 50.0 dB.
 	err := sdr.SetOverallGain(&stub, testLogger, 50.1)
 	assert.NotNil(t, err)
-	assert.Equal(t, "Requested overall gain = 50.1 dB, but must be between 0.0 and 50.0 dB.", err.Error())
+	assert.Equal(t, "requested overall gain = 50.1 dB, but must be between 0.0 and 50.0 dB", err.Error())
 }
 
 func TestSetOverallGain_Negative(t *testing.T) {
