@@ -23,3 +23,11 @@ func TestSaveToApp(t *testing.T) {
 	assert.Equal(t, "Generic RTL2832U OEM :: 00000101", sdrDev2.Device)
 	assert.Equal(t, sdrDevice.Device, sdrDev2.Device)
 }
+
+func TestClear(t *testing.T) {
+	testLogger, _ := logger.NewFileLogger("stdout")
+	app.NewWithID("com.github.jimorc.jsdrtest")
+	var sdrDevice sdrdevice.SdrDevice
+	sdrDevice.Clear(testLogger)
+	assert.Equal(t, "", sdrDevice.Device)
+}

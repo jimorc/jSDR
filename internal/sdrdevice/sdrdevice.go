@@ -42,3 +42,14 @@ func (s *SdrDevice) SaveToApp(log *logger.Logger) {
 
 	log.Log(logger.Debug, msg.String())
 }
+
+// Clear clears all values in the SdrDevice struct. This should only be called if the
+// previously stored SDR is no longer connected to the computer.
+//
+// Params:
+//
+//	log is the logger to write messages to.
+func (s *SdrDevice) Clear(log *logger.Logger) {
+	s.Device = ""
+	log.Log(logger.Debug, "SdrDevice has been cleared\n")
+}
