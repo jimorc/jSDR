@@ -1,6 +1,8 @@
 package sdr
 
 import (
+	"fmt"
+
 	"github.com/pothosware/go-soapy-sdr/pkg/device"
 )
 
@@ -19,5 +21,15 @@ func (dev *StubDevice) GetCurrentAntenna(direction device.Direction, _ uint) str
 		return "RX"
 	} else {
 		return ""
+	}
+}
+
+// SetAntenna sets the RX antenna. Channel number is ignored here.
+// Returns nil on success, or error on failure.
+func (dev *StubDevice) SetAntenna(direction device.Direction, _ uint, antenna string) error {
+	if antenna == "RX" {
+		return nil
+	} else {
+		return fmt.Errorf("invalid antenna: %s", antenna)
 	}
 }

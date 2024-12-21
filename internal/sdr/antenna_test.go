@@ -22,3 +22,18 @@ func TestGetCurrentAntenna(t *testing.T) {
 	ant := sdr.GetCurrentAntenna(&stub, testLogger)
 	assert.Equal(t, "RX", ant)
 }
+
+func TestSetAntenna(t *testing.T) {
+	testLogger, _ := logger.NewFileLogger("stdout")
+	stub := sdr.StubDevice{}
+	err := sdr.SetAntenna(&stub, testLogger, "RX")
+	assert.Nil(t, err)
+}
+
+func TestSetAntenna_BadName(t *testing.T) {
+	testLogger, _ := logger.NewFileLogger("stdout")
+	stub := sdr.StubDevice{}
+	err := sdr.SetAntenna(&stub, testLogger, "RX2")
+	assert.NotNil(t, err)
+	assert.Equal(t, "invalid antenna: RX2", err.Error())
+}
