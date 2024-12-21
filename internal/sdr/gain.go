@@ -99,7 +99,7 @@ func GetElementGainRange(sdrD Gain, log *logger.Logger, elementName string) (dev
 	}
 	if !valid {
 		errStr := fmt.Sprintf("Gain element name: %s is invalid\n", elementName)
-		log.Logf(logger.Error, errStr+"\n")
+		log.Log(logger.Error, errStr+"\n")
 		return device.SDRRange{Minimum: 0, Maximum: 0, Step: 0}, errors.New(errStr)
 	}
 	return sdrD.GetElementGainRange(device.DirectionRX, 0, elementName), nil
@@ -120,7 +120,7 @@ func SetElementGain(sdrD Gain, log *logger.Logger, elementName string, gain floa
 	}
 	err := sdrD.SetElementGain(device.DirectionRX, 0, elementName, gain)
 	if err != nil {
-		log.Logf(logger.Error, fmt.Sprintf("unable to set gain for element: %s: %s\n", elementName, err))
+		log.Logf(logger.Error, "unable to set gain for element: %s: %s\n", elementName, err)
 	}
 	return err
 }

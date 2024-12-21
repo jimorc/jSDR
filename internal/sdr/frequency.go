@@ -69,7 +69,7 @@ func GetTunableElementFrequencyRanges(sdrD Frequency, log *logger.Logger, tunabl
 		var eMsg strings.Builder
 		eMsg.WriteString(fmt.Sprintf("Invalid tunable element name: %s\n", tunableElement))
 		eMsg.WriteString(fmt.Sprintf("Tunable element names are: %v\n", tElts))
-		log.Logf(logger.Error, fmt.Sprintf("Invalid "))
+		log.Log(logger.Error, eMsg.String())
 		return []device.SDRRange{}, fmt.Errorf("invalid tunable element name: %s", tunableElement)
 	}
 	fRanges := sdrD.GetTunableElementFrequencyRanges(device.DirectionRX, 0, tunableElement)
@@ -93,11 +93,11 @@ func GetTunableElementFrequency(sdrD Frequency, log *logger.Logger, name string)
 		var eMsg strings.Builder
 		eMsg.WriteString(fmt.Sprintf("Invalid tunable element name: %s\n", name))
 		eMsg.WriteString(fmt.Sprintf("Tunable element names are: %v\n", tElts))
-		log.Logf(logger.Error, fmt.Sprintf("Invalid "))
+		log.Log(logger.Error, eMsg.String())
 		return 0.0, fmt.Errorf("invalid tunable element name: %s", name)
 	}
 	eltFreq := sdrD.GetTunableElementFrequency(device.DirectionRX, 0, name)
-	log.Logf(logger.Debug, fmt.Sprintf("Current frequency for element %s: %.1f\n", name, eltFreq))
+	log.Logf(logger.Debug, "Current frequency for element %s: %.1f\n", name, eltFreq)
 	return eltFreq, nil
 }
 
@@ -112,7 +112,7 @@ func SetTunableElementFrequency(sdrD Frequency, log *logger.Logger, name string,
 		var eMsg strings.Builder
 		eMsg.WriteString(fmt.Sprintf("Invalid tunable element name: %s\n", name))
 		eMsg.WriteString(fmt.Sprintf("Tunable element names are: %v\n", tElts))
-		log.Logf(logger.Error, eMsg.String())
+		log.Log(logger.Error, eMsg.String())
 		return fmt.Errorf("cannot set frequency. Invalid tunable element name: %s", name)
 	}
 
@@ -125,7 +125,7 @@ func SetTunableElementFrequency(sdrD Frequency, log *logger.Logger, name string,
 	}
 
 	sdrD.SetTunableElementFrequency(device.DirectionRX, 0, name, freq)
-	log.Logf(logger.Debug, fmt.Sprintf("Setting element %s frequency to %.1f\n", name, freq))
+	log.Logf(logger.Debug, "Setting element %s frequency to %.1f\n", name, freq)
 	sdrD.GetTunableElementFrequency(device.DirectionRX, 0, name)
 	return nil
 }
