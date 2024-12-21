@@ -1,4 +1,5 @@
 # jsdr
+
 A Software Defined Radio written in Go. The intention is to provide an application that
 will run on Windows, Linux, and macOS.
 
@@ -29,7 +30,7 @@ In addition to the Go toolset, I also use Visual Studio Code, so the build instr
 below assume that.
 
 Development of jsdr is currently being done on Linux (specifically Kubuntu 24.04), so build
-instructions will only be given for Unbuntu Linux at this time.
+instructions will only be given for Ubuntu Linux at this time.
 
 ### Needed Development Tools
 
@@ -47,15 +48,27 @@ various required tools will be listed.
 
 The following instructions assume you are starting from a freshly installed system.
 
-* sudo apt update
-* sudo apt install build-essential libgl1-mesa-dev xorg-dev
-* sudo apt install libsoapysdr-dev
-* sudo snap install go
-* sudo snap install code
-* cd ~
-* mkdir go
-* cd go
-* git clone https://github.com/jimorc/jsdr.git
-  
-A number of other libraries will be needed. Installation instructions will be added as
-needed.
+```bash
+sudo apt update
+sudo apt install build-essential libgl1-mesa-dev xorg-dev
+sudo apt install libsoapysdr-dev
+sudo snap install go
+sudo snap install code
+cd ~
+mkdir go
+cd go
+git clone https://github.com/jimorc/jsdr.git
+cd jsdr
+go mod tidy
+cd cmd/jsdr
+go run .
+```
+
+Depending on the state of your computer system (i.e. whether you have done any Go programming in the past),
+that last step could take some time (a minute or more) the first time it is run. After the first time, builds
+are very fast.
+
+Add the Go VSCode extension and any others that you may find useful.
+
+A number of libraries in addition to those installed above will be needed. Installation instructions will be
+added as needed.
