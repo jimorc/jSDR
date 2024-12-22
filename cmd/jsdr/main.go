@@ -35,7 +35,6 @@ func main() {
 	if sdr.SoapyDev.Device != nil {
 		sdr.Unmake(sdr.SoapyDev, log)
 	}
-	sdrDevice.SaveToApp(log)
 
 	log.Logf(logger.Info, "jsdr terminated at %v\n", time.Now().UTC())
 }

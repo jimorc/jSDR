@@ -34,21 +34,6 @@ func (s *SdrDevice) LoadFromApp(log *logger.Logger) {
 	}
 }
 
-// SaveToApp saves the contents of the SdrDevice to the app to allow for saving settings
-// across program executions.
-//
-// Params:
-//
-//	log is the logger to write messages to.
-func (s *SdrDevice) SaveToApp(log *logger.Logger) {
-	var msg strings.Builder
-	msg.WriteString("Saving SdrDevice data to the app:\n")
-	fyne.CurrentApp().Preferences().SetString("device", s.Device)
-	msg.WriteString(fmt.Sprintf("         Device: %s\n", s.Device))
-
-	log.Log(logger.Debug, msg.String())
-}
-
 // Clear clears all values in the SdrDevice struct. This should only be called if the
 // previously stored SDR is no longer connected to the computer.
 //
