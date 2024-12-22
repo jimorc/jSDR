@@ -11,11 +11,8 @@ import (
 	"github.com/jimorc/jsdr/internal/sdr"
 )
 
-var sdrsSelect *widget.Select
-
 // sdrs is a map of devices info indexed by device's label
-var sdrs map[string]map[string]string
-var selSdr *sdr.Sdr
+var sdrs sdr.Sdrs
 var sampleRatesSelect *widget.Select
 var antennaSelect *widget.Select
 var SoapyDev = &sdr.SoapyDevice{}
@@ -29,16 +26,17 @@ func makeSettingsAction() *widget.ToolbarAction {
 
 func settingsCallback() {
 	jsdrLogger.Log(logger.Debug, "In settingsCallback\n")
-	sdrs = sdr.EnumerateWithoutAudio(SoapyDev, jsdrLogger)
-	jsdrLogger.Logf(logger.Debug, "Number of sdr devices returned from EnumerateWithoutAudio: %d\n", len(sdrs))
-	if len(sdrs) == 0 {
+	sdrs = sdr.EnumerateSdrsWithoutAudio(SoapyDev, jsdrLogger)
+	jsdrLogger.Logf(logger.Debug, "Number of sdr devices returned from EnumerateWithoutAudio: %d\n",
+		len(sdrs.DevicesMap))
+	if len(sdrs.DevicesMap) == 0 {
 		noDevices := dialog.NewInformation("No Attached SDRs",
 			"No SDRs were found.\nAttach an SDR, then try again.",
 			mainWin)
 		noDevices.Show()
 	} else {
 		var sdrLabels []string
-		for k := range sdrs {
+		for k := range sdrs.DevicesMap {
 			sdrLabels = append(sdrLabels, k)
 		}
 		sdrsLabel := widget.NewLabel("SDR Device:")
@@ -70,7 +68,7 @@ func settingsDialogCallback(accept bool) {
 
 func sdrChanged(value string) {
 	jsdrLogger.Logf(logger.Debug, "SDR selected: %s\n", value)
-	devProps := sdrs[value]
+	devProps := sdrs.DevicesMap[value]
 	if SoapyDev.Device != nil {
 		sdr.Unmake(SoapyDev, jsdrLogger)
 	}
