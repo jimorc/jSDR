@@ -15,7 +15,6 @@ import (
 var sdrs sdr.Sdrs
 var sampleRatesSelect *widget.Select
 var antennaSelect *widget.Select
-var SoapyDev = &sdr.SoapyDevice{}
 
 func makeSettingsAction() *widget.ToolbarAction {
 	jsdrLogger.Log(logger.Debug, "Entered ui.makeSettingsAction\n")
@@ -26,7 +25,7 @@ func makeSettingsAction() *widget.ToolbarAction {
 
 func settingsCallback() {
 	jsdrLogger.Log(logger.Debug, "In settingsCallback\n")
-	sdrs = sdr.EnumerateSdrsWithoutAudio(SoapyDev, jsdrLogger)
+	sdrs = sdr.EnumerateSdrsWithoutAudio(sdr.SoapyDev, jsdrLogger)
 	jsdrLogger.Logf(logger.Debug, "Number of sdr devices returned from EnumerateWithoutAudio: %d\n",
 		sdrs.NumberOfSdrs())
 	if sdrs.NumberOfSdrs() == 0 {
@@ -69,23 +68,23 @@ func settingsDialogCallback(accept bool) {
 func sdrChanged(value string) {
 	jsdrLogger.Logf(logger.Debug, "SDR selected: %s\n", value)
 	devProps := sdrs.DevicesMap[value]
-	if SoapyDev.Device != nil {
-		sdr.Unmake(SoapyDev, jsdrLogger)
+	if sdr.SoapyDev.Device != nil {
+		sdr.Unmake(sdr.SoapyDev, jsdrLogger)
 	}
-	err := sdr.Make(SoapyDev, devProps, jsdrLogger)
+	err := sdr.Make(sdr.SoapyDev, devProps, jsdrLogger)
 	if err != nil {
 		errDialog := dialog.NewError(err, mainWin)
 		errDialog.Show()
 	} else {
 
-		sampleRatesSelect.Options = sdr.GetSampleRates(SoapyDev, jsdrLogger)
-		sampleRatesSelect.Selected = sdr.GetSampleRate(SoapyDev, jsdrLogger)
+		sampleRatesSelect.Options = sdr.GetSampleRates(sdr.SoapyDev, jsdrLogger)
+		sampleRatesSelect.Selected = sdr.GetSampleRate(sdr.SoapyDev, jsdrLogger)
 		sampleRatesSelect.Refresh()
-		antennaSelect.Options = sdr.GetAntennaNames(SoapyDev, jsdrLogger)
+		antennaSelect.Options = sdr.GetAntennaNames(sdr.SoapyDev, jsdrLogger)
 		if len(antennaSelect.Options) == 1 {
 			antennaSelect.SetSelectedIndex(0)
 		} else {
-			antennaSelect.SetSelected(sdr.GetCurrentAntenna(SoapyDev, jsdrLogger))
+			antennaSelect.SetSelected(sdr.GetCurrentAntenna(sdr.SoapyDev, jsdrLogger))
 		}
 		antennaSelect.Refresh()
 	}

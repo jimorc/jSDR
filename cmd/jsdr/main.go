@@ -32,8 +32,8 @@ func main() {
 	log.Log(logger.Debug, "Displaying main window\n")
 	mainWin.ShowAndRun()
 	log.Log(logger.Debug, "Terminated main window\n")
-	if ui.SoapyDev.Device != nil {
-		sdr.Unmake(ui.SoapyDev, log)
+	if sdr.SoapyDev.Device != nil {
+		sdr.Unmake(sdr.SoapyDev, log)
 	}
 	sdrDevice.SaveToApp(log)
 

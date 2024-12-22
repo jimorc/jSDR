@@ -6,6 +6,7 @@ import (
 
 	"fyne.io/fyne/v2"
 	"github.com/jimorc/jsdr/internal/logger"
+	"github.com/jimorc/jsdr/internal/sdr"
 )
 
 // SdrDevice holds SDR device properties across jsdr app executions.
@@ -26,6 +27,11 @@ func (s *SdrDevice) LoadFromApp(log *logger.Logger) {
 	msg.WriteString(fmt.Sprintf("         Device: %s\n", s.Device))
 
 	log.Log(logger.Debug, msg.String())
+
+	sdrs := sdr.EnumerateSdrsWithoutAudio(sdr.SoapyDev, log)
+	if !sdrs.Contains(s.Device, log) {
+		s.Clear(log)
+	}
 }
 
 // SaveToApp saves the contents of the SdrDevice to the app to allow for saving settings

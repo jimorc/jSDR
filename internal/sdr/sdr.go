@@ -41,6 +41,8 @@ type Sdr struct {
 	Antenna          string
 }
 
+var SoapyDev = &SoapyDevice{}
+
 // Make makes a new device given construction args.
 //
 // Construction args should be as explicit as possible (i.e. include all values retrieved by
