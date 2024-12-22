@@ -17,16 +17,16 @@ var sampleRatesSelect *widget.Select
 var antennaSelect *widget.Select
 
 func makeSettingsAction() *widget.ToolbarAction {
-	jsdrLogger.Log(logger.Debug, "Entered ui.makeSettingsAction\n")
+	JsdrLogger.Log(logger.Debug, "Entered ui.makeSettingsAction\n")
 	action := widget.NewToolbarAction(theme.SettingsIcon(), settingsCallback)
-	jsdrLogger.Log(logger.Debug, "Returning the settings toolbar action from makeSettingsAction\n")
+	JsdrLogger.Log(logger.Debug, "Returning the settings toolbar action from makeSettingsAction\n")
 	return action
 }
 
 func settingsCallback() {
-	jsdrLogger.Log(logger.Debug, "In settingsCallback\n")
-	sdrs = sdr.EnumerateSdrsWithoutAudio(sdr.SoapyDev, jsdrLogger)
-	jsdrLogger.Logf(logger.Debug, "Number of sdr devices returned from EnumerateWithoutAudio: %d\n",
+	JsdrLogger.Log(logger.Debug, "In settingsCallback\n")
+	sdrs = sdr.EnumerateSdrsWithoutAudio(sdr.SoapyDev, JsdrLogger)
+	JsdrLogger.Logf(logger.Debug, "Number of sdr devices returned from EnumerateSdrsWithoutAudio: %d\n",
 		sdrs.NumberOfSdrs())
 	if sdrs.NumberOfSdrs() == 0 {
 		noDevices := dialog.NewInformation("No Attached SDRs",
@@ -39,7 +39,6 @@ func settingsCallback() {
 			sdrLabels = append(sdrLabels, k)
 		}
 		sdrsLabel := widget.NewLabel("SDR Device:")
-		sdrsLabel.Alignment = fyne.TextAlignTrailing
 		sdrsSelect := widget.NewSelect(sdrLabels, sdrChanged)
 		sampleRateLabel := widget.NewLabel("Sample Rate:")
 		sampleRateLabel.Alignment = fyne.TextAlignTrailing
@@ -58,38 +57,38 @@ func settingsCallback() {
 }
 
 func antennaChanged(antenna string) {
-	jsdrLogger.Logf(logger.Debug, "Antenna selected: %s\n", antenna)
+	JsdrLogger.Logf(logger.Debug, "Antenna selected: %s\n", antenna)
 }
 
 func settingsDialogCallback(accept bool) {
-	jsdrLogger.Logf(logger.Debug, "In settingsDialogCallback: %v\n", accept)
+	JsdrLogger.Logf(logger.Debug, "In settingsDialogCallback: %v\n", accept)
 }
 
 func sdrChanged(value string) {
-	jsdrLogger.Logf(logger.Debug, "SDR selected: %s\n", value)
+	JsdrLogger.Logf(logger.Debug, "SDR selected: %s\n", value)
 	devProps := sdrs.DevicesMap[value]
 	if sdr.SoapyDev.Device != nil {
-		sdr.Unmake(sdr.SoapyDev, jsdrLogger)
+		sdr.Unmake(sdr.SoapyDev, JsdrLogger)
 	}
-	err := sdr.Make(sdr.SoapyDev, devProps, jsdrLogger)
+	err := sdr.Make(sdr.SoapyDev, devProps, JsdrLogger)
 	if err != nil {
 		errDialog := dialog.NewError(err, mainWin)
 		errDialog.Show()
 	} else {
 
-		sampleRatesSelect.Options = sdr.GetSampleRates(sdr.SoapyDev, jsdrLogger)
-		sampleRatesSelect.Selected = sdr.GetSampleRate(sdr.SoapyDev, jsdrLogger)
+		sampleRatesSelect.Options = sdr.GetSampleRates(sdr.SoapyDev, JsdrLogger)
+		sampleRatesSelect.Selected = sdr.GetSampleRate(sdr.SoapyDev, JsdrLogger)
 		sampleRatesSelect.Refresh()
-		antennaSelect.Options = sdr.GetAntennaNames(sdr.SoapyDev, jsdrLogger)
+		antennaSelect.Options = sdr.GetAntennaNames(sdr.SoapyDev, JsdrLogger)
 		if len(antennaSelect.Options) == 1 {
 			antennaSelect.SetSelectedIndex(0)
 		} else {
-			antennaSelect.SetSelected(sdr.GetCurrentAntenna(sdr.SoapyDev, jsdrLogger))
+			antennaSelect.SetSelected(sdr.GetCurrentAntenna(sdr.SoapyDev, JsdrLogger))
 		}
 		antennaSelect.Refresh()
 	}
 }
 
 func sampleRateChanged(rate string) {
-	jsdrLogger.Logf(logger.Debug, "Sample rate selected: %s\n", rate)
+	JsdrLogger.Logf(logger.Debug, "Sample rate selected: %s\n", rate)
 }
