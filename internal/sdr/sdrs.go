@@ -30,7 +30,7 @@ func EnumerateSdrsWithoutAudio(sdrD Enumerate, log *logger.Logger) Sdrs {
 		}
 	}
 	var sMsg strings.Builder
-	if len(sdrs.DevicesMap) == 0 {
+	if sdrs.NumberOfSdrs() == 0 {
 		sMsg.WriteString("Attached SDRs: none\n")
 	} else {
 		sMsg.WriteString("Attached SDRs:\n")
@@ -49,7 +49,7 @@ func EnumerateSdrsWithoutAudio(sdrD Enumerate, log *logger.Logger) Sdrs {
 //	 label is the label for the SDR.
 //		log is the logger to write messages to
 func (s *Sdrs) Contains(label string, log *logger.Logger) bool {
-	for k, _ := range s.DevicesMap {
+	for k := range s.DevicesMap {
 		if k == label {
 			log.Logf(logger.Debug, "Found device with label: %s\n", label)
 			return true
@@ -57,4 +57,9 @@ func (s *Sdrs) Contains(label string, log *logger.Logger) bool {
 	}
 	log.Logf(logger.Debug, "Could not find device with label: %s\n", label)
 	return false
+}
+
+// NumberOfSdrs returns the number of SDRs in the Sdrs struct.
+func (s *Sdrs) NumberOfSdrs() int {
+	return len(s.DevicesMap)
 }

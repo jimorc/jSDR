@@ -28,8 +28,8 @@ func settingsCallback() {
 	jsdrLogger.Log(logger.Debug, "In settingsCallback\n")
 	sdrs = sdr.EnumerateSdrsWithoutAudio(SoapyDev, jsdrLogger)
 	jsdrLogger.Logf(logger.Debug, "Number of sdr devices returned from EnumerateWithoutAudio: %d\n",
-		len(sdrs.DevicesMap))
-	if len(sdrs.DevicesMap) == 0 {
+		sdrs.NumberOfSdrs())
+	if sdrs.NumberOfSdrs() == 0 {
 		noDevices := dialog.NewInformation("No Attached SDRs",
 			"No SDRs were found.\nAttach an SDR, then try again.",
 			mainWin)
