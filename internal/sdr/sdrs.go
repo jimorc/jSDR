@@ -41,3 +41,20 @@ func EnumerateSdrsWithoutAudio(sdrD Enumerate, log *logger.Logger) Sdrs {
 	log.Log(logger.Debug, sMsg.String())
 	return sdrs
 }
+
+// Contains determines if the Sdrs struct contains the specified Sdr device.
+//
+// Params:
+//
+//	 label is the label for the SDR.
+//		log is the logger to write messages to
+func (s *Sdrs) Contains(label string, log *logger.Logger) bool {
+	for k, _ := range s.DevicesMap {
+		if k == label {
+			log.Logf(logger.Debug, "Found device with label: %s\n", label)
+			return true
+		}
+	}
+	log.Logf(logger.Debug, "Could not find device with label: %s\n", label)
+	return false
+}

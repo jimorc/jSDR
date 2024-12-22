@@ -63,3 +63,37 @@ func TestEnumerateSdrsWithoutAudio_NoAudio(t *testing.T) {
 	sdrs := sdr.EnumerateSdrsWithoutAudio(&stub, testLogger)
 	assert.Equal(t, 0, len(sdrs.DevicesMap))
 }
+
+func TestContains(t *testing.T) {
+	testLogger, _ := logger.NewFileLogger("stdout")
+	stub := sdr.StubDevice{Devices: []map[string]string{
+		{
+			"default_output": "False",
+			"device_id":      "0",
+			"driver":         "audio",
+			"label":          "Built-in Audio",
+			"default_input":  "False",
+		},
+		{
+			"driver":       "rtlsdr",
+			"label":        "Generic RTL2832U OEM :: 00000101",
+			"manufacturer": "Realtek",
+			"product":      "RTL2838UHIDIR",
+			"serial":       "00000101",
+			"tuner":        "Rafael Micro R820T",
+		},
+		{
+			"driver":       "rtlsdr",
+			"label":        "Generic RTL2832U OEM :: 00000102",
+			"manufacturer": "Realtek",
+			"product":      "RTL2838UHIDIR",
+			"serial":       "00000102",
+			"tuner":        "Rafael Micro R820T"},
+	},
+	}
+
+	sdrs := sdr.EnumerateSdrsWithoutAudio(&stub, testLogger)
+	assert.True(t, sdrs.Contains("Generic RTL2832U OEM :: 00000101", testLogger))
+	assert.True(t, sdrs.Contains("Generic RTL2832U OEM :: 00000102", testLogger))
+	assert.False(t, sdrs.Contains("Generic RTL2832U OEM :: 00000103", testLogger))
+}
