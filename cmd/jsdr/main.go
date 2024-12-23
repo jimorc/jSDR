@@ -13,6 +13,7 @@ import (
 	"fyne.io/fyne/v2/widget"
 	"github.com/jimorc/jsdr/internal/logger"
 	"github.com/jimorc/jsdr/internal/sdr"
+	"github.com/jimorc/jsdr/internal/sdrdevice"
 
 	"github.com/spf13/pflag"
 	"github.com/spf13/viper"
@@ -21,6 +22,7 @@ import (
 var log *logger.Logger
 var mainWin fyne.Window
 var sdrs sdr.Sdrs
+var sdrPrefs sdrdevice.SdrPreferences
 
 var sampleRatesSelect *widget.Select
 var antennaSelect *widget.Select
@@ -32,7 +34,8 @@ func main() {
 	defer log.Close()
 
 	log.Logf(logger.Info, "jsdr started at %v\n", time.Now().UTC())
-
+	sdrPrefs = *sdrdevice.NewFromPreferences()
+	defer sdrPrefs.SavePreferences(log)
 	a := app.NewWithID("com.github.jimorc.jsdr")
 	mainWin = makeMainWindow(&a, log)
 
@@ -112,16 +115,18 @@ func settingsCallback() {
 			sdrLabels = append(sdrLabels, k)
 		}
 		sdrsLabel := widget.NewLabel("SDR Device:")
-		sdrsSelect := widget.NewSelect(sdrLabels, sdrChanged)
-		sdrsSelect.Selected = fyne.CurrentApp().Preferences().String("device")
+		sdrsSelect := widget.NewSelect(sdrLabels, nil)
+		sdrsSelect.Bind(sdrPrefs.Device)
+
 		sampleRateLabel := widget.NewLabel("Sample Rate:")
 		sampleRateLabel.Alignment = fyne.TextAlignTrailing
-		sampleRatesSelect = widget.NewSelect([]string{}, sampleRateChanged)
-		sampleRatesSelect.Selected = fyne.CurrentApp().Preferences().String("samplerate")
+		sampleRatesSelect = widget.NewSelect([]string{}, nil)
+		sampleRatesSelect.Bind(sdrPrefs.SampleRate)
+
 		antennaLabel := widget.NewLabel("Antenna:")
 		antennaLabel.Alignment = fyne.TextAlignTrailing
-		antennaSelect = widget.NewSelect([]string{}, antennaChanged)
-		antennaSelect.Selected = fyne.CurrentApp().Preferences().String("antenna")
+		antennaSelect = widget.NewSelect([]string{}, nil)
+		antennaSelect.Bind(sdrPrefs.Antenna)
 		grid := container.NewGridWithColumns(2, sdrsLabel, sdrsSelect, sampleRateLabel, sampleRatesSelect,
 			antennaLabel, antennaSelect)
 		settings := dialog.NewCustomConfirm("SDR Settings", "Accept", "Close", grid, settingsDialogCallback, mainWin)
@@ -142,8 +147,6 @@ func settingsDialogCallback(accept bool) {
 }
 
 func sdrChanged(value string) {
-	fyne.CurrentApp().Preferences().SetString("device", value)
-
 	log.Logf(logger.Debug, "SDR selected: %s\n", value)
 	devProps := sdrs.DevicesMap[value]
 	if sdr.SoapyDev.Device != nil {
