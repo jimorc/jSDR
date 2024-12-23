@@ -15,6 +15,12 @@ type SdrPreferences struct {
 	Antenna    binding.String
 }
 
+type SdrChanges interface {
+	SdrChanged()
+	SampleRateChanged()
+	AntennaChanged()
+}
+
 // ClearPreferences clears all values in the SdrDevice struct. This should only be called if the
 // previously stored SDR is no longer connected to the computer.
 //
@@ -39,11 +45,11 @@ func (s *SdrPreferences) ClearPreferences(log *logger.Logger) error {
 // the program's preferences.
 //
 // Returns pointer to the new SdrPreferences object.
-func NewFromPreferences() *SdrPreferences {
+func NewFromPreferences(sP SdrChanges) *SdrPreferences {
 	s := &SdrPreferences{}
-	s.Device = bindToString("device", deviceCallback)
-	s.SampleRate = bindToString("samplerate", sampleRateCallback)
-	s.Antenna = bindToString("antenna", antennaCallback)
+	s.Device = bindToString("device", sP.SdrChanged)
+	s.SampleRate = bindToString("samplerate", sP.SampleRateChanged)
+	s.Antenna = bindToString("antenna", sP.AntennaChanged)
 	return s
 }
 
@@ -108,14 +114,14 @@ func bindToString(prefName string, listener func()) binding.String {
 	return s
 }
 
-func deviceCallback() {
+func (sP SdrPreferences) SdrChanged() {
 
 }
 
-func sampleRateCallback() {
+func (sP SdrPreferences) SampleRateChanged() {
 
 }
 
-func antennaCallback() {
+func (sP SdrPreferences) AntennaChanged() {
 
 }

@@ -12,10 +12,19 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+type TestChanges struct{}
+
+var tC TestChanges
+
+// the following functions allow NewFromPreferences to be called during the tests.
+func (TestChanges) SdrChanged()        {}
+func (TestChanges) SampleRateChanged() {}
+func (TestChanges) AntennaChanged()    {}
+
 func TestNewFromPreferences(t *testing.T) {
 	testLogger, _ := logger.NewFileLogger("stdout")
 	app.NewWithID("com.github.jimorc.jsdrtestnew")
-	sdrPrefs := sdrdevice.NewFromPreferences()
+	sdrPrefs := sdrdevice.NewFromPreferences(tC)
 	err := sdrPrefs.Device.Set("01")
 	assert.Nil(t, err)
 	err = sdrPrefs.SampleRate.Set("256 kHz")
@@ -24,7 +33,7 @@ func TestNewFromPreferences(t *testing.T) {
 	assert.Nil(t, err)
 	err = sdrPrefs.SavePreferences(testLogger)
 	assert.Nil(t, err)
-	sdrPrefs2 := sdrdevice.NewFromPreferences()
+	sdrPrefs2 := sdrdevice.NewFromPreferences(tC)
 	device, err := sdrPrefs2.Device.Get()
 	assert.Nil(t, err)
 	assert.Equal(t, "01", device)
@@ -39,7 +48,7 @@ func TestNewFromPreferences(t *testing.T) {
 func TestClearPreferences(t *testing.T) {
 	testLogger, _ := logger.NewFileLogger("stdout")
 	app.NewWithID("com.github.jimorc.jsdrtest")
-	sdrPrefs := sdrdevice.NewFromPreferences()
+	sdrPrefs := sdrdevice.NewFromPreferences(tC)
 	err := sdrPrefs.Device.Set("01")
 	assert.Nil(t, err)
 	err = sdrPrefs.SampleRate.Set("256 kHz")

@@ -34,9 +34,9 @@ func main() {
 	defer log.Close()
 
 	log.Logf(logger.Info, "jsdr started at %v\n", time.Now().UTC())
-	sdrPrefs = *sdrdevice.NewFromPreferences()
-	defer sdrPrefs.SavePreferences(log)
 	a := app.NewWithID("com.github.jimorc.jsdr")
+	sdrPrefs = *sdrdevice.NewFromPreferences(sdrPrefs)
+	defer sdrPrefs.SavePreferences(log)
 	mainWin = makeMainWindow(&a, log)
 
 	log.Log(logger.Debug, "Displaying main window\n")
@@ -137,41 +137,47 @@ func settingsCallback() {
 	}
 }
 
-func antennaChanged(antenna string) {
-	fyne.CurrentApp().Preferences().SetString("antenna", antenna)
-	log.Logf(logger.Debug, "Antenna selected: %s\n", antenna)
+// Functions are commented below waiting to be moved to SdrPreferences methods. This is so
+// massive changes are not required in one commit.
+/*func antennaChanged() {
+	// fyne.CurrentApp().Preferences().SetString("antenna", antenna)
+	// log.Logf(logger.Debug, "Antenna selected: %s\n", antenna)
+}*/
+
+func settingsDialogCallback(bool) {
+	// log.Logf(logger.Debug, "In settingsDialogCallback: %v\n", accept)
 }
 
-func settingsDialogCallback(accept bool) {
-	log.Logf(logger.Debug, "In settingsDialogCallback: %v\n", accept)
-}
+/*func sdrChanged() {
+	   log.Logf(logger.Debug, "SDR selected: %s\n", value)
+	   devProps := sdrs.DevicesMap[value]
 
-func sdrChanged(value string) {
-	log.Logf(logger.Debug, "SDR selected: %s\n", value)
-	devProps := sdrs.DevicesMap[value]
-	if sdr.SoapyDev.Device != nil {
-		sdr.Unmake(sdr.SoapyDev, log)
-	}
-	err := sdr.Make(sdr.SoapyDev, devProps, log)
-	if err != nil {
-		errDialog := dialog.NewError(err, mainWin)
-		errDialog.Show()
-	} else {
+	   	if sdr.SoapyDev.Device != nil {
+	   		sdr.Unmake(sdr.SoapyDev, log)
+	   	}
 
-		sampleRatesSelect.Options = sdr.GetSampleRates(sdr.SoapyDev, log)
-		sampleRatesSelect.Selected = sdr.GetSampleRate(sdr.SoapyDev, log)
-		sampleRatesSelect.Refresh()
-		antennaSelect.Options = sdr.GetAntennaNames(sdr.SoapyDev, log)
-		if len(antennaSelect.Options) == 1 {
-			antennaSelect.SetSelectedIndex(0)
-		} else {
-			antennaSelect.SetSelected(sdr.GetCurrentAntenna(sdr.SoapyDev, log))
-		}
-		antennaSelect.Refresh()
-	}
+	   err := sdr.Make(sdr.SoapyDev, devProps, log)
+
+	   	if err != nil {
+	   		errDialog := dialog.NewError(err, mainWin)
+	   		errDialog.Show()
+	   	} else {
+
+	   		sampleRatesSelect.Options = sdr.GetSampleRates(sdr.SoapyDev, log)
+	   		sampleRatesSelect.Selected = sdr.GetSampleRate(sdr.SoapyDev, log)
+	   		sampleRatesSelect.Refresh()
+	   		antennaSelect.Options = sdr.GetAntennaNames(sdr.SoapyDev, log)
+	   		if len(antennaSelect.Options) == 1 {
+	   			antennaSelect.SetSelectedIndex(0)
+	   		} else {
+	   			antennaSelect.SetSelected(sdr.GetCurrentAntenna(sdr.SoapyDev, log))
+	   		}
+	   		antennaSelect.Refresh()
+	   	}
+
 }
 
 func sampleRateChanged(rate string) {
-	log.Logf(logger.Debug, "Sample rate selected: %s\n", rate)
-	fyne.CurrentApp().Preferences().SetString("samplerate", rate)
-}
+	// log.Logf(logger.Debug, "Sample rate selected: %s\n", rate)
+	// fyne.CurrentApp().Preferences().SetString("samplerate", rate)
+}*/
