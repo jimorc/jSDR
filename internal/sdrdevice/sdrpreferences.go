@@ -3,7 +3,6 @@ package sdrdevice
 import (
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/container"
-	"fyne.io/fyne/v2/data/binding"
 	"fyne.io/fyne/v2/dialog"
 	"fyne.io/fyne/v2/theme"
 	"fyne.io/fyne/v2/widget"
@@ -15,9 +14,9 @@ import (
 // For example, this struct holds the last SDR, its last selected sample rate, and its
 // last selected antenna.
 type SdrPreferences struct {
-	Device     binding.String
-	SampleRate binding.String
-	Antenna    binding.String
+	Device     string
+	SampleRate string
+	Antenna    string
 }
 
 // variables that are needed across multiple functions and methods.
@@ -25,6 +24,8 @@ var jsdrLog *logger.Logger
 var parentWindow *fyne.Window
 var settingsDialog *dialog.ConfirmDialog
 var sdrsSelect *widget.Select
+var sampleRatesSelect *widget.Select
+var antennaSelect *widget.Select
 
 // ClearPreferences clears all values in the SdrDevice struct. This should only be called if the
 // previously stored SDR is no longer connected to the computer.
@@ -32,18 +33,12 @@ var sdrsSelect *widget.Select
 // Params:
 //
 //	log is the logger to write messages to.
-func (s *SdrPreferences) ClearPreferences(log *logger.Logger) error {
-	s.Device.Set("")
-	s.SampleRate.Set("")
-	s.Antenna.Set("")
-	err := s.SavePreferences(log)
-	if err != nil {
-		log.Logf(logger.Debug, "Error encountered while clearing SDR Preferences: %s.\n",
-			err.Error())
-	} else {
-		log.Log(logger.Debug, "SdrDevice device settings have been cleared\n")
-	}
-	return err
+func (s *SdrPreferences) ClearPreferences(log *logger.Logger) {
+	s.Device = ""
+	s.SampleRate = ""
+	s.Antenna = ""
+	s.SavePreferences(log)
+	log.Log(logger.Debug, "SdrDevice device settings have been cleared\n")
 }
 
 // NewFromPreferences creates a new SdrPreferences struct populated with data from
@@ -53,32 +48,26 @@ func (s *SdrPreferences) ClearPreferences(log *logger.Logger) error {
 func NewFromPreferences(log *logger.Logger) *SdrPreferences {
 	jsdrLog = log
 	s := &SdrPreferences{}
-	s.Device = binding.BindPreferenceString("device", fyne.CurrentApp().Preferences())
-	s.SampleRate = binding.BindPreferenceString("samplerate", fyne.CurrentApp().Preferences())
-	s.Antenna = binding.BindPreferenceString("antenna", fyne.CurrentApp().Preferences())
+	s.Device = fyne.CurrentApp().Preferences().String("device")
+	log.Logf(logger.Debug, "Value: %s loaded from preference: %s\n", s.Device, "device")
+	s.SampleRate = fyne.CurrentApp().Preferences().String("samplerate")
+	log.Logf(logger.Debug, "Value: %s loaded from preference: %s\n", s.SampleRate, "samplerate")
+	s.Antenna = fyne.CurrentApp().Preferences().String("antenna")
+	log.Logf(logger.Debug, "Value: %s loaded from preference: %s\n", s.Antenna, "antenna")
 	return s
 }
 
 // SavePreferences saves the values in the SdrPreferences object to the program's preferences
 // file.
 //
+// SdrC
 // Params:
 //
 //	log - the logger to write log messages to.
-func (s *SdrPreferences) SavePreferences(log *logger.Logger) error {
-	err := savePreference(s.Device, "device", log)
-	if err != nil {
-		return err
-	}
-	err = savePreference(s.SampleRate, "samplerate", log)
-	if err != nil {
-		return err
-	}
-	err = savePreference(s.Antenna, "antenna", log)
-	if err != nil {
-		return err
-	}
-	return nil
+func (s *SdrPreferences) SavePreferences(log *logger.Logger) {
+	savePreference(s.Device, "device", log)
+	savePreference(s.SampleRate, "samplerate", log)
+	savePreference(s.Antenna, "antenna", log)
 }
 
 // MakeSettingsAction creates a ToolbarAction widget linked to showing the settings dialog.
@@ -100,11 +89,11 @@ func (s *SdrPreferences) CreateSettingsDialog(parent *fyne.Window, log *logger.L
 
 	sampleRateLabel := widget.NewLabel("Sample Rate:")
 	sampleRateLabel.Alignment = fyne.TextAlignTrailing
-	sampleRatesSelect := widget.NewSelect([]string{}, s.SampleRateChanged)
+	sampleRatesSelect = widget.NewSelect([]string{}, s.SampleRateChanged)
 
 	antennaLabel := widget.NewLabel("Antenna:")
 	antennaLabel.Alignment = fyne.TextAlignTrailing
-	antennaSelect := widget.NewSelect([]string{}, s.AntennaChanged)
+	antennaSelect = widget.NewSelect([]string{}, s.AntennaChanged)
 	grid := container.NewGridWithColumns(2, sdrsLabel, sdrsSelect, sampleRateLabel, sampleRatesSelect,
 		antennaLabel, antennaSelect)
 	settingsDialog = dialog.NewCustomConfirm("SDR Settings", "Accept", "Close", grid, acceptCancelCallback, *parentWindow)
@@ -129,11 +118,7 @@ func (s *SdrPreferences) showSettingsDialog() {
 		if len(sdrLabels) == 1 {
 			sdrsSelect.SetSelectedIndex(0)
 		} else {
-			sdrLabel, err := s.Device.Get()
-			if err != nil {
-				jsdrLog.Logf(logger.Error, "Cannot retrieve device label from SdrPreferences: %s\n", err.Error())
-			}
-			sdrsSelect.SetSelected(sdrLabel)
+			sdrsSelect.SetSelected(s.Device)
 		}
 		settingsDialog.Show()
 	}
@@ -143,23 +128,16 @@ func (s *SdrPreferences) showSettingsDialog() {
 //
 // Params:
 //
-//	pref - the bound string to be saved.
+//	pref - the string to be saved.
 //	prefName - the preference name to save to.
 //	log - the logger to write log messages to.
-func savePreference(pref binding.String, prefName string, log *logger.Logger) error {
-	value, err := pref.Get()
-	if err != nil {
-		log.Logf(logger.Error, "Unable to retrieve %s value.\n", prefName)
-		return err
-	} else {
-		fyne.CurrentApp().Preferences().SetString(prefName, value)
-		return nil
-	}
-
+func savePreference(pref string, prefName string, log *logger.Logger) {
+	log.Logf(logger.Debug, "Value: %s saved to preference: %s\n", pref, prefName)
+	fyne.CurrentApp().Preferences().SetString(prefName, pref)
 }
 
 // SdrChanged is the callback executed when an SDR is selected in the settings dialog.
-func (sP SdrPreferences) SdrChanged(selectedSdr string) {
+func (s SdrPreferences) SdrChanged(selectedSdr string) {
 	jsdrLog.Logf(logger.Debug, "SDR selected: %s\n", selectedSdr)
 
 }
