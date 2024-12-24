@@ -71,3 +71,12 @@ func (s *Sdrs) SdrLabels() []string {
 	}
 	return sdrLabels
 }
+
+func (s *Sdrs) Sdr(label string) map[string]string {
+	for k, v := range s.DevicesMap {
+		if k == label {
+			return v
+		}
+	}
+	return nil
+}

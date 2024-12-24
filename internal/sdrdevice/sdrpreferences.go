@@ -142,7 +142,18 @@ func savePreference(pref string, prefName string, log *logger.Logger) {
 // SdrChanged is the callback executed when an SDR is selected in the settings dialog.
 func (s SdrPreferences) SdrChanged(selectedSdr string) {
 	jsdrLog.Logf(logger.Debug, "SDR selected: %s\n", selectedSdr)
-
+	sdrs := sdr.EnumerateSdrsWithoutAudio(sdr.SoapyDev, jsdrLog)
+	sdr := sdrs.Sdr(selectedSdr)
+	if sdr == nil {
+		jsdrLog.Logf(logger.Error, "The selected SDR: %s is no longer attached.\n", selectedSdr)
+		settingsDialog.Hide()
+		noDevice := dialog.NewInformation("SDR No Longer Attached",
+			"The selected SDR is no longer attached to the computer.\n"+
+				"Either reattach the SDR and try again, or select another SDR.",
+			*parentWindow)
+		noDevice.Show()
+		return
+	}
 }
 
 // SampleRateChanged is the callback executed when one of the sample rates is selected
