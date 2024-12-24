@@ -3,7 +3,7 @@ module github.com/jimorc/jsdr
 go 1.23.1
 
 require (
-	fyne.io/fyne/v2 v2.5.3-rc7.0.20241222135335-eb40d8e6fa2c
+	fyne.io/fyne/v2 v2.5.3
 	github.com/pothosware/go-soapy-sdr v0.7.4
 	github.com/spf13/pflag v1.0.5
 	github.com/spf13/viper v1.19.0
