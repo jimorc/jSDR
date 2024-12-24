@@ -4,6 +4,7 @@ import (
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/container"
 	"fyne.io/fyne/v2/dialog"
+	"fyne.io/fyne/v2/layout"
 	"fyne.io/fyne/v2/theme"
 	"fyne.io/fyne/v2/widget"
 	"github.com/jimorc/jsdr/internal/logger"
@@ -85,6 +86,7 @@ func (s *SdrPreferences) CreateSettingsDialog(parent *fyne.Window, log *logger.L
 	parentWindow = parent
 	log.Log(logger.Debug, "In settingsCallback\n")
 	sdrsLabel := widget.NewLabel("SDR Device:")
+	sdrsLabel.Alignment = fyne.TextAlignTrailing
 	sdrsSelect = widget.NewSelect([]string{}, s.SdrChanged)
 
 	sampleRateLabel := widget.NewLabel("Sample Rate:")
@@ -94,9 +96,10 @@ func (s *SdrPreferences) CreateSettingsDialog(parent *fyne.Window, log *logger.L
 	antennaLabel := widget.NewLabel("Antenna:")
 	antennaLabel.Alignment = fyne.TextAlignTrailing
 	antennaSelect = widget.NewSelect([]string{}, s.AntennaChanged)
-	grid := container.NewGridWithColumns(2, sdrsLabel, sdrsSelect, sampleRateLabel, sampleRatesSelect,
+	grid := container.New(layout.NewFormLayout(), sdrsLabel, sdrsSelect, sampleRateLabel, sampleRatesSelect,
 		antennaLabel, antennaSelect)
 	settingsDialog = dialog.NewCustomConfirm("SDR Settings", "Accept", "Close", grid, acceptCancelCallback, *parentWindow)
+	settingsDialog.Resize(fyne.NewSize(450, settingsDialog.MinSize().Height))
 }
 
 // showSettingsDialog is the callback for the settings ToolbarAction widget created in MakeSettingsAction.
