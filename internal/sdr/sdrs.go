@@ -63,3 +63,11 @@ func (s *Sdrs) Contains(label string, log *logger.Logger) bool {
 func (s *Sdrs) NumberOfSdrs() int {
 	return len(s.DevicesMap)
 }
+
+func (s *Sdrs) SdrLabels() []string {
+	var sdrLabels []string
+	for k := range s.DevicesMap {
+		sdrLabels = append(sdrLabels, k)
+	}
+	return sdrLabels
+}

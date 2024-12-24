@@ -126,15 +126,17 @@ func (s *SdrPreferences) showSettingsDialog() {
 		noDevices.Show()
 		return
 	} else {
-		// there is at least one SDR, so
-		var sdrLabels []string
-		for k := range sdrs.DevicesMap {
-			sdrLabels = append(sdrLabels, k)
-		}
-
+		// there is at least one SDR, so retrieve their labels and set as Options in sdrsSelect.
+		sdrLabels := sdrs.SdrLabels()
 		sdrsSelect.Options = sdrLabels
 		if len(sdrLabels) == 1 {
-			s.Device.Set(sdrLabels[0])
+			sdrsSelect.SetSelectedIndex(0)
+		} else {
+			sdrLabel, err := s.Device.Get()
+			if err != nil {
+				jsdrLog.Logf(logger.Error, "Cannot retrieve device label from SdrPreferences: %s\n", err.Error())
+			}
+			sdrsSelect.SetSelected(sdrLabel)
 		}
 		settingsDialog.Show()
 	}

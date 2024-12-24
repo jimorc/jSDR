@@ -12,15 +12,6 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-type TestChanges struct{}
-
-var tC TestChanges
-
-// the following functions allow NewFromPreferences to be called during the tests.
-func (TestChanges) SdrChanged()        {}
-func (TestChanges) SampleRateChanged() {}
-func (TestChanges) AntennaChanged()    {}
-
 func TestNewFromPreferences(t *testing.T) {
 	testLogger, _ := logger.NewFileLogger("stdout")
 	app.NewWithID("com.github.jimorc.jsdrtestnew")
