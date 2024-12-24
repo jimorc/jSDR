@@ -97,17 +97,14 @@ func (s *SdrPreferences) CreateSettingsDialog(parent *fyne.Window, log *logger.L
 	log.Log(logger.Debug, "In settingsCallback\n")
 	sdrsLabel := widget.NewLabel("SDR Device:")
 	sdrsSelect = widget.NewSelect([]string{}, s.SdrChanged)
-	sdrsSelect.Bind(s.Device)
 
 	sampleRateLabel := widget.NewLabel("Sample Rate:")
 	sampleRateLabel.Alignment = fyne.TextAlignTrailing
 	sampleRatesSelect := widget.NewSelect([]string{}, s.SampleRateChanged)
-	sampleRatesSelect.Bind(s.SampleRate)
 
 	antennaLabel := widget.NewLabel("Antenna:")
 	antennaLabel.Alignment = fyne.TextAlignTrailing
 	antennaSelect := widget.NewSelect([]string{}, s.AntennaChanged)
-	antennaSelect.Bind(s.Antenna)
 	grid := container.NewGridWithColumns(2, sdrsLabel, sdrsSelect, sampleRateLabel, sampleRatesSelect,
 		antennaLabel, antennaSelect)
 	settingsDialog = dialog.NewCustomConfirm("SDR Settings", "Accept", "Close", grid, acceptCancelCallback, *parentWindow)
@@ -164,6 +161,7 @@ func savePreference(pref binding.String, prefName string, log *logger.Logger) er
 // SdrChanged is the callback executed when an SDR is selected in the settings dialog.
 func (sP SdrPreferences) SdrChanged(selectedSdr string) {
 	jsdrLog.Logf(logger.Debug, "SDR selected: %s\n", selectedSdr)
+
 }
 
 // SampleRateChanged is the callback executed when one of the sample rates is selected
