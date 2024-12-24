@@ -8,8 +8,6 @@ import (
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/app"
 	"fyne.io/fyne/v2/container"
-	"fyne.io/fyne/v2/dialog"
-	"fyne.io/fyne/v2/theme"
 	"fyne.io/fyne/v2/widget"
 	"github.com/jimorc/jsdr/internal/logger"
 	"github.com/jimorc/jsdr/internal/sdr"
@@ -19,13 +17,10 @@ import (
 	"github.com/spf13/viper"
 )
 
+// variables that are needed across multiple functions.
 var log *logger.Logger
 var mainWin fyne.Window
-var sdrs sdr.Sdrs
 var sdrPrefs sdrdevice.SdrPreferences
-
-var sampleRatesSelect *widget.Select
-var antennaSelect *widget.Select
 
 func main() {
 	logLevel, LogFile := parseCommandLine()
@@ -35,9 +30,10 @@ func main() {
 
 	log.Logf(logger.Info, "jsdr started at %v\n", time.Now().UTC())
 	a := app.NewWithID("com.github.jimorc.jsdr")
-	sdrPrefs = *sdrdevice.NewFromPreferences(sdrPrefs)
+	sdrPrefs = *sdrdevice.NewFromPreferences(sdrPrefs, log)
 	defer sdrPrefs.SavePreferences(log)
-	mainWin = makeMainWindow(&a, log)
+	mainWin = makeMainWindow(&a, &sdrPrefs, log)
+	sdrPrefs.CreateSettingsDialog(&mainWin, log)
 
 	log.Log(logger.Debug, "Displaying main window\n")
 	mainWin.ShowAndRun()
@@ -83,101 +79,14 @@ func parseCommandLine() (logger.LoggingLevel, string) {
 	return logLevel, logFile
 }
 
-func makeMainWindow(jsdrApp *fyne.App, log *logger.Logger) fyne.Window {
+func makeMainWindow(jsdrApp *fyne.App, prefs *sdrdevice.SdrPreferences, log *logger.Logger) fyne.Window {
 	mainWin := (*jsdrApp).NewWindow("jsdr")
 
 	log.Log(logger.Debug, "Creating main window content\n")
-	settingsAction := makeSettingsAction()
+	settingsAction := prefs.MakeSettingsAction()
 	toolbar := widget.NewToolbar(settingsAction)
 	mainWin.SetContent(container.NewBorder(toolbar, nil, nil, nil))
 	mainWin.Resize(fyne.NewSize(800, 400))
 	log.Log(logger.Debug, "Main window content created\n")
 	return mainWin
 }
-
-func makeSettingsAction() *widget.ToolbarAction {
-	return widget.NewToolbarAction(theme.SettingsIcon(), settingsCallback)
-}
-
-func settingsCallback() {
-	log.Log(logger.Debug, "In settingsCallback\n")
-	sdrs = sdr.EnumerateSdrsWithoutAudio(sdr.SoapyDev, log)
-	log.Logf(logger.Debug, "Number of sdr devices returned from EnumerateSdrsWithoutAudio: %d\n",
-		sdrs.NumberOfSdrs())
-	if sdrs.NumberOfSdrs() == 0 {
-		noDevices := dialog.NewInformation("No Attached SDRs",
-			"No SDRs were found.\nAttach an SDR, then try again.",
-			mainWin)
-		noDevices.Show()
-	} else {
-		var sdrLabels []string
-		for k := range sdrs.DevicesMap {
-			sdrLabels = append(sdrLabels, k)
-		}
-		sdrsLabel := widget.NewLabel("SDR Device:")
-		sdrsSelect := widget.NewSelect(sdrLabels, nil)
-		sdrsSelect.Bind(sdrPrefs.Device)
-
-		sampleRateLabel := widget.NewLabel("Sample Rate:")
-		sampleRateLabel.Alignment = fyne.TextAlignTrailing
-		sampleRatesSelect = widget.NewSelect([]string{}, nil)
-		sampleRatesSelect.Bind(sdrPrefs.SampleRate)
-
-		antennaLabel := widget.NewLabel("Antenna:")
-		antennaLabel.Alignment = fyne.TextAlignTrailing
-		antennaSelect = widget.NewSelect([]string{}, nil)
-		antennaSelect.Bind(sdrPrefs.Antenna)
-		grid := container.NewGridWithColumns(2, sdrsLabel, sdrsSelect, sampleRateLabel, sampleRatesSelect,
-			antennaLabel, antennaSelect)
-		settings := dialog.NewCustomConfirm("SDR Settings", "Accept", "Close", grid, settingsDialogCallback, mainWin)
-		settings.Show()
-		if len(sdrLabels) == 1 {
-			sdrsSelect.SetSelectedIndex(0)
-		}
-	}
-}
-
-// Functions are commented below waiting to be moved to SdrPreferences methods. This is so
-// massive changes are not required in one commit.
-/*func antennaChanged() {
-	// fyne.CurrentApp().Preferences().SetString("antenna", antenna)
-	// log.Logf(logger.Debug, "Antenna selected: %s\n", antenna)
-}*/
-
-func settingsDialogCallback(bool) {
-	// log.Logf(logger.Debug, "In settingsDialogCallback: %v\n", accept)
-}
-
-/*func sdrChanged() {
-	   log.Logf(logger.Debug, "SDR selected: %s\n", value)
-	   devProps := sdrs.DevicesMap[value]
-
-	   	if sdr.SoapyDev.Device != nil {
-	   		sdr.Unmake(sdr.SoapyDev, log)
-	   	}
-
-	   err := sdr.Make(sdr.SoapyDev, devProps, log)
-
-	   	if err != nil {
-	   		errDialog := dialog.NewError(err, mainWin)
-	   		errDialog.Show()
-	   	} else {
-
-	   		sampleRatesSelect.Options = sdr.GetSampleRates(sdr.SoapyDev, log)
-	   		sampleRatesSelect.Selected = sdr.GetSampleRate(sdr.SoapyDev, log)
-	   		sampleRatesSelect.Refresh()
-	   		antennaSelect.Options = sdr.GetAntennaNames(sdr.SoapyDev, log)
-	   		if len(antennaSelect.Options) == 1 {
-	   			antennaSelect.SetSelectedIndex(0)
-	   		} else {
-	   			antennaSelect.SetSelected(sdr.GetCurrentAntenna(sdr.SoapyDev, log))
-	   		}
-	   		antennaSelect.Refresh()
-	   	}
-
-}
-
-func sampleRateChanged(rate string) {
-	// log.Logf(logger.Debug, "Sample rate selected: %s\n", rate)
-	// fyne.CurrentApp().Preferences().SetString("samplerate", rate)
-}*/

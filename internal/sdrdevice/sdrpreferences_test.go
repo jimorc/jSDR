@@ -24,7 +24,7 @@ func (TestChanges) AntennaChanged()    {}
 func TestNewFromPreferences(t *testing.T) {
 	testLogger, _ := logger.NewFileLogger("stdout")
 	app.NewWithID("com.github.jimorc.jsdrtestnew")
-	sdrPrefs := sdrdevice.NewFromPreferences(tC)
+	sdrPrefs := sdrdevice.NewFromPreferences(tC, testLogger)
 	err := sdrPrefs.Device.Set("01")
 	assert.Nil(t, err)
 	err = sdrPrefs.SampleRate.Set("256 kHz")
@@ -33,7 +33,7 @@ func TestNewFromPreferences(t *testing.T) {
 	assert.Nil(t, err)
 	err = sdrPrefs.SavePreferences(testLogger)
 	assert.Nil(t, err)
-	sdrPrefs2 := sdrdevice.NewFromPreferences(tC)
+	sdrPrefs2 := sdrdevice.NewFromPreferences(tC, testLogger)
 	device, err := sdrPrefs2.Device.Get()
 	assert.Nil(t, err)
 	assert.Equal(t, "01", device)
@@ -48,7 +48,7 @@ func TestNewFromPreferences(t *testing.T) {
 func TestClearPreferences(t *testing.T) {
 	testLogger, _ := logger.NewFileLogger("stdout")
 	app.NewWithID("com.github.jimorc.jsdrtest")
-	sdrPrefs := sdrdevice.NewFromPreferences(tC)
+	sdrPrefs := sdrdevice.NewFromPreferences(tC, testLogger)
 	err := sdrPrefs.Device.Set("01")
 	assert.Nil(t, err)
 	err = sdrPrefs.SampleRate.Set("256 kHz")
