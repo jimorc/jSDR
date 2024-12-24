@@ -20,14 +20,6 @@ type SdrPreferences struct {
 	Antenna    binding.String
 }
 
-// SdrChanges interface is a dependency injection interface. It is used for testing
-// of the SdrPreferences struct and for the jsdr program.
-type SdrChanges interface {
-	SdrChanged()
-	SampleRateChanged()
-	AntennaChanged()
-}
-
 // variables that are needed across multiple functions and methods.
 var jsdrLog *logger.Logger
 var parentWindow *fyne.Window
@@ -58,12 +50,12 @@ func (s *SdrPreferences) ClearPreferences(log *logger.Logger) error {
 // the program's preferences.
 //
 // Returns pointer to the new SdrPreferences object.
-func NewFromPreferences(sP SdrChanges, log *logger.Logger) *SdrPreferences {
+func NewFromPreferences(log *logger.Logger) *SdrPreferences {
 	jsdrLog = log
 	s := &SdrPreferences{}
-	s.Device = bindToString("device", sP.SdrChanged)
-	s.SampleRate = bindToString("samplerate", sP.SampleRateChanged)
-	s.Antenna = bindToString("antenna", sP.AntennaChanged)
+	s.Device = binding.BindPreferenceString("device", fyne.CurrentApp().Preferences())
+	s.SampleRate = binding.BindPreferenceString("samplerate", fyne.CurrentApp().Preferences())
+	s.Antenna = binding.BindPreferenceString("antenna", fyne.CurrentApp().Preferences())
 	return s
 }
 
@@ -104,17 +96,17 @@ func (s *SdrPreferences) CreateSettingsDialog(parent *fyne.Window, log *logger.L
 	parentWindow = parent
 	log.Log(logger.Debug, "In settingsCallback\n")
 	sdrsLabel := widget.NewLabel("SDR Device:")
-	sdrsSelect = widget.NewSelect([]string{}, nil)
+	sdrsSelect = widget.NewSelect([]string{}, s.SdrChanged)
 	sdrsSelect.Bind(s.Device)
 
 	sampleRateLabel := widget.NewLabel("Sample Rate:")
 	sampleRateLabel.Alignment = fyne.TextAlignTrailing
-	sampleRatesSelect := widget.NewSelect([]string{}, nil)
+	sampleRatesSelect := widget.NewSelect([]string{}, s.SampleRateChanged)
 	sampleRatesSelect.Bind(s.SampleRate)
 
 	antennaLabel := widget.NewLabel("Antenna:")
 	antennaLabel.Alignment = fyne.TextAlignTrailing
-	antennaSelect := widget.NewSelect([]string{}, nil)
+	antennaSelect := widget.NewSelect([]string{}, s.AntennaChanged)
 	antennaSelect.Bind(s.Antenna)
 	grid := container.NewGridWithColumns(2, sdrsLabel, sdrsSelect, sampleRateLabel, sampleRatesSelect,
 		antennaLabel, antennaSelect)
@@ -167,41 +159,21 @@ func savePreference(pref binding.String, prefName string, log *logger.Logger) er
 
 }
 
-// bindToString creates a binding to the specified string, loads the specified value
-// from the program's preferences, and adds a listener.
-//
-// Params:
-//
-//	prefName - the name of the value to retrieve from the program's preferences.
-//
-//	listener - the callback function to be called whenever the value in the bound
-//
-// string is modified.
-//
-// Returns the bound string object.
-func bindToString(prefName string, listener func()) binding.String {
-	s := binding.NewString()
-	s.Set(fyne.CurrentApp().Preferences().String(prefName))
-	callback := binding.NewDataListener(listener)
-	s.AddListener(callback)
-	return s
-}
-
 // SdrChanged is the callback executed when an SDR is selected in the settings dialog.
-func (sP SdrPreferences) SdrChanged() {
-	jsdrLog.Log(logger.Debug, "In SdrChanged\n")
+func (sP SdrPreferences) SdrChanged(selectedSdr string) {
+	jsdrLog.Logf(logger.Debug, "SDR selected: %s\n", selectedSdr)
 }
 
 // SampleRateChanged is the callback executed when one of the sample rates is selected
 // in the settings dialog.
-func (sP SdrPreferences) SampleRateChanged() {
-	jsdrLog.Log(logger.Debug, "In SampleRateChanged\n")
+func (sP SdrPreferences) SampleRateChanged(sampleRate string) {
+	jsdrLog.Logf(logger.Debug, "Sample Rate selected: %s\n", sampleRate)
 }
 
 // AntennaChanged is the callback executed when one of the antennas is selected in
 // the settings dialog.
-func (sP SdrPreferences) AntennaChanged() {
-	jsdrLog.Log(logger.Debug, "In AntennaChanged\n")
+func (sP SdrPreferences) AntennaChanged(antenna string) {
+	jsdrLog.Logf(logger.Debug, "Antenna selected: %s\n", antenna)
 }
 
 // acceptCancelCallback is the callback that is called when either of the Close or Accept

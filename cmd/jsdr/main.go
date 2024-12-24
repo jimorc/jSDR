@@ -30,7 +30,7 @@ func main() {
 
 	log.Logf(logger.Info, "jsdr started at %v\n", time.Now().UTC())
 	a := app.NewWithID("com.github.jimorc.jsdr")
-	sdrPrefs = *sdrdevice.NewFromPreferences(sdrPrefs, log)
+	sdrPrefs = *sdrdevice.NewFromPreferences(log)
 	defer sdrPrefs.SavePreferences(log)
 	mainWin = makeMainWindow(&a, &sdrPrefs, log)
 	sdrPrefs.CreateSettingsDialog(&mainWin, log)
