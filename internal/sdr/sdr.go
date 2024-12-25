@@ -91,6 +91,11 @@ func (sdr *Sdr) ClearPreferences(log *logger.Logger) {
 	log.Log(logger.Debug, "Sdr device settings have been cleared\n")
 }
 
+// LoadPreferences loads preferences values into an Sdr object from
+// the program's preferences.
+//
+// Returns pointer to the new SdrPreferences object.
+
 func (sdr *Sdr) LoadPreferences(log *logger.Logger) {
 	sdr.DeviceName = fyne.CurrentApp().Preferences().String("device")
 	log.Logf(logger.Debug, "Value: %s loaded from preference: %s\n", sdr.DeviceName, "device")
@@ -100,6 +105,12 @@ func (sdr *Sdr) LoadPreferences(log *logger.Logger) {
 	log.Logf(logger.Debug, "Value: %s loaded from preference: %s\n", sdr.Antenna, "antenna")
 }
 
+// SavePreferences saves the values in the Sdr object to the program's preferences
+// file.
+//
+// Params:
+//
+//	log - the logger to write log messages to.
 func (sdr *Sdr) SavePreferences(log *logger.Logger) {
 	saveStringPreference(sdr.DeviceName, "device", log)
 	saveFloatPreference(sdr.SampleRate, "samplerate", log)
