@@ -11,7 +11,6 @@ import (
 	"fyne.io/fyne/v2/widget"
 	"github.com/jimorc/jsdr/internal/logger"
 	"github.com/jimorc/jsdr/internal/sdr"
-	"github.com/jimorc/jsdr/internal/sdrdevice"
 
 	"github.com/spf13/pflag"
 	"github.com/spf13/viper"
@@ -20,7 +19,6 @@ import (
 // variables that are needed across multiple functions.
 var log *logger.Logger
 var mainWin fyne.Window
-var sdrPrefs sdrdevice.SdrPreferences
 
 func main() {
 	logLevel, LogFile := parseCommandLine()
@@ -29,11 +27,10 @@ func main() {
 	defer log.Close()
 
 	log.Logf(logger.Info, "jsdr started at %v\n", time.Now().UTC())
+	sdr.SoapyDev.Device = &sdr.Sdr{}
 	a := app.NewWithID("com.github.jimorc.jsdr")
-	sdrPrefs = *sdrdevice.NewFromPreferences(log)
-	defer sdrPrefs.SavePreferences(log)
-	mainWin = makeMainWindow(&a, &sdrPrefs, log)
-	sdrPrefs.CreateSettingsDialog(&mainWin, log)
+	mainWin = makeMainWindow(&a, sdr.SoapyDev.Device, log)
+	sdr.SoapyDev.Device.CreateSettingsDialog(&mainWin, log)
 
 	log.Log(logger.Debug, "Displaying main window\n")
 	mainWin.ShowAndRun()
@@ -79,11 +76,11 @@ func parseCommandLine() (logger.LoggingLevel, string) {
 	return logLevel, logFile
 }
 
-func makeMainWindow(jsdrApp *fyne.App, prefs *sdrdevice.SdrPreferences, log *logger.Logger) fyne.Window {
+func makeMainWindow(jsdrApp *fyne.App, sdr *sdr.Sdr, log *logger.Logger) fyne.Window {
 	mainWin := (*jsdrApp).NewWindow("jsdr")
 
 	log.Log(logger.Debug, "Creating main window content\n")
-	settingsAction := prefs.MakeSettingsAction()
+	settingsAction := sdr.MakeSettingsAction()
 	toolbar := widget.NewToolbar(settingsAction)
 	mainWin.SetContent(container.NewBorder(toolbar, nil, nil, nil))
 	mainWin.Resize(fyne.NewSize(800, 400))
