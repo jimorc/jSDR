@@ -14,14 +14,15 @@ import (
 
 func TestMake(t *testing.T) {
 	testLogger, _ := logger.NewFileLogger("stdout")
-	stub := sdr.StubDevice{}
-	err := sdr.Make(&stub, map[string]string{
+	stub := sdr.StubDevice{Device: &sdr.Sdr{}}
+	stub.Device.DeviceProperties = map[string]string{
 		"driver":       "rtlsdr",
 		"label":        "Generic RTL2832U OEM :: 00000102",
 		"manufacturer": "Realtek",
 		"product":      "RTL2838UHIDIR",
 		"serial":       "00000102",
-		"tuner":        "Rafael Micro R820T"}, testLogger)
+		"tuner":        "Rafael Micro R820T"}
+	err := stub.Device.Make(&stub, testLogger)
 	assert.NotNil(t, stub.Device)
 	assert.NotNil(t, stub.Device.Device)
 	assert.Nil(t, err)
@@ -29,9 +30,10 @@ func TestMake(t *testing.T) {
 
 func TestBadMake(t *testing.T) {
 	testLogger, _ := logger.NewFileLogger("stdout")
-	stub := sdr.StubDevice{}
-	err := sdr.Make(&stub, map[string]string{}, testLogger)
-	assert.Nil(t, stub.Device)
+	stub := sdr.StubDevice{Device: &sdr.Sdr{}}
+	stub.Device.DeviceProperties = map[string]string{}
+	err := stub.Device.Make(&stub, testLogger)
+	assert.Nil(t, stub.Device.Device)
 	assert.NotNil(t, err)
 	// The following error message is returned from StubDevice only. SoapyDevice would return
 	// a different error message in case of error.
@@ -40,15 +42,15 @@ func TestBadMake(t *testing.T) {
 
 func TestUnmake(t *testing.T) {
 	testLogger, _ := logger.NewFileLogger("stdout")
-	stub := sdr.StubDevice{}
-	err := sdr.Make(&stub, map[string]string{
+	stub := sdr.StubDevice{Device: &sdr.Sdr{}}
+	stub.Device.DeviceProperties = map[string]string{
 		"driver":       "rtlsdr",
 		"label":        "Generic RTL2832U OEM :: 00000102",
 		"manufacturer": "Realtek",
 		"product":      "RTL2838UHIDIR",
 		"serial":       "00000102",
-		"tuner":        "Rafael Micro R820T"}, testLogger)
-	require.NotNil(t, stub.Device)
+		"tuner":        "Rafael Micro R820T"}
+	err := stub.Device.Make(&stub, testLogger)
 	require.NotNil(t, stub.Device.Device)
 	require.Nil(t, err)
 	err = sdr.Unmake(&stub, testLogger)
@@ -64,28 +66,31 @@ func TestBadUnmake(t *testing.T) {
 
 func TestGetHardwareKey(t *testing.T) {
 	testLogger, _ := logger.NewFileLogger("stdout")
-	stub := sdr.StubDevice{}
-	_ = sdr.Make(&stub, map[string]string{
+	stub := sdr.StubDevice{Device: &sdr.Sdr{}}
+	stub.Device.DeviceProperties = map[string]string{
 		"driver":       "rtlsdr",
 		"label":        "Generic RTL2832U OEM :: 00000102",
 		"manufacturer": "Realtek",
 		"product":      "RTL2838UHIDIR",
 		"serial":       "00000102",
-		"tuner":        "Rafael Micro R820T"}, testLogger)
+		"tuner":        "Rafael Micro R820T"}
+	err := stub.Device.Make(&stub, testLogger)
+	require.Nil(t, err)
 	hwKey := stub.GetHardwareKey()
 	assert.Equal(t, "hardKey", hwKey)
 }
 
 func TestLoadSavePreferences(t *testing.T) {
 	testLogger, _ := logger.NewFileLogger("stdout")
-	stub := sdr.StubDevice{}
-	err := sdr.Make(&stub, map[string]string{
+	stub := sdr.StubDevice{Device: &sdr.Sdr{}}
+	stub.Device.DeviceProperties = map[string]string{
 		"driver":       "rtlsdr",
 		"label":        "Generic RTL2832U OEM :: 00000102",
 		"manufacturer": "Realtek",
 		"product":      "RTL2838UHIDIR",
 		"serial":       "00000102",
-		"tuner":        "Rafael Micro R820T"}, testLogger)
+		"tuner":        "Rafael Micro R820T"}
+	err := stub.Device.Make(&stub, testLogger)
 	require.Nil(t, err)
 	app.NewWithID("com.github.jimorc.jsdrtestnew")
 	stub.Device.LoadPreferences(testLogger)
@@ -93,14 +98,15 @@ func TestLoadSavePreferences(t *testing.T) {
 	stub.Device.SampleRate = 256000.
 	stub.Device.Antenna = "D"
 	stub.Device.SavePreferences(testLogger)
-	stub2 := sdr.StubDevice{}
-	err = sdr.Make(&stub2, map[string]string{
+	stub2 := sdr.StubDevice{Device: &sdr.Sdr{}}
+	stub2.Device.DeviceProperties = map[string]string{
 		"driver":       "rtlsdr",
 		"label":        "Generic RTL2832U OEM :: 00000102",
 		"manufacturer": "Realtek",
 		"product":      "RTL2838UHIDIR",
 		"serial":       "00000102",
-		"tuner":        "Rafael Micro R820T"}, testLogger)
+		"tuner":        "Rafael Micro R820T"}
+	err = stub.Device.Make(&stub, testLogger)
 	require.Nil(t, err)
 	stub2.Device.LoadPreferences(testLogger)
 	assert.Equal(t, "01", stub2.Device.DeviceName)
@@ -110,14 +116,15 @@ func TestLoadSavePreferences(t *testing.T) {
 
 func TestClearPreferences(t *testing.T) {
 	testLogger, _ := logger.NewFileLogger("stdout")
-	stub := sdr.StubDevice{}
-	err := sdr.Make(&stub, map[string]string{
+	stub := sdr.StubDevice{Device: &sdr.Sdr{}}
+	stub.Device.DeviceProperties = map[string]string{
 		"driver":       "rtlsdr",
 		"label":        "Generic RTL2832U OEM :: 00000102",
 		"manufacturer": "Realtek",
 		"product":      "RTL2838UHIDIR",
 		"serial":       "00000102",
-		"tuner":        "Rafael Micro R820T"}, testLogger)
+		"tuner":        "Rafael Micro R820T"}
+	err := stub.Device.Make(&stub, testLogger)
 	require.Nil(t, err)
 	app.NewWithID("com.github.jimorc.jsdrtest")
 	stub.Device.LoadPreferences(testLogger)

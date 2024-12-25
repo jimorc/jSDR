@@ -39,7 +39,7 @@ var sampleRatesMap = map[float64]string{
 }
 
 // GetSampleRate returns the sample rate that most closely matches the current sample rate for the SDR.
-func GetSampleRate(sdrD SampleRates, log *logger.Logger) string {
+func (sdr *Sdr) GetSampleRate(sdrD SampleRates, log *logger.Logger) string {
 	sampleRate := sdrD.GetSampleRate(device.DirectionRX, 0)
 	log.Logf(logger.Debug, "Current sample rate: %f\n", sampleRate)
 	closestRate := closestSampleRate(sampleRate, log)
@@ -49,7 +49,10 @@ func GetSampleRate(sdrD SampleRates, log *logger.Logger) string {
 }
 
 // GetSampleRates retrieves a string slice of sample rates based on the sample rate ranges for the SDR.
-func GetSampleRates(sdrD SampleRates, log *logger.Logger) []string {
+func (sdr *Sdr) GetSampleRates(sdrD SampleRates, log *logger.Logger) []string {
+	if sdr.Device == nil {
+		return []string{}
+	}
 	sampleRateRanges := sdrD.GetSampleRateRange(device.DirectionRX, 0)
 	var rMsg strings.Builder
 	if len(sampleRateRanges) == 0 {
@@ -67,9 +70,9 @@ func GetSampleRates(sdrD SampleRates, log *logger.Logger) []string {
 // SetSampleRate sets the sample rate to the specified value.
 //
 // Returns error if an error occured while trying to set the requested sample rate.
-func SetSampleRate(sdrD SampleRates, log *logger.Logger, rate float64) error {
-	GetSampleRates(sdrD, log)
-	currentRate := GetSampleRate(sdrD, log)
+func (sdr *Sdr) SetSampleRate(sdrD SampleRates, log *logger.Logger, rate float64) error {
+	sdr.GetSampleRates(sdrD, log)
+	currentRate := sdr.GetSampleRate(sdrD, log)
 	re, err := regexp.Compile(`[0-9]+\.[0-9]+`)
 	if err != nil {
 		return err
@@ -91,11 +94,11 @@ func SetSampleRate(sdrD SampleRates, log *logger.Logger, rate float64) error {
 			log.Logf(logger.Error, "Error attempting to set sample rate: %s\n", err.Error())
 			return err
 		} else {
-			match = re.FindString(GetSampleRate(sdrD, log))
+			match = re.FindString(sdr.GetSampleRate(sdrD, log))
 			setRate, _ := strconv.ParseFloat(match, 64)
 			setRate *= 1e6
 			if setRate != rate {
-				errMsg := fmt.Sprintf("Attempt to set sample rate to %.1f failed. Sample rate is %.1f", rate, setRate)
+				errMsg := fmt.Sprintf("attempt to set sample rate to %.1f failed. Sample rate is %.1f", rate, setRate)
 				log.Log(logger.Error, errMsg)
 				return errors.New(errMsg)
 			} else {

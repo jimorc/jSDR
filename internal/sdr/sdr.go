@@ -14,6 +14,8 @@
 package sdr
 
 import (
+	"errors"
+
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/container"
 	"fyne.io/fyne/v2/dialog"
@@ -62,9 +64,13 @@ var antennaSelect *widget.Select
 //
 // Construction args should be as explicit as possible (i.e. include all values retrieved by
 // EnumerateSdrsWithoutAudio). args should contain a label value.
-func Make(sdrD MakeDevice, args map[string]string, log *logger.Logger) error {
-	log.Logf(logger.Debug, "Making device with label: %s\n", args["label"])
-	err := sdrD.Make(args)
+func (sdr *Sdr) Make(sdrD MakeDevice, log *logger.Logger) error {
+	log.Logf(logger.Debug, "Making device with label: %s\n", sdr.DeviceName)
+	if len(sdr.DeviceProperties) == 0 {
+		sdr.Device = nil
+		return errors.New("no arguments provided")
+	}
+	err := sdrD.Make(sdr.DeviceProperties)
 	if err != nil {
 		log.Logf(logger.Error, "Error encountered trying to make device: %s\n", err.Error())
 		return err
@@ -228,6 +234,7 @@ func (sdr *Sdr) SdrChanged(selectedSdr string) {
 		return
 	}
 	sdr.DeviceProperties = s
+	sdr.Make(SoapyDev, jsdrLog)
 }
 
 // SampleRateChanged is the callback executed when one of the sample rates is selected

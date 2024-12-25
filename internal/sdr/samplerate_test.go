@@ -15,16 +15,17 @@ import (
 
 func TestGetSampleRates(t *testing.T) {
 	testLogger, _ := logger.NewFileLogger("stdout")
-	stub := sdr.StubDevice{}
-	err := sdr.Make(&stub, map[string]string{
+	stub := sdr.StubDevice{Device: &sdr.Sdr{}}
+	stub.Device.DeviceProperties = map[string]string{
 		"driver":       "rtlsdr",
 		"label":        "Generic RTL2832U OEM :: 00000102",
 		"manufacturer": "Realtek",
 		"product":      "RTL2838UHIDIR",
 		"serial":       "00000102",
-		"tuner":        "Rafael Micro R820T"}, testLogger)
+		"tuner":        "Rafael Micro R820T"}
+	err := stub.Device.Make(&stub, testLogger)
 	require.Nil(t, err)
-	rates := sdr.GetSampleRates(&stub, testLogger)
+	rates := stub.Device.GetSampleRates(&stub, testLogger)
 	require.Equal(t, 7, len(rates))
 	assert.True(t, slices.Index(rates, "0.256 MS/s") != -1)
 	assert.True(t, slices.Index(rates, "1.024 MS/s") != -1)
@@ -38,66 +39,72 @@ func TestGetSampleRates(t *testing.T) {
 
 func TestGetSampleRates_NoDevice(t *testing.T) {
 	testLogger, _ := logger.NewFileLogger("stdout")
-	stub := sdr.StubDevice{}
-	rates := sdr.GetSampleRates(&stub, testLogger)
+	stub := sdr.StubDevice{Device: &sdr.Sdr{}}
+	stub.Device.DeviceProperties = map[string]string{}
+	err := stub.Device.Make(&stub, testLogger)
+	require.NotNil(t, err)
+	rates := stub.Device.GetSampleRates(&stub, testLogger)
 	require.Equal(t, 0, len(rates))
 }
 
 func TestGetSampleRate(t *testing.T) {
 	testLogger, _ := logger.NewFileLogger("stdout")
-	stub := sdr.StubDevice{}
-	err := sdr.Make(&stub, map[string]string{
+	stub := sdr.StubDevice{Device: &sdr.Sdr{}}
+	stub.Device.DeviceProperties = map[string]string{
 		"driver":       "rtlsdr",
 		"label":        "Generic RTL2832U OEM :: 00000102",
 		"manufacturer": "Realtek",
 		"product":      "RTL2838UHIDIR",
 		"serial":       "1",
-		"tuner":        "Rafael Micro R820T"}, testLogger)
+		"tuner":        "Rafael Micro R820T"}
+	err := stub.Device.Make(&stub, testLogger)
 	require.Nil(t, err)
-	sampleRate := sdr.GetSampleRate(&stub, testLogger)
+	sampleRate := stub.Device.GetSampleRate(&stub, testLogger)
 	assert.Equal(t, "2.048 MS/s", sampleRate)
 }
 
 func TestGetSampleRate_BadDevice(t *testing.T) {
 	testLogger, _ := logger.NewFileLogger("stdout")
-	stub := sdr.StubDevice{}
+	stub := sdr.StubDevice{Device: &sdr.Sdr{}}
 	// stub.Make not called, so no sample rate returned by sdr.GetSampleRate.
-	sampleRate := sdr.GetSampleRate(&stub, testLogger)
+	sampleRate := stub.Device.GetSampleRate(&stub, testLogger)
 	assert.Equal(t, "", sampleRate)
 }
 
 func TestSetSampleRate_SameAsCurrentRate(t *testing.T) {
 	testLogger, _ := logger.NewFileLogger("stdout")
-	stub := sdr.StubDevice{}
-	err := sdr.Make(&stub, map[string]string{
+	stub := sdr.StubDevice{Device: &sdr.Sdr{}}
+	stub.Device.DeviceProperties = map[string]string{
 		"driver":       "rtlsdr",
 		"label":        "Generic RTL2832U OEM :: 00000102",
 		"manufacturer": "Realtek",
 		"product":      "RTL2838UHIDIR",
-		"serial":       "1",
-		"tuner":        "Rafael Micro R820T"}, testLogger)
+		"serial":       "00000102",
+		"tuner":        "Rafael Micro R820T"}
+	err := stub.Device.Make(&stub, testLogger)
 	require.Nil(t, err)
 	re, err := regexp.Compile(`\d+\.\d+`)
 	require.Nil(t, err)
-	rate := re.FindString(sdr.GetSampleRate(&stub, testLogger))
+	rate := re.FindString(stub.Device.GetSampleRate(&stub, testLogger))
 	sampleRate, _ := strconv.ParseFloat(rate, 64)
 	sampleRate *= 1e6
-	err = sdr.SetSampleRate(&stub, testLogger, sampleRate)
+	err = stub.Device.SetSampleRate(&stub, testLogger, sampleRate)
 	assert.Nil(t, err)
 }
 
 func TestSetSampleRate_Mismatch(t *testing.T) {
 	testLogger, _ := logger.NewFileLogger("stdout")
-	stub := sdr.StubDevice{}
-	err := sdr.Make(&stub, map[string]string{
+	stub := sdr.StubDevice{Device: &sdr.Sdr{}}
+	stub.Device.DeviceProperties = map[string]string{
 		"driver":       "rtlsdr",
 		"label":        "Generic RTL2832U OEM :: 00000102",
 		"manufacturer": "Realtek",
 		"product":      "RTL2838UHIDIR",
-		"serial":       "0",
-		"tuner":        "Rafael Micro R820T"}, testLogger)
+		"serial":       "1",
+		"tuner":        "Rafael Micro R820T"}
+	err := stub.Device.Make(&stub, testLogger)
 	require.Nil(t, err)
-	err = sdr.SetSampleRate(&stub, testLogger, 1.024*1e6)
+	err = stub.Device.SetSampleRate(&stub, testLogger, 1.024*1e6)
 	assert.NotNil(t, err)
 	assert.Equal(t, "attempt to set sample rate to 1024000.0 failed. Sample rate is 2048000.0", err.Error())
 }
