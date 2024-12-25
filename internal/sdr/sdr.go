@@ -14,6 +14,7 @@
 package sdr
 
 import (
+	"fyne.io/fyne/v2"
 	"github.com/jimorc/jsdr/internal/logger"
 
 	"github.com/pothosware/go-soapy-sdr/pkg/device"
@@ -34,6 +35,7 @@ type KeyValues interface {
 // Sdr represents the SDR device.
 type Sdr struct {
 	Device           *device.SDRDevice
+	DeviceName       string
 	DeviceProperties map[string]string
 	SampleRates      []string
 	SampleRate       float64
@@ -73,4 +75,43 @@ func Unmake(sdrD MakeDevice, log *logger.Logger) error {
 // GetHardwareKey returns the hardware key for the SDR device.
 func (sdr *Sdr) GetHardwareKey(sdrD KeyValues) string {
 	return sdrD.GetHardwareKey()
+}
+
+func (sdr *Sdr) LoadPreferences(log *logger.Logger) {
+	sdr.DeviceName = fyne.CurrentApp().Preferences().String("device")
+	log.Logf(logger.Debug, "Value: %s loaded from preference: %s\n", sdr.DeviceName, "device")
+	sdr.SampleRate = fyne.CurrentApp().Preferences().Float("samplerate")
+	log.Logf(logger.Debug, "Value: %f loaded from preference: %s\n", sdr.SampleRate, "samplerate")
+	sdr.Antenna = fyne.CurrentApp().Preferences().String("antenna")
+	log.Logf(logger.Debug, "Value: %s loaded from preference: %s\n", sdr.Antenna, "antenna")
+}
+
+func (sdr *Sdr) SavePreferences(log *logger.Logger) {
+	saveStringPreference(sdr.DeviceName, "device", log)
+	saveFloatPreference(sdr.SampleRate, "samplerate", log)
+	saveStringPreference(sdr.Antenna, "antenna", log)
+}
+
+// saveStringPreference saves the specified value to the name preference.
+//
+// Params:
+//
+//	pref - the string to be saved.
+//	prefName - the preference name to save to.
+//	log - the logger to write log messages to.
+func saveStringPreference(pref string, prefName string, log *logger.Logger) {
+	log.Logf(logger.Debug, "Value: %s saved to preference: %s\n", pref, prefName)
+	fyne.CurrentApp().Preferences().SetString(prefName, pref)
+}
+
+// saveFloatPreference saves the specified value to the name preference.
+//
+// Params:
+//
+//	pref - the float to be saved.
+//	prefName - the preference name to save to.
+//	log - the logger to write log messages to.
+func saveFloatPreference(pref float64, prefName string, log *logger.Logger) {
+	log.Logf(logger.Debug, "Value: %f saved to preference: %s\n", pref, prefName)
+	fyne.CurrentApp().Preferences().SetFloat(prefName, pref)
 }
