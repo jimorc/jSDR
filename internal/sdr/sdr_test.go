@@ -3,6 +3,7 @@ package sdr_test
 import (
 	"testing"
 
+	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/app"
 	"github.com/jimorc/jsdr/internal/logger"
 	"github.com/jimorc/jsdr/internal/sdr"
@@ -105,4 +106,31 @@ func TestLoadSavePreferences(t *testing.T) {
 	assert.Equal(t, "01", stub2.Device.DeviceName)
 	assert.Equal(t, 256000., stub2.Device.SampleRate)
 	assert.Equal(t, "D", stub2.Device.Antenna)
+}
+
+func TestClearPreferences(t *testing.T) {
+	testLogger, _ := logger.NewFileLogger("stdout")
+	stub := sdr.StubDevice{}
+	err := sdr.Make(&stub, map[string]string{
+		"driver":       "rtlsdr",
+		"label":        "Generic RTL2832U OEM :: 00000102",
+		"manufacturer": "Realtek",
+		"product":      "RTL2838UHIDIR",
+		"serial":       "00000102",
+		"tuner":        "Rafael Micro R820T"}, testLogger)
+	require.Nil(t, err)
+	app.NewWithID("com.github.jimorc.jsdrtest")
+	stub.Device.LoadPreferences(testLogger)
+	stub.Device.DeviceName = "01"
+	stub.Device.SampleRate = 256000.
+	stub.Device.Antenna = "D"
+
+	stub.Device.SavePreferences(testLogger)
+	stub.Device.ClearPreferences(testLogger)
+	assert.Equal(t, "", stub.Device.DeviceName)
+	assert.Equal(t, 0., stub.Device.SampleRate)
+	assert.Equal(t, "", stub.Device.Antenna)
+	assert.Equal(t, "", fyne.CurrentApp().Preferences().String("device"))
+	assert.Equal(t, 0., fyne.CurrentApp().Preferences().Float("samplerate"))
+	assert.Equal(t, "", fyne.CurrentApp().Preferences().String("antenna"))
 }

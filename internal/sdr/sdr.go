@@ -77,6 +77,20 @@ func (sdr *Sdr) GetHardwareKey(sdrD KeyValues) string {
 	return sdrD.GetHardwareKey()
 }
 
+// ClearPreferences clears all values in the SdrDevice struct. This should only be called if the
+// previously stored SDR is no longer connected to the computer.
+//
+// Params:
+//
+//	log is the logger to write messages to.
+func (sdr *Sdr) ClearPreferences(log *logger.Logger) {
+	sdr.DeviceName = ""
+	sdr.SampleRate = 0.
+	sdr.Antenna = ""
+	sdr.SavePreferences(log)
+	log.Log(logger.Debug, "Sdr device settings have been cleared\n")
+}
+
 func (sdr *Sdr) LoadPreferences(log *logger.Logger) {
 	sdr.DeviceName = fyne.CurrentApp().Preferences().String("device")
 	log.Logf(logger.Debug, "Value: %s loaded from preference: %s\n", sdr.DeviceName, "device")
